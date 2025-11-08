@@ -1,0 +1,111 @@
+# ============================================================
+# GLOBAL IGNORE SETTINGS
+# ============================================================
+
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+
+# Build and output directories
+dist/
+build/
+.next/
+out/
+coverage/
+tmp/
+temp/
+
+# Logs
+logs/
+*.log
+*.log.*
+*.out
+*.pid
+*.seed
+*.pid.lock
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Editor folders and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ============================================================
+# BACKEND (Express)
+# ============================================================
+backend/node_modules/
+backend/dist/
+backend/.env
+backend/.env.*
+backend/coverage/
+backend/tmp/
+backend/logs/
+
+# ============================================================
+# FRONTEND (Next.js)
+# ============================================================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env
+frontend/.env.*
+frontend/coverage/
+frontend/.turbo/
+frontend/.vercel/
+frontend/.cache/
+
+# ============================================================
+# NFRA / DOCKER / CI FILES
+# ============================================================
+infra/db_data/
+infra/caddy_data/
+infra/caddy_config/
+infra/nginx_cache/
+*.pem
+*.key
+*.crt
+
+# Docker stuff
+**/Dockerfile.dev
+**/.dockerignore
+**/docker-compose.override.yml
+
+# ============================================================
+# ENVIRONMENT FILES (Critical to ignore)
+# ============================================================
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.env
+
+# ============================================================
+# TESTING
+# ============================================================
+jest.config.js
+*.spec.js
+*.test.js
+*.spec.ts
+*.test.ts
+
+# ============================================================
+# MISC
+# ============================================================
+*.bak
+*.orig
+*.rej
+*.swp
+*.tmp
+*.old

@@ -119,7 +119,7 @@ export function Navbar() {
 
   return (
     <header className="w-full border-b border-slate-200 bg-white">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-3 py-3 lg:gap-5 lg:px-6">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px- py-6 lg:gap-5 lg:px-6">
         <div className="flex flex-wrap items-center gap-3 lg:gap-6">
           <button
             className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:border-transparent hover:bg-slate-100 lg:hidden"

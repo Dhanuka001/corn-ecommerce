@@ -1,0 +1,32 @@
+name: corn-ecommerce
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"     # HTTP in
+      - "443:443"   # HTTPS in (we’ll use this in the next phase with domains)
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
+  # Demo frontend: simple “Hello from Nginx”
+  frontend:
+    image: nginxdemos/hello
+    restart: unless-stopped
+
+  # Demo backend: echoes request data (so you can see headers, URL, JSON, etc.)
+  backend:
+    image: ealen/echo-server:latest
+    restart: unless-stopped
+    environment:
+      - PORT=80
+
+volumes:
+  caddy_data:
+  caddy_config:

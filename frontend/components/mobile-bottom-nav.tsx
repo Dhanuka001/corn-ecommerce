@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { SVGAttributes } from "react";
+import type { ComponentType, SVGAttributes } from "react";
 
 type IconProps = SVGAttributes<SVGSVGElement> & {
   size?: number;
@@ -80,12 +80,19 @@ const UserIcon = ({ size = 22, ...props }: IconProps) => (
   </svg>
 );
 
-const navItems = [
+type NavItem = {
+  label: string;
+  href: string;
+  Icon: ComponentType<IconProps>;
+  active?: boolean;
+};
+
+const navItems: NavItem[] = [
   { label: "Home", href: "/", Icon: HomeIcon, active: true },
   { label: "Shop", href: "/#shop", Icon: ShopIcon },
   { label: "Wishlist", href: "/#wishlist", Icon: HeartIcon },
   { label: "My Account", href: "/#account", Icon: UserIcon },
-] as const;
+];
 
 export function MobileBottomNav() {
   return (

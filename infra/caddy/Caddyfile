@@ -1,12 +1,13 @@
 :80 {
     encode gzip
 
-    @api path /api*
-    handle @api {
+    handle_path /api* {
         reverse_proxy backend:8080
     }
 
-    # Everything else goes to the frontend
+    # Don't cache HTML (Next assets stay cache-busted by filename)
+    header /* Cache-Control "no-store"
+
     handle {
         reverse_proxy frontend:3000
     }

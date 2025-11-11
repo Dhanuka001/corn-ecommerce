@@ -2,10 +2,8 @@ name: Deploy to VPS
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
-# Prevent overlapping deploys if you push multiple times quickly
 concurrency:
   group: deploy-to-vps
   cancel-in-progress: true
@@ -13,9 +11,8 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout (not used remotely, but keeps Actions UI happy)
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup SSH agent
@@ -23,19 +20,18 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Deploy to VPS (build fresh & restart)
+      - name: Deploy to VPS (no sudo)
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
             set -euo pipefail
-
             REPO_URL="https://github.com/Dhanuka001/corn-ecommerce.git"
             APP_DIR="/opt/app"
 
-            # Ensure app dir exists and is owned by the deploy user
-            sudo mkdir -p "$APP_DIR"
-            sudo chown -R "$USER":"$USER" "$APP_DIR"
+            # Ensure we can write to /opt/app (one-time chown was done manually)
+            [ -d "$APP_DIR" ] || mkdir -p "$APP_DIR"
+            [ -w "$APP_DIR" ] || { echo "No write permission to $APP_DIR"; exit 1; }
 
-            # Clone once if not a git repo; otherwise hard reset to origin/main
+            # Clone or hard reset to origin/main
             if [ ! -d "$APP_DIR/.git" ]; then
               rm -rf "$APP_DIR"
               git clone "$REPO_URL" "$APP_DIR"
@@ -46,25 +42,19 @@ jobs:
             fi
 
             cd "$APP_DIR"
-
-            # Optional: show last commit for traceability
             echo "Deploying commit: \$(git rev-parse --short HEAD)"
 
-            # Keep Docker clean so we don't reuse stale layers
+            # Clean build cache to avoid stale layers
             docker builder prune -af || true
             docker image prune -af || true
 
-            # Build images FRESH (no cache) and pull latest base images
+            # Build fresh images
             docker build --pull --no-cache -t corn-frontend:dev ./frontend
             docker build --pull --no-cache -t corn-backend:dev  ./backend
 
-            # Recreate services (also removes old orphaned containers)
+            # Recreate services
             cd "$APP_DIR/infra"
             docker compose -f docker-compose.prod.yml up -d --force-recreate --remove-orphans
 
-            # (Optional) bounce caddy if you want to kill any proxy-side cache
-            # docker compose -f docker-compose.prod.yml restart caddy || true
-
-            echo "Services status:"
             docker compose -f docker-compose.prod.yml ps
           EOF

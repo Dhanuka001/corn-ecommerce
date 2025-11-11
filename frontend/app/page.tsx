@@ -1,3 +1,4 @@
+import { Hero } from "@/components/hero";
 import { Navbar } from "@/components/navbar";
 
 export default function Home() {
@@ -5,8 +6,8 @@ export default function Home() {
     <div className="min-h-screen bg-zinc-50">
       <Navbar />
 
-      <main className="mx-auto w-full max-w-6xl px-4 py-12">
-     
+      <main className="mx-auto w-full max-w-7xl  py-10">
+        <Hero />
       </main>
     </div>
   );

@@ -118,8 +118,8 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="w-full border-b border-slate-200 bg-white">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px- py-6 lg:gap-5 lg:px-6">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-6 lg:gap-5 lg:px-2">
         <div className="flex flex-wrap items-center gap-3 lg:gap-6">
           <button
             className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:border-transparent hover:bg-slate-100 lg:hidden"

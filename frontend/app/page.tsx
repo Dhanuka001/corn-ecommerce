@@ -1,4 +1,5 @@
 import { Hero } from "@/components/hero";
+import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { Navbar } from "@/components/navbar";
 import { StorePerks } from "@/components/store-perks";
 
@@ -11,6 +12,8 @@ export default function Home() {
         <Hero />
         <StorePerks />
       </main>
+
+      <MobileBottomNav />
     </div>
   );
 }

@@ -8,24 +8,36 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout (for context)
+      - name: 🧾 Checkout (for context)
         uses: actions/checkout@v4
 
-      - name: Write SSH key
+      - name: 🔐 Prep SSH (dir, key, known_hosts)
         run: |
-          echo "${{ secrets.VPS_SSH_KEY }}" > ssh_key
-          chmod 600 ssh_key
+          # make ssh dir
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
 
-      - name: Add VPS to known_hosts
-        run: |
-          ssh-keyscan -p "${{ secrets.VPS_SSH_PORT }}" -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
+          # write private key
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ci
+          chmod 600 ~/.ssh/id_ci
 
-      - name: Deploy via SSH
+          # add host to known_hosts (with default port 22 if not set)
+          PORT="${{ secrets.VPS_SSH_PORT }}"
+          [ -z "$PORT" ] && PORT=22
+          ssh-keyscan -T 10 -p "$PORT" -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: 🚀 Deploy via SSH
         env:
           VPS_APP_DIR: ${{ secrets.VPS_APP_DIR }}
           GIT_BRANCH: ${{ secrets.GIT_BRANCH }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT }}
         run: |
-          ssh -i ssh_key -p "${{ secrets.VPS_SSH_PORT }}" \
-            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+          PORT="$VPS_SSH_PORT"; [ -z "$PORT" ] && PORT=22
+          ssh -i ~/.ssh/id_ci -o StrictHostKeyChecking=yes -p "$PORT" \
+            "$VPS_USER@$VPS_HOST" \
             "export GIT_BRANCH='${GIT_BRANCH}'; cd '${VPS_APP_DIR}' && infra/deploy.sh"

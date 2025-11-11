@@ -1,25 +1,24 @@
-# ---------- Build stage ----------
-FROM node:20-alpine AS builder
+# ---- deps
+FROM node:20-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
+
+# ---- build
+FROM node:20-alpine AS build
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-# ---------- Runtime stage ----------
+# ---- runtime
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-RUN apk add --no-cache libc6-compat
-
-# Public assets
-COPY --from=builder /app/public ./public
-
-# Standalone server output (server.js + minimal node_modules)
-COPY --from=builder /app/.next/standalone ./
-
-# Copy static bundles AFTER standalone so they aren’t overwritten
-COPY --from=builder /app/.next/static ./.next/static
-
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/public ./public
+COPY --from=build /app/package*.json ./
+COPY --from=deps  /app/node_modules ./node_modules
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["npm","run","start"]    # make sure package.json has "start": "next start -p 3000"

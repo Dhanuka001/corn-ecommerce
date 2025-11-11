@@ -1,6 +1,24 @@
 name: corn-ecommerce
 
 services:
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    env_file:
+      - ../frontend/.env.production
+    restart: unless-stopped
+    networks: [web]
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    env_file:
+      - ../backend/.env.production
+    restart: unless-stopped
+    networks: [web]
+
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -14,19 +32,11 @@ services:
     depends_on:
       - frontend
       - backend
+    networks: [web]
 
-
-  frontend:
-    image: corn-frontend:dev
-    restart: unless-stopped
-    env_file:
-      - ../frontend/.env.production
-
-  backend:
-    image: corn-backend:dev
-    restart: unless-stopped
-    env_file:
-      - ../backend/.env.production
+networks:
+  web:
+    driver: bridge
 
 volumes:
   caddy_data:

@@ -21,4 +21,4 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/package*.json ./
 COPY --from=deps  /app/node_modules ./node_modules
 EXPOSE 3000
-CMD ["npm","run","start"]    # make sure package.json has "start": "next start -p 3000"
+CMD ["npm","run","start"]   # requires "start": "next start -p 3000" in package.json

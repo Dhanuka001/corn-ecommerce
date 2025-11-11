@@ -5,8 +5,8 @@ services:
     image: caddy:2-alpine
     restart: unless-stopped
     ports:
-      - "80:80"     # HTTP in
-      - "443:443"   # HTTPS in (we’ll use this in the next phase with domains)
+      - "80:80"
+      - "443:443"
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
@@ -15,17 +15,18 @@ services:
       - frontend
       - backend
 
-  # Demo frontend: simple “Hello from Nginx”
-  frontend:
-    image: nginxdemos/hello
-    restart: unless-stopped
 
-  # Demo backend: echoes request data (so you can see headers, URL, JSON, etc.)
-  backend:
-    image: ealen/echo-server:latest
+  frontend:
+    image: corn-frontend:dev
     restart: unless-stopped
-    environment:
-      - PORT=80
+    env_file:
+      - ../frontend/.env.production
+
+  backend:
+    image: corn-backend:dev
+    restart: unless-stopped
+    env_file:
+      - ../backend/.env.production
 
 volumes:
   caddy_data:

@@ -124,7 +124,7 @@ export function Hero() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
           <button className="absolute bottom-4 left-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-white transition hover:text-primary lg:bottom-6 lg:left-6">
-            Shop Now
+            Shop Now 222
             <ArrowIcon />
           </button>
         </article>

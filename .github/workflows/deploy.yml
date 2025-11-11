@@ -2,59 +2,88 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+  workflow_dispatch:
 
 concurrency:
   group: deploy-to-vps
   cancel-in-progress: true
 
+env:
+  REPO_URL: https://github.com/Dhanuka001/corn-ecommerce.git
+  APP_DIR: /opt/app/corn-ecommerce
+  COMPOSE_FILE: infra/docker-compose.prod.yml
+  BRANCH: main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - name: Checkout
+      - name: Checkout (for composite actions/tools)
         uses: actions/checkout@v4
+
+      - name: Validate required secrets
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          for var in SERVER_HOST SERVER_USER SSH_PRIVATE_KEY; do
+            if [ -z "${!var}" ]; then
+              echo "::error::Environment secret '$var' is missing."
+              exit 1
+            fi
+          done
+
+      - name: Add VPS host key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${SERVER_HOST}" >> ~/.ssh/known_hosts
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
 
       - name: Setup SSH agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Deploy to VPS (no sudo)
+      - name: Deploy to VPS
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          REPO_URL: ${{ env.REPO_URL }}
+          APP_DIR: ${{ env.APP_DIR }}
+          COMPOSE_FILE: ${{ env.COMPOSE_FILE }}
+          BRANCH: ${{ env.BRANCH }}
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
-            set -euo pipefail
-            REPO_URL="https://github.com/Dhanuka001/corn-ecommerce.git"
-            APP_DIR="/opt/app"
+          ssh -o StrictHostKeyChecking=yes \
+              -p "${SERVER_PORT:-22}" \
+              "${SERVER_USER}@${SERVER_HOST}" \
+              "REPO_URL='${REPO_URL}' APP_DIR='${APP_DIR}' COMPOSE_FILE='${COMPOSE_FILE}' BRANCH='${BRANCH}' bash -s" <<'EOF'
+          set -euo pipefail
 
-            # Ensure we can write to /opt/app (one-time chown was done manually)
-            [ -d "$APP_DIR" ] || mkdir -p "$APP_DIR"
-            [ -w "$APP_DIR" ] || { echo "No write permission to $APP_DIR"; exit 1; }
+          REPO_URL="${REPO_URL}"
+          APP_DIR="${APP_DIR}"
+          COMPOSE_FILE="${COMPOSE_FILE}"
+          BRANCH="${BRANCH}"
 
-            # Clone or hard reset to origin/main
-            if [ ! -d "$APP_DIR/.git" ]; then
-              rm -rf "$APP_DIR"
-              git clone "$REPO_URL" "$APP_DIR"
-            else
-              cd "$APP_DIR"
-              git fetch --prune origin
-              git reset --hard origin/main
-            fi
+          mkdir -p "$APP_DIR"
 
-            cd "$APP_DIR"
-            echo "Deploying commit: \$(git rev-parse --short HEAD)"
+          if [ ! -d "$APP_DIR/.git" ]; then
+            rm -rf "$APP_DIR"
+            git clone --depth=1 "$REPO_URL" "$APP_DIR"
+          fi
 
-            # Clean build cache to avoid stale layers
-            docker builder prune -af || true
-            docker image prune -af || true
+          cd "$APP_DIR"
+          git fetch origin "$BRANCH"
+          git reset --hard "origin/$BRANCH"
+          git clean -fdx
 
-            # Build fresh images
-            docker build --pull --no-cache -t corn-frontend:dev ./frontend
-            docker build --pull --no-cache -t corn-backend:dev  ./backend
-
-            # Recreate services
-            cd "$APP_DIR/infra"
-            docker compose -f docker-compose.prod.yml up -d --force-recreate --remove-orphans
-
-            docker compose -f docker-compose.prod.yml ps
+          docker compose -f "$COMPOSE_FILE" pull
+          docker compose -f "$COMPOSE_FILE" build --pull --no-cache
+          docker compose -f "$COMPOSE_FILE" up -d --force-recreate --remove-orphans
+          docker compose -f "$COMPOSE_FILE" ps
           EOF

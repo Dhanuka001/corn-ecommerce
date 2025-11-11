@@ -2,66 +2,30 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: [main]
-
-# Avoid overlapping deploys if you push multiple times quickly
-concurrency:
-  group: deploy-to-vps
-  cancel-in-progress: true
+    branches: ["main"]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout (for context in Actions)
+      - name: Checkout (for context)
         uses: actions/checkout@v4
 
-      - name: Setup SSH agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Deploy to VPS (no sudo; safe swap)
+      - name: Write SSH key
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
-            set -euo pipefail
+          echo "${{ secrets.VPS_SSH_KEY }}" > ssh_key
+          chmod 600 ssh_key
 
-            REPO_URL="https://github.com/Dhanuka001/corn-ecommerce.git"
-            APP_DIR="/opt/app"
-            TMP_DIR="/opt/app.__tmp"
+      - name: Add VPS to known_hosts
+        run: |
+          ssh-keyscan -p "${{ secrets.VPS_SSH_PORT }}" -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
 
-            # Ensure writable app dir (we chowned it once as root)
-            [ -d "$APP_DIR" ] || mkdir -p "$APP_DIR"
-            [ -w "$APP_DIR" ] || { echo "No write permission to $APP_DIR"; exit 1; }
-
-            # If not a git repo, clone to temp then atomic swap; else hard reset to origin/main
-            if [ ! -d "$APP_DIR/.git" ]; then
-              rm -rf "$TMP_DIR"
-              git clone "$REPO_URL" "$TMP_DIR"
-              rm -rf "$APP_DIR"
-              mv "$TMP_DIR" "$APP_DIR"
-            else
-              cd "$APP_DIR"
-              git fetch --prune origin
-              git reset --hard origin/main
-            fi
-
-            cd "$APP_DIR"
-            echo "Deploying commit: $(git rev-parse --short HEAD)"
-
-            # Keep Docker clean (prevents stale layers)
-            docker builder prune -af || true
-            docker image prune -af || true
-
-            # Build images FRESH (no cache, pull latest bases)
-            docker build --pull --no-cache -t corn-frontend:dev ./frontend
-            docker build --pull --no-cache -t corn-backend:dev  ./backend
-
-            # Recreate services (remove old orphans)
-            cd "$APP_DIR/infra"
-            docker compose -f docker-compose.prod.yml up -d --force-recreate --remove-orphans
-
-            echo "Services:"
-            docker compose -f docker-compose.prod.yml ps
-          EOF
+      - name: Deploy via SSH
+        env:
+          VPS_APP_DIR: ${{ secrets.VPS_APP_DIR }}
+          GIT_BRANCH: ${{ secrets.GIT_BRANCH }}
+        run: |
+          ssh -i ssh_key -p "${{ secrets.VPS_SSH_PORT }}" \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            "export GIT_BRANCH='${GIT_BRANCH}'; cd '${VPS_APP_DIR}' && infra/deploy.sh"

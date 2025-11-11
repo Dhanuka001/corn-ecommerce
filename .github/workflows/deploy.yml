@@ -82,7 +82,6 @@ jobs:
           git reset --hard "origin/$BRANCH"
           git clean -fdx
 
-          docker compose -f "$COMPOSE_FILE" pull
           docker compose -f "$COMPOSE_FILE" build --pull --no-cache
           docker compose -f "$COMPOSE_FILE" up -d --force-recreate --remove-orphans
           docker compose -f "$COMPOSE_FILE" ps

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const categories = [
   "Chargers",
@@ -36,47 +36,40 @@ const ArrowIcon = ({ direction }: { direction: "left" | "right" }) => (
 );
 
 export function CategoryBrowser() {
-  const [itemsPerView, setItemsPerView] = useState(2);
-  const [startIndex, setStartIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   useEffect(() => {
-    const updateItems = () => {
-      const width = window.innerWidth;
-      if (width >= 1024) {
-        setItemsPerView(5);
-      } else if (width >= 640) {
-        setItemsPerView(3);
-      } else {
-        setItemsPerView(2);
-      }
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const updateScrollState = () => {
+      setCanScrollLeft(container.scrollLeft > 0);
+      setCanScrollRight(
+        container.scrollLeft + container.clientWidth < container.scrollWidth - 1,
+      );
     };
 
-    updateItems();
-    window.addEventListener("resize", updateItems);
-    return () => window.removeEventListener("resize", updateItems);
+    updateScrollState();
+    container.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+
+    return () => {
+      container.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", updateScrollState);
+    };
   }, []);
 
-  const maxIndex = useMemo(
-    () => Math.max(categories.length - itemsPerView, 0),
-    [itemsPerView],
-  );
-
-  useEffect(() => {
-    setStartIndex((prev) => Math.min(prev, maxIndex));
-  }, [maxIndex]);
-
-  const handlePrev = () => {
-    setStartIndex((prev) => Math.max(prev - 1, 0));
+  const scrollByAmount = (direction: "left" | "right") => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const amount = container.clientWidth * 0.8;
+    container.scrollBy({
+      left: direction === "left" ? -amount : amount,
+      behavior: "smooth",
+    });
   };
-
-  const handleNext = () => {
-    setStartIndex((prev) => Math.min(prev + 1, maxIndex));
-  };
-
-  const itemWidth = useMemo(
-    () => `${100 / itemsPerView}%`,
-    [itemsPerView],
-  );
 
   return (
     <section className="px-4 lg:px-0" aria-label="Browse by product category">
@@ -88,8 +81,8 @@ export function CategoryBrowser() {
           <button
             type="button"
             aria-label="Previous categories"
-            onClick={handlePrev}
-            disabled={startIndex === 0}
+            onClick={() => scrollByAmount("left")}
+            disabled={!canScrollLeft}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-primary/40 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ArrowIcon direction="left" />
@@ -97,8 +90,8 @@ export function CategoryBrowser() {
           <button
             type="button"
             aria-label="Next categories"
-            onClick={handleNext}
-            disabled={startIndex === maxIndex}
+            onClick={() => scrollByAmount("right")}
+            disabled={!canScrollRight}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-primary/40 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ArrowIcon direction="right" />
@@ -106,18 +99,15 @@ export function CategoryBrowser() {
         </div>
       </div>
 
-      <div className="relative mt-8 overflow-hidden">
+      <div className="relative mt-8">
         <div
-          className="flex transition-transform duration-500 ease-out"
-          style={{
-            transform: `translateX(-${(startIndex * 100) / itemsPerView}%)`,
-          }}
+          ref={scrollRef}
+          className="flex gap-4 overflow-x-auto scroll-smooth pb-4 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {categories.map((category) => (
             <article
               key={category}
-              className="flex flex-col items-center gap-4 px-4 text-center"
-              style={{ flex: `0 0 ${itemWidth}` }}
+              className="flex w-1/2 flex-shrink-0 flex-col items-center gap-4 rounded-3xl px-4 py-2 text-center snap-start sm:w-1/3 lg:w-1/5"
             >
               <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-slate-100">
                 <Image

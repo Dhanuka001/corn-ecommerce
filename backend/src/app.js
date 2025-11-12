@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const respond = require("./lib/respond");
 const env = require("./config/env");
@@ -20,6 +21,12 @@ const adminOrdersRouter = require("./routes/admin/orders");
 const app = express();
 
 app.set("trust proxy", env.isProduction);
+app.use(
+  cors({
+    origin: env.webOrigin,
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(cookieParser());
 

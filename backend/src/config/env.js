@@ -6,6 +6,7 @@ const env = {
   jwtSecret: process.env.JWT_SECRET || "corn-dev-secret-change-me",
   sessionCookieName: process.env.SESSION_COOKIE || "corn_session",
   sessionMaxAgeMs: Number(process.env.SESSION_MAX_AGE_MS || 7 * MS_IN_DAY),
+  webOrigin: process.env.WEB_APP_ORIGIN || "http://localhost:3000",
 };
 
 env.isProduction = env.nodeEnv === "production";

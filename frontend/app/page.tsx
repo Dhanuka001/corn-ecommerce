@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { CategoryBrowser } from "@/components/category-browser";
 import { Hero } from "@/components/hero";
 import { LoadingOverlay } from "@/components/loading-overlay";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
@@ -38,6 +39,7 @@ export default function Home() {
         <main className="mx-auto w-full max-w-7xl space-y-4 py-10 sm:space-y-10">
           <Hero />
           <StorePerks />
+          <CategoryBrowser />
         </main>
 
         <MobileBottomNav />

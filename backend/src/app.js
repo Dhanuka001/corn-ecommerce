@@ -25,7 +25,7 @@ app.use(cookieParser());
 
 app.use("/health", healthRouter);
 app.use("/auth", authRouter);
-app.use("/catalog", catalogRouter);
+app.use(catalogRouter);
 app.use("/cart", cartRouter);
 app.use("/checkout", checkoutRouter);
 app.use("/orders", ordersRouter);

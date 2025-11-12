@@ -58,3 +58,61 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Category {
+  id        String     @id @default(cuid())
+  slug      String     @unique
+  name      String
+  parentId  String?
+  parent    Category?  @relation("CatToParent", fields: [parentId], references: [id])
+  children  Category[] @relation("CatToParent")
+  position  Int        @default(0)
+  products  ProductOnCategory[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Product {
+  id           String              @id @default(cuid())
+  slug         String              @unique
+  name         String
+  sku          String              @unique
+  description  String?
+  priceLKR     Int
+  compareAtLKR Int?
+  active       Boolean             @default(true)
+  stock        Int                 @default(0)
+  images       ProductImage[]
+  variants     Variant[]
+  categories   ProductOnCategory[]
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+}
+
+model Variant {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  name      String
+  sku       String  @unique
+  priceLKR  Int
+  stock     Int     @default(0)
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  url       String
+  alt       String?
+  position  Int     @default(0)
+}
+
+model ProductOnCategory {
+  productId  String
+  categoryId String
+  product    Product  @relation(fields: [productId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([productId, categoryId])
+}

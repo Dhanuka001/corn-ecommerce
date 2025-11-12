@@ -136,6 +136,8 @@ export function CategoryBrowser() {
           ))}
         </div>
       </div>
+
+      <hr className="mt-8 border-t border-slate-100" />
     </section>
   );
 }

@@ -8,6 +8,7 @@ import { LoadingOverlay } from "@/components/loading-overlay";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { Navbar } from "@/components/navbar";
 import { StorePerks } from "@/components/store-perks";
+import { NewArrivals } from "@/components/new-arrivals";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -40,6 +41,7 @@ export default function Home() {
           <Hero />
           <StorePerks />
           <CategoryBrowser />
+          <NewArrivals />
         </main>
 
         <MobileBottomNav />

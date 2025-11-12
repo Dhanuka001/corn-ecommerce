@@ -23,7 +23,7 @@ const app = express();
 app.set("trust proxy", env.isProduction);
 app.use(
   cors({
-    origin: env.webOrigin,
+    origin: env.webOrigins,
     credentials: true,
   }),
 );

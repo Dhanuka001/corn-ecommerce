@@ -1,13 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
-type Product = {
-  id: string;
-  name: string;
-  price: number;
-  oldPrice: number;
-};
+import { products } from "@/data/products";
 
 type IconProps = {
   size?: number;
@@ -64,12 +60,11 @@ const EyeIcon = ({ size = 18 }: IconProps) => (
   </svg>
 );
 
-const products: Product[] = Array.from({ length: 8 }).map((_, index) => ({
-  id: `placeholder-${index + 1}`,
-  name: `Product ${index + 1}`,
-  price: 49000 + index * 8000,
-  oldPrice: 56000 + index * 9000,
-}));
+const hoverActions = [
+  { label: "Add to bag", Icon: CartIcon },
+  { label: "Save", Icon: HeartIcon },
+  { label: "Quick view", Icon: EyeIcon },
+];
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("en-LK", {
@@ -77,12 +72,6 @@ const formatCurrency = (value: number) =>
     currency: "LKR",
     maximumFractionDigits: 0,
   }).format(value);
-
-const actions = [
-  { label: "Add to cart", icon: CartIcon },
-  { label: "Add to wishlist", icon: HeartIcon },
-  { label: "Quick view", icon: EyeIcon },
-];
 
 export function NewArrivals() {
   return (
@@ -94,39 +83,64 @@ export function NewArrivals() {
         <h2 className="text-lg font-semibold text-slate-900 sm:text-2xl">
           New Arrivals
         </h2>
-        <button className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-normal text-slate-600 transition hover:border-slate-300 hover:bg-slate-200">
+        <Link
+          href="/#shop"
+          className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-normal text-slate-600 transition hover:border-slate-300 hover:bg-slate-200"
+        >
           View All
-        </button>
+        </Link>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {products.map((product) => (
           <article
-            key={product.id}
-            className="group overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+            key={product.sku}
+            className="group relative overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >
-            <div className="relative flex h-56 items-center justify-center bg-zinc-50">
+            <Link
+              href={`/product/${product.slug}`}
+              className="absolute inset-0 z-10 rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              <span className="sr-only">View {product.name}</span>
+            </Link>
+
+            <div className="relative z-0 flex h-56 items-center justify-center bg-zinc-50">
               <Image
                 src="/logo.png"
                 alt={product.name}
-                width={120}
-                height={120}
-                className="h-28 w-28 object-contain opacity-70"
+                width={160}
+                height={160}
+                className="h-28 w-28 object-contain"
               />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-center gap-2 bg-primary/95 py-2 px-3 text-white transition duration-300 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 opacity-0">
-                {actions.map(({ label, icon: Icon }) => (
-                  <button
+              <div className="pointer-events-none absolute inset-x-4 bottom-4 flex translate-y-4 items-center justify-center gap-2 rounded-full bg-primary px-3 py-2 text-white opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                {hoverActions.map(({ label, Icon }) => (
+                  <span
                     key={label}
-                    className="inline-flex h-9 w-9 items-center justify-center bg-white/10 text-white transition hover:bg-white hover:text-primary"
-                    aria-label={label}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-white/10 text-white"
+                    aria-hidden
                   >
                     <Icon size={16} />
-                  </button>
+                  </span>
                 ))}
               </div>
             </div>
 
-            <div className="space-y-1 px-5 pb-5 pt-4">
+            <div className="space-y-2 px-5 pb-5 pt-4">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
+                {product.badge ?? "Fresh Drop"}
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[11px] ${
+                    product.stockStatus === "in-stock"
+                      ? "bg-emerald-50 text-emerald-600"
+                      : product.stockStatus === "limited"
+                        ? "bg-amber-50 text-amber-600"
+                        : "bg-blue-50 text-blue-600"
+                  }`}
+                >
+                  {product.stockStatus.replace("-", " ")}
+                </span>
+              </div>
+
               <p className="text-sm font-semibold text-slate-900">
                 {product.name}
               </p>
@@ -134,8 +148,16 @@ export function NewArrivals() {
                 <span className="font-semibold text-primary">
                   {formatCurrency(product.price)}
                 </span>
-                <span className="text-slate-400 line-through">
-                  {formatCurrency(product.oldPrice)}
+                {product.oldPrice ? (
+                  <span className="text-slate-400 line-through">
+                    {formatCurrency(product.oldPrice)}
+                  </span>
+                ) : null}
+              </div>
+              <div className="flex items-center gap-1 text-xs text-amber-500">
+                {"★★★★★".slice(0, Math.round(product.rating))}
+                <span className="text-slate-400">
+                  ({product.reviews.toLocaleString()} reviews)
                 </span>
               </div>
             </div>

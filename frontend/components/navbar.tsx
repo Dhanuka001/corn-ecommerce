@@ -140,9 +140,7 @@ export function Navbar() {
                 priority
               />
               <div>
-                <p className="text-xl font-semibold leading-tight text-slate-900">
-                  Corn Electronics
-                </p>
+  
               </div>
             </div>
 

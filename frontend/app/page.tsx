@@ -35,7 +35,7 @@ export default function Home() {
       >
         <Navbar />
 
-        <main className="mx-auto w-full max-w-7xl space-y-10 py-10">
+        <main className="mx-auto w-full max-w-7xl space-y-4 py-10 sm:space-y-10">
           <Hero />
           <StorePerks />
         </main>

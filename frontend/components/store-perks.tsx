@@ -92,7 +92,7 @@ const perks = [
   },
   {
     title: "Secure Payments",
-    description: "256-bit encryption keeps every transaction protected.",
+    description: "keeps every transaction protected.",
     icon: ShieldIcon,
   },
   {
@@ -103,13 +103,15 @@ const perks = [
 ];
 
 export function StorePerks() {
+  const marqueePerks = [...perks, ...perks];
+
   return (
     <section
-      className="px-4 lg:px-0"
+      className="mt-1 px-4 lg:mt-0 lg:px-0"
       aria-label="Corn Electronics service highlights"
     >
       <div className="rounded-[28px]  bg-white/90 p-6 shadow-sm shadow-primary/5 backdrop-blur-sm sm:p-8">
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="hidden gap-6 sm:grid sm:grid-cols-2 xl:grid-cols-4">
           {perks.map((perk) => (
             <article
               key={perk.title}
@@ -126,6 +128,27 @@ export function StorePerks() {
               </div>
             </article>
           ))}
+        </div>
+
+        <div className="relative overflow-hidden sm:hidden">
+          <div className="flex w-max gap-4 animate-perks-marquee">
+            {marqueePerks.map((perk, index) => (
+              <article
+                key={`${perk.title}-${index}`}
+                className="flex min-w-[260px] items-start gap-4 rounded-2xl border border-transparent px-2 py-1"
+              >
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <perk.icon size={22} />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-slate-900">
+                    {perk.title}
+                  </h3>
+                  <p className="text-sm text-slate-600">{perk.description}</p>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </div>
     </section>

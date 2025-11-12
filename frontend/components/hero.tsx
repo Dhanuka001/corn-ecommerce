@@ -61,8 +61,8 @@ export function Hero() {
   }, []);
 
   return (
-    <section className="grid auto-rows-[240px] grid-cols-1 gap-4 px-4 lg:auto-rows-[260px] lg:grid-cols-4 lg:gap-6 lg:px-0">
-      <div className="relative h-full overflow-hidden rounded-2xl shadow-lg lg:col-span-3 lg:row-span-2 lg:min-h-[520px] lg:rounded-[32px] lg:shadow-none">
+    <section className="grid auto-rows-[240px] grid-cols-1 gap-4 px-0 -mt-10 lg:mt-0 lg:auto-rows-[260px] lg:grid-cols-4 lg:gap-6 lg:px-0">
+      <div className="relative h-full overflow-hidden rounded-none shadow-none sm:rounded-2xl sm:shadow-lg lg:col-span-3 lg:row-span-2 lg:min-h-[520px] lg:rounded-[10px] lg:shadow-none">
         {sliderItems.map((item, index) => {
           const isActive = index === currentSlide;
 
@@ -113,7 +113,7 @@ export function Hero() {
       {promoCards.map((card) => (
         <article
           key={card.title}
-          className="relative h-full overflow-hidden rounded-2xl shadow-md lg:col-span-1 lg:row-span-1 lg:rounded-3xl lg:shadow-xl lg:ring-1 lg:ring-white/20 lg:backdrop-blur"
+          className="relative hidden h-full overflow-hidden rounded-2xl shadow-md sm:block lg:col-span-1 lg:row-span-1 lg:rounded-[10px] lg:shadow-xl lg:ring-1 lg:ring-white/20 lg:backdrop-blur"
         >
           <Image
             src={card.image}

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 
 import { LoadingOverlay } from "@/components/loading-overlay";
@@ -20,6 +21,7 @@ type AuthModalProps = {
     firstName?: string;
     lastName?: string;
   }) => Promise<void>;
+  onGoogleLogin: () => void;
 };
 
 const initialFormState = {
@@ -28,34 +30,6 @@ const initialFormState = {
   firstName: "",
   lastName: "",
 };
-
-const GoogleLogo = () => (
-  <svg
-    className="h-4 w-4"
-    viewBox="0 0 46 46"
-    aria-hidden
-  >
-    <g fill="none" fillRule="evenodd">
-      <path
-        d="M23 9c3.25 0 5.5 1.4 6.77 2.57l4.96-4.82C31.9 4.08 27.82 2 23 2 13.66 2 5.79 7.98 2.64 16.23l5.81 4.52C9.57 14.51 15.7 9 23 9Z"
-        fill="#EA4335"
-      />
-      <path
-        d="M44.02 24.5c0-1.55-.14-3.04-.4-4.48H23v8.48h11.73c-.5 2.63-2.03 4.86-4.33 6.36l6.82 5.29C41.42 35.92 44.02 30.73 44.02 24.5Z"
-        fill="#4285F4"
-      />
-      <path
-        d="M8.45 20.75a13.94 13.94 0 0 0 0 10.51l-5.81 4.52C.9 32.16 0 28.46 0 24.5s.9-7.66 2.64-11.28l5.81 4.52Z"
-        fill="#FBBC05"
-      />
-      <path
-        d="M23 44c4.82 0 8.88-1.59 11.85-4.33l-6.82-5.29c-1.9 1.27-4.34 2.02-5.03 2.02-5.38 0-9.96-3.62-11.55-8.55l-5.81 4.52C5.79 41.02 13.66 44 23 44Z"
-        fill="#34A853"
-      />
-      <path d="M0 0h46v46H0z" />
-    </g>
-  </svg>
-);
 
 export function AuthModal({
   open,
@@ -66,6 +40,7 @@ export function AuthModal({
   onModeChange,
   onLogin,
   onRegister,
+  onGoogleLogin,
 }: AuthModalProps) {
   const [form, setForm] = useState(initialFormState);
   const resetForm = () => setForm(initialFormState);
@@ -142,10 +117,17 @@ export function AuthModal({
         <button
           type="button"
           className="mt-8 flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-primary/30 hover:text-primary"
-          disabled
+          onClick={onGoogleLogin}
+          disabled={loading}
         >
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white">
-            <GoogleLogo />
+            <Image
+              src="/google.png"
+              alt="Google logo"
+              width={16}
+              height={16}
+              className="h-6 w-6"
+            />
           </span>
           {googleLabel}
         </button>
@@ -222,7 +204,7 @@ export function AuthModal({
           </label>
 
           {error && (
-            <p className="rounded-2xl bg-red-50 px-4 py-2 text-sm text-red-600">
+            <p className="rounded-2xl mt-4 bg-red-50 px-4 py-2 text-sm text-red-600">
               {error}
             </p>
           )}

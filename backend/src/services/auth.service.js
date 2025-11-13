@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const prisma = require("../lib/prisma");
 const env = require("../config/env");
 const { createHttpError } = require("../lib/respond");
+const { verifyGoogleIdToken } = require("../lib/google");
 
 const userSelect = {
   id: true,
@@ -92,6 +93,76 @@ const loginUser = async ({ email, password }) => {
   return { user, token };
 };
 
+const loginWithGoogle = async ({ credential }) => {
+  if (!credential || typeof credential !== "string") {
+    throw createHttpError(400, "Google credential is required.");
+  }
+
+  const payload = await verifyGoogleIdToken(credential);
+  const googleId = payload?.sub;
+  const email = payload?.email;
+
+  if (!googleId || !email) {
+    throw createHttpError(400, "Google account is missing required info.");
+  }
+
+  const normalizedEmail = normalizeEmail(email);
+  const givenName =
+    payload?.given_name || payload?.name?.split(" ")?.[0] || null;
+  const familyName =
+    payload?.family_name || payload?.name?.split(" ")?.slice(1).join(" ") || null;
+
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      OR: [{ googleId }, { email: normalizedEmail }],
+    },
+  });
+
+  let user;
+  if (existingUser) {
+    const updates = {};
+    if (!existingUser.googleId) {
+      updates.googleId = googleId;
+    }
+    if (!existingUser.firstName && givenName) {
+      updates.firstName = givenName;
+    }
+    if (!existingUser.lastName && familyName) {
+      updates.lastName = familyName;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      user = await prisma.user.update({
+        where: { id: existingUser.id },
+        data: updates,
+        select: userSelect,
+      });
+    } else {
+      user = await prisma.user.findUnique({
+        where: { id: existingUser.id },
+        select: userSelect,
+      });
+    }
+  } else {
+    user = await prisma.user.create({
+      data: {
+        email: normalizedEmail,
+        googleId,
+        firstName: givenName,
+        lastName: familyName,
+      },
+      select: userSelect,
+    });
+  }
+
+  if (!user) {
+    throw createHttpError(500, "Unable to complete Google sign-in.");
+  }
+
+  const token = createSessionToken(user);
+  return { user, token };
+};
+
 const getUserProfile = async (userId) =>
   prisma.user.findUnique({
     where: { id: userId },
@@ -101,5 +172,6 @@ const getUserProfile = async (userId) =>
 module.exports = {
   registerUser,
   loginUser,
+  loginWithGoogle,
   getUserProfile,
 };

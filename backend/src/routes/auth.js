@@ -10,6 +10,7 @@ const {
   registerUser,
   loginUser,
   getUserProfile,
+  loginWithGoogle,
 } = require("../services/auth.service");
 
 const router = Router();
@@ -66,6 +67,27 @@ router.post("/login", authLimiter, async (req, res) => {
 router.post("/logout", (_req, res) => {
   clearSessionCookie(res);
   respond.success(res, { success: true });
+});
+
+router.post("/google", authLimiter, async (req, res) => {
+  const { credential } = req.body || {};
+
+  if (typeof credential !== "string" || credential.length < 10) {
+    return respond.error(res, 400, "Google credential is required.");
+  }
+
+  try {
+    const { user, token } = await loginWithGoogle({ credential });
+    setSessionCookie(res, token);
+    return respond.success(res, { user });
+  } catch (error) {
+    const status = error.status || 500;
+    return respond.error(
+      res,
+      status,
+      error.message || "Unable to sign in with Google.",
+    );
+  }
 });
 
 router.get("/me", requireAuth, async (req, res) => {

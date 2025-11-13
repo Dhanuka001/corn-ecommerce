@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -28,10 +29,12 @@ type AuthContextValue = {
   loading: boolean;
   openAuth: (mode?: AuthMode) => void;
   closeAuth: () => void;
+  loginWithGoogle: () => void;
   logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -40,6 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [modalMode, setModalMode] = useState<AuthMode>("login");
   const [formError, setFormError] = useState<string | null>(null);
   const [formLoading, setFormLoading] = useState(false);
+  const googleInitializedRef = useRef(false);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -124,15 +128,112 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const handleGoogleCredential = useCallback(
+    async (credential: string) => {
+      setFormLoading(true);
+      setFormError(null);
+      try {
+        const data = await apiRequest<{ user: User }>("/auth/google", {
+          method: "POST",
+          body: JSON.stringify({ credential }),
+        });
+        setUser(data.user);
+        closeAuth();
+      } catch (error) {
+        setFormError(
+          error instanceof Error
+            ? error.message
+            : "Google sign-in failed. Please try again.",
+        );
+      } finally {
+        setFormLoading(false);
+      }
+    },
+    [closeAuth],
+  );
+
+  const initializeGoogle = useCallback(() => {
+    if (!googleClientId || googleInitializedRef.current) {
+      return;
+    }
+    if (typeof window === "undefined") {
+      return;
+    }
+    const google = window.google;
+    if (!google?.accounts?.id) {
+      return;
+    }
+
+    google.accounts.id.initialize({
+      client_id: googleClientId,
+      auto_select: false,
+      ux_mode: "popup",
+      callback: (response) => {
+        if (response.credential) {
+          void handleGoogleCredential(response.credential);
+        } else {
+          setFormError(
+            "Google didn't return a credential. Please try again.",
+          );
+        }
+      },
+    });
+    googleInitializedRef.current = true;
+  }, [handleGoogleCredential]);
+
+  useEffect(() => {
+    if (!googleClientId) {
+      return;
+    }
+    if (typeof window === "undefined") {
+      return;
+    }
+    if (window.google?.accounts?.id) {
+      initializeGoogle();
+      return;
+    }
+    const handler = () => initializeGoogle();
+    document.addEventListener("google-identity-service-loaded", handler);
+    return () => {
+      document.removeEventListener("google-identity-service-loaded", handler);
+    };
+  }, [initializeGoogle]);
+
+  const loginWithGoogle = useCallback(() => {
+    if (!googleClientId) {
+      setFormError("Google login is not configured.");
+      return;
+    }
+    if (typeof window === "undefined" || !window.google?.accounts?.id) {
+      setFormError(
+        "Google services are still loading. Please try again in a moment.",
+      );
+      return;
+    }
+    window.google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed()) {
+        setFormError(
+          `Google sign-in was blocked (${notification.getNotDisplayedReason()}).`,
+        );
+      } else if (notification.isDismissedMoment()) {
+        setFormError("Google sign-in was dismissed.");
+      }
+    }, {
+      // FedCM can reject on some browsers without HTTPS. Fallback to popup.
+      use_fedcm_for_prompt: false,
+    } as unknown as never);
+  }, []);
+
   const contextValue = useMemo(
     () => ({
       user,
       loading,
       openAuth,
       closeAuth,
+      loginWithGoogle,
       logout,
     }),
-    [user, loading, openAuth, closeAuth, logout],
+    [user, loading, openAuth, closeAuth, loginWithGoogle, logout],
   );
 
   return (
@@ -148,6 +249,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           onModeChange={setModalMode}
           onLogin={handleLogin}
           onRegister={handleRegister}
+          onGoogleLogin={loginWithGoogle}
         />
       )}
     </AuthContext.Provider>

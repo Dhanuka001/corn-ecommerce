@@ -388,8 +388,18 @@ export default function AccountPage() {
           <aside className="rounded-[28px] border border-slate-100 bg-white p-6 shadow-[0_25px_70px_rgba(15,23,42,0.08)] min-h-[420px]">
             {user ? (
               <div className="flex items-center gap-4 rounded-2xl bg-slate-50/60 p-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-xl font-semibold uppercase text-primary">
-                  {initials}
+                <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-primary/10 text-xl font-semibold uppercase text-primary">
+                  {user.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt="Profile"
+                      className="h-full w-full object-cover"
+                      referrerPolicy="no-referrer"
+                      loading="lazy"
+                    />
+                  ) : (
+                    initials
+                  )}
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-slate-900">

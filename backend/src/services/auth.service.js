@@ -10,6 +10,7 @@ const userSelect = {
   email: true,
   firstName: true,
   lastName: true,
+  avatarUrl: true,
   phone: true,
   role: true,
   createdAt: true,
@@ -111,6 +112,7 @@ const loginWithGoogle = async ({ credential }) => {
     payload?.given_name || payload?.name?.split(" ")?.[0] || null;
   const familyName =
     payload?.family_name || payload?.name?.split(" ")?.slice(1).join(" ") || null;
+  const avatarUrl = payload?.picture || null;
 
   const existingUser = await prisma.user.findFirst({
     where: {
@@ -129,6 +131,9 @@ const loginWithGoogle = async ({ credential }) => {
     }
     if (!existingUser.lastName && familyName) {
       updates.lastName = familyName;
+    }
+    if (avatarUrl && existingUser.avatarUrl !== avatarUrl) {
+      updates.avatarUrl = avatarUrl;
     }
 
     if (Object.keys(updates).length > 0) {
@@ -150,6 +155,7 @@ const loginWithGoogle = async ({ credential }) => {
         googleId,
         firstName: givenName,
         lastName: familyName,
+        avatarUrl,
       },
       select: userSelect,
     });

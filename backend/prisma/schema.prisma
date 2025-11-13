@@ -24,6 +24,7 @@ model User {
   email        String    @unique
   passwordHash String?
   googleId     String?   @unique
+  avatarUrl    String?
   firstName    String?
   lastName     String?
   phone        String?

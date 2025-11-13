@@ -187,7 +187,19 @@ export function Navbar() {
                   href="/account"
                   className="flex items-center gap-3 rounded-full border border-slate-200 px-4 py-2 text-left text-sm font-medium text-slate-700 transition hover:border-primary/20 hover:bg-primary/5"
                 >
-                  <UserIcon className="text-primary" />
+                  <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-primary/10">
+                    {user.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt="Profile"
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <UserIcon className="text-primary" />
+                    )}
+                  </span>
                   <div>
                     <p className="leading-none text-xs uppercase text-slate-400">
                       Account

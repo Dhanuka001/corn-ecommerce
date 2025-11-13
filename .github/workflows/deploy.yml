@@ -10,41 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🧾 Checkout (for context)
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: 🔐 Prep SSH (dir, key, known_hosts)
+      - name: Prep SSH (dir, key, known_hosts)
         run: |
-          set -euo pipefail
-
-          # make ssh dir
           mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-
-          # write private key
-          if [ -z "${{ secrets.VPS_SSH_KEY }}" ]; then
-            echo "VPS_SSH_KEY secret is missing." >&2
-            exit 1
-          fi
-          printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ci
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ci
           chmod 600 ~/.ssh/id_ci
+          ssh-keyscan -p "${{ secrets.VPS_SSH_PORT }}" -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
 
-          HOST="${{ secrets.VPS_HOST }}"
-          if [ -z "$HOST" ]; then
-            echo "VPS_HOST secret is missing." >&2
-            exit 1
-          fi
-
-          # add host to known_hosts (with default port 22 if not set)
-          PORT="${{ secrets.VPS_SSH_PORT }}"
-          [ -z "$PORT" ] && PORT=22
-          touch ~/.ssh/known_hosts
-          if ! ssh-keyscan -T 10 -p "$PORT" -H "$HOST" >> ~/.ssh/known_hosts; then
-            echo "Warning: unable to prefetch SSH host key for $HOST:$PORT. It will be accepted on first use." >&2
-          fi
-          chmod 644 ~/.ssh/known_hosts
-
-      - name: 🚀 Deploy via SSH
+      - name: Deploy via SSH
         env:
           VPS_APP_DIR: ${{ secrets.VPS_APP_DIR }}
           GIT_BRANCH: ${{ secrets.GIT_BRANCH }}
@@ -52,37 +28,9 @@ jobs:
           VPS_USER: ${{ secrets.VPS_USER }}
           VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT }}
         run: |
-          PORT="$VPS_SSH_PORT"; [ -z "$PORT" ] && PORT=22
-          BRANCH="$GIT_BRANCH"; [ -z "$BRANCH" ] && BRANCH=main
+          PORT="$VPS_SSH_PORT"
+          [ -z "$PORT" ] && PORT=22
 
-          ssh -i ~/.ssh/id_ci \
-            -o StrictHostKeyChecking=accept-new \
-            -o UserKnownHostsFile=~/.ssh/known_hosts \
-            -p "$PORT" \
+          ssh -i ~/.ssh/id_ci -o StrictHostKeyChecking=yes -p "$PORT" \
             "$VPS_USER@$VPS_HOST" \
-            "set -euo pipefail
-            APP_DIR='${VPS_APP_DIR}'
-            BRANCH='${BRANCH}'
-
-            if [ -z \"\$APP_DIR\" ]; then
-              echo 'VPS_APP_DIR secret is missing.' >&2
-              exit 1
-            fi
-
-            if [ ! -d \"\$APP_DIR/.git\" ]; then
-              echo \"Directory \$APP_DIR is not a git repository.\" >&2
-              exit 1
-            fi
-
-            cd \"\$APP_DIR\"
-
-            git fetch --prune origin \"\$BRANCH\"
-            if git show-ref --verify --quiet \"refs/heads/\$BRANCH\"; then
-              git checkout \"\$BRANCH\"
-            else
-              git checkout -B \"\$BRANCH\" \"origin/\$BRANCH\"
-            fi
-            git reset --hard \"origin/\$BRANCH\"
-
-            export GIT_BRANCH=\"\$BRANCH\"
-            infra/deploy.sh"
+            "export GIT_BRANCH='${GIT_BRANCH}'; cd '${VPS_APP_DIR}' && infra/deploy.sh"

@@ -213,12 +213,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     window.google.accounts.id.prompt((notification) => {
       if (notification.isNotDisplayed()) {
+        const reason = notification.getNotDisplayedReason();
         setFormError(
-          `Google sign-in was blocked (${notification.getNotDisplayedReason()}).`,
+          reason === "suppressed_by_user"
+            ? "Google sign-in popup was blocked by the browser."
+            : `Google sign-in could not start (${reason}).`,
         );
-      } else if (notification.isDismissedMoment()) {
-        setFormError("Google sign-in was dismissed.");
+        return;
       }
+      if (!notification.isDismissedMoment()) {
+        return;
+      }
+      const dismissReason = notification.getDismissedReason();
+      if (dismissReason === "credential_returned") {
+        return;
+      }
+      setFormError(
+        dismissReason === "cancel_called"
+          ? "Google sign-in was canceled before completion."
+          : "Google sign-in was dismissed. Please try again.",
+      );
     }, {
       // FedCM can reject on some browsers without HTTPS. Fallback to popup.
       use_fedcm_for_prompt: false,

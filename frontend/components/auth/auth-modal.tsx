@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 
+import { LoadingOverlay } from "@/components/loading-overlay";
+
 type AuthMode = "login" | "register";
 
 type AuthModalProps = {
@@ -115,8 +117,10 @@ export function AuthModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 px-4 py-8 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-[32px] bg-white p-8 shadow-2xl">
+    <>
+      <LoadingOverlay visible={loading} background="transparent" />
+      <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 px-4 py-8 backdrop-blur-sm">
+        <div className="w-full max-w-md rounded-[32px] bg-white p-8 shadow-2xl">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-slate-900">{title}</h2>
@@ -242,7 +246,8 @@ export function AuthModal({
             {switchAction}
           </button>
         </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

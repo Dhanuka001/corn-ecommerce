@@ -2,7 +2,7 @@
 
 ## Deploying to the VPS
 
-Use the helper script so old containers are removed before a new stack is started. This prevents the `container name is already in use` errors that appear when `docker compose up` is run repeatedly by CI/CD.
+Use the helper script so the server always runs the latest commit from the configured branch and old containers are removed before a new stack is started.
 
 ```bash
 ./infra/deploy.sh
@@ -10,8 +10,8 @@ Use the helper script so old containers are removed before a new stack is starte
 
 The script accepts additional Compose flags (for example `./infra/deploy.sh --profile prod`). It performs these steps:
 
-1. `docker compose down --remove-orphans` – stops any existing containers in the project, removing stale names.
-2. `docker compose up -d --build` – rebuilds images and recreates the stack.
-3. `docker compose ps` – prints the status for quick verification.
+1. `git fetch` + `git checkout -B <branch> origin/<branch>` – forces the repo on the server to match the branch (defaults to `main`, override with `GIT_BRANCH`).
+2. `docker compose down --remove-orphans` – stops any existing containers in the project, removing stale names.
+3. `docker compose up -d --build` (followed by `docker compose ps`) – rebuilds images, recreates the stack, and prints status for quick verification.
 
 Run it from the repository root on the server (after pulling the latest commit) to perform a clean deployment.

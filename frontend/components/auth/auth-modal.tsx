@@ -154,10 +154,10 @@ export function AuthModal({
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-4"
+          className="space-y-5"
         >
           {mode === "register" && (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               <label className="text-sm">
                 <span className="text-slate-600">First name</span>
                 <input
@@ -226,7 +226,7 @@ export function AuthModal({
           <button
             type="submit"
             disabled={!canSubmit || loading}
-            className="mt-2 w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-primary/50"
+            className="mt-4 w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-primary/50"
           >
             {loading ? "Please wait..." : actionLabel}
           </button>

@@ -36,6 +36,7 @@ const env = {
   port: Number(process.env.PORT || 8080),
   jwtSecret: process.env.JWT_SECRET || "corn-dev-secret-change-me",
   googleClientId: process.env.GOOGLE_CLIENT_ID || "",
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
   sessionCookieName: process.env.SESSION_COOKIE || "corn_session",
   sessionMaxAgeMs: Number(process.env.SESSION_MAX_AGE_MS || 7 * MS_IN_DAY),
   webOrigins: parseOrigins(process.env.WEB_APP_ORIGIN)?.length

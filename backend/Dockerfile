@@ -9,4 +9,4 @@ RUN npx prisma generate
 
 ENV NODE_ENV=production
 EXPOSE 8080
-CMD ["node","src/index.js"]
+CMD ["node","src/server.js"]

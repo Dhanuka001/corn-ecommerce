@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState, type SVGAttributes } from "react";
+import Link from "next/link";
+import { useState, type SVGAttributes } from "react";
 
 import { useAuth } from "@/context/auth-context";
 
@@ -118,24 +119,7 @@ const navLinks = ["Popular", "Shop", "Contact", "Pages", "Blogs"];
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-  const accountRef = useRef<HTMLDivElement | null>(null);
-  const { user, loading: authLoading, openAuth, logout } = useAuth();
-
-  useEffect(() => {
-    if (!accountMenuOpen) return;
-    const handleClick = (event: MouseEvent) => {
-      if (
-        accountRef.current &&
-        event.target instanceof Node &&
-        !accountRef.current.contains(event.target)
-      ) {
-        setAccountMenuOpen(false);
-      }
-    };
-    window.addEventListener("mousedown", handleClick);
-    return () => window.removeEventListener("mousedown", handleClick);
-  }, [accountMenuOpen]);
+  const { user, loading: authLoading, openAuth } = useAuth();
 
   const displayName = user
     ? user.firstName
@@ -194,47 +178,34 @@ export function Navbar() {
           </div>
 
           <div className="ml-auto flex items-center gap-2 lg:gap-5">
-            <div className="relative" ref={accountRef}>
-              <button
-                className="hidden items-center gap-3 rounded-full border border-slate-200 px-4 py-2 text-left text-sm font-medium text-slate-700 transition hover:border-primary/20 hover:bg-primary/5 lg:flex"
-                onClick={() =>
-                  user ? setAccountMenuOpen((prev) => !prev) : openAuth("login")
-                }
-                disabled={authLoading}
-              >
-                <UserIcon className="text-primary" />
-                <div>
-                  <p className="leading-none text-xs uppercase text-slate-400">
-                    {user ? "Account" : "Sign in"}
-                  </p>
-                  <p>{user ? displayName : "Sign In / Register"}</p>
-                </div>
-              </button>
-              <button
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-primary/20 hover:bg-primary/5 lg:hidden"
-                onClick={() =>
-                  user ? setAccountMenuOpen((prev) => !prev) : openAuth("login")
-                }
-                disabled={authLoading}
-                aria-label="Account menu"
-              >
-                <UserIcon />
-              </button>
-
-              {user && accountMenuOpen && (
-                <div className="absolute right-0 z-20 mt-2 w-60 rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-xl">
-                  <p className="font-semibold text-slate-900">{displayName}</p>
-                  <p className="text-xs text-slate-500">{user.email}</p>
-                  <button
-                    className="mt-4 w-full rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-slate-800"
-                    onClick={async () => {
-                      await logout();
-                      setAccountMenuOpen(false);
-                    }}
-                  >
-                    Sign out
-                  </button>
-                </div>
+            <div className="hidden lg:block">
+              {user ? (
+                <Link
+                  href="/account"
+                  className="flex items-center gap-3 rounded-full border border-slate-200 px-4 py-2 text-left text-sm font-medium text-slate-700 transition hover:border-primary/20 hover:bg-primary/5"
+                >
+                  <UserIcon className="text-primary" />
+                  <div>
+                    <p className="leading-none text-xs uppercase text-slate-400">
+                      Account
+                    </p>
+                    <p>{displayName}</p>
+                  </div>
+                </Link>
+              ) : (
+                <button
+                  className="flex items-center gap-3 rounded-full border border-slate-200 px-4 py-2 text-left text-sm font-medium text-slate-700 transition hover:border-primary/20 hover:bg-primary/5"
+                  onClick={() => openAuth("login")}
+                  disabled={authLoading}
+                >
+                  <UserIcon className="text-primary" />
+                  <div>
+                    <p className="leading-none text-xs uppercase text-slate-400">
+                      Sign in
+                    </p>
+                    <p>Sign In / Register</p>
+                  </div>
+                </button>
               )}
             </div>
             <button className="relative flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-transparent hover:bg-slate-100">

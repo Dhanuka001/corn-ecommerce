@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 type AuthMode = "login" | "register";
 
@@ -66,12 +66,7 @@ export function AuthModal({
   onRegister,
 }: AuthModalProps) {
   const [form, setForm] = useState(initialFormState);
-
-  useEffect(() => {
-    if (!open) {
-      setForm(initialFormState);
-    }
-  }, [open]);
+  const resetForm = () => setForm(initialFormState);
 
   const title = mode === "login" ? "Welcome back" : "Create your account";
   const subtitle =
@@ -129,7 +124,10 @@ export function AuthModal({
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => {
+              resetForm();
+              onClose();
+            }}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100"
             aria-label="Close authentication dialog"
           >
@@ -154,7 +152,10 @@ export function AuthModal({
           <div className="h-px flex-1 bg-slate-200" />
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4"
+        >
           {mode === "register" && (
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="text-sm">

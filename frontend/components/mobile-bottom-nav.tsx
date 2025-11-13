@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import type { ComponentType, SVGAttributes } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import type { SVGAttributes } from "react";
+
+import { useAuth } from "@/context/auth-context";
 
 type IconProps = SVGAttributes<SVGSVGElement> & {
   size?: number;
@@ -80,45 +83,64 @@ const UserIcon = ({ size = 22, ...props }: IconProps) => (
   </svg>
 );
 
-type NavItem = {
-  label: string;
-  href: string;
-  Icon: ComponentType<IconProps>;
-  active?: boolean;
-};
-
-const navItems: NavItem[] = [
-  { label: "Home", href: "/", Icon: HomeIcon, active: true },
-  { label: "Shop", href: "/#shop", Icon: ShopIcon },
-  { label: "Wishlist", href: "/#wishlist", Icon: HeartIcon },
-  { label: "My Account", href: "/#account", Icon: UserIcon },
-];
-
 export function MobileBottomNav() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user, openAuth } = useAuth();
+
   return (
     <nav
       aria-label="Primary mobile navigation"
       className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200/70 bg-white/95 pb-[calc(env(safe-area-inset-bottom)+0.35rem)] pt-2 shadow-[0_-10px_30px_rgba(15,23,42,0.08)] backdrop-blur lg:hidden"
     >
       <div className="mx-auto flex max-w-3xl items-center justify-between px-4">
-        {navItems.map(({ label, href, Icon, active }) => {
-          const isActive = Boolean(active);
-
-          return (
-            <Link
-              key={label}
-              href={href}
-              className={`flex flex-1 flex-col items-center gap-1 text-xs font-semibold transition ${
-                isActive ? "text-primary" : "text-slate-500"
-              }`}
-            >
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-50">
-                <Icon className={isActive ? "text-primary" : "text-slate-500"} />
-              </div>
-              <span>{label}</span>
-            </Link>
-          );
-        })}
+        <Link
+          href="/"
+          className={`flex flex-1 flex-col items-center gap-1 text-xs font-semibold transition ${
+            pathname === "/" ? "text-primary" : "text-slate-500"
+          }`}
+        >
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-50">
+            <HomeIcon
+              className={pathname === "/" ? "text-primary" : "text-slate-500"}
+            />
+          </div>
+          <span>Home</span>
+        </Link>
+        <Link
+          href="/#shop"
+          className="flex flex-1 flex-col items-center gap-1 text-xs font-semibold text-slate-500 transition"
+        >
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-50">
+            <ShopIcon className="text-slate-500" />
+          </div>
+          <span>Shop</span>
+        </Link>
+        <Link
+          href="/#wishlist"
+          className="flex flex-1 flex-col items-center gap-1 text-xs font-semibold text-slate-500 transition"
+        >
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-50">
+            <HeartIcon className="text-slate-500" />
+          </div>
+          <span>Wishlist</span>
+        </Link>
+        <button
+          type="button"
+          onClick={() =>
+            user ? router.push("/account") : openAuth("login")
+          }
+          className={`flex flex-1 flex-col items-center gap-1 text-xs font-semibold transition ${
+            pathname === "/account" ? "text-primary" : "text-slate-500"
+          }`}
+        >
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-50">
+            <UserIcon
+              className={pathname === "/account" ? "text-primary" : "text-slate-500"}
+            />
+          </div>
+          <span>My Account</span>
+        </button>
       </div>
     </nav>
   );

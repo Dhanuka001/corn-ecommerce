@@ -138,16 +138,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider value={contextValue}>
       {children}
-      <AuthModal
-        open={modalOpen}
-        mode={modalMode}
-        loading={formLoading}
-        error={formError}
-        onClose={closeAuth}
-        onModeChange={setModalMode}
-        onLogin={handleLogin}
-        onRegister={handleRegister}
-      />
+      {modalOpen && (
+        <AuthModal
+          open={modalOpen}
+          mode={modalMode}
+          loading={formLoading}
+          error={formError}
+          onClose={closeAuth}
+          onModeChange={setModalMode}
+          onLogin={handleLogin}
+          onRegister={handleRegister}
+        />
+      )}
     </AuthContext.Provider>
   );
 }

@@ -16,9 +16,13 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=build /app/.next ./.next
+ENV PORT=3000
+
+# copy the minimal standalone server output
 COPY --from=build /app/public ./public
-COPY --from=build /app/package*.json ./
-COPY --from=deps  /app/node_modules ./node_modules
+COPY --from=build /app/.next/standalone ./
+COPY --from=build /app/.next/static ./.next/static
+
+USER node
 EXPOSE 3000
-CMD ["npm","run","start"]   # requires "start": "next start -p 3000" in package.json
+CMD ["node","server.js"]

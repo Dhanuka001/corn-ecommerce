@@ -404,55 +404,56 @@ export default function AccountPage() {
               </div>
             )}
 
-            <nav className="mt-6 space-y-2">
-              {navigationItems.map(({ key, label, description, icon: Icon }) => {
-                const isActive = activeSection === key;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setActiveSection(key)}
-                    className={`flex w-full items-center gap-4 rounded-2xl border px-4 py-3 text-left transition ${
-                      isActive
-                        ? "border-primary bg-primary text-white"
-                        : "border-slate-100 text-slate-600 hover:border-primary/20 hover:bg-primary/5 hover:text-slate-900"
+            <nav className="mt-6 grid grid-cols-2 gap-2 lg:block lg:space-y-2">
+            {navigationItems.map(({ key, label, description, icon: Icon }) => {
+              const isActive = activeSection === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setActiveSection(key)}
+                  className={`flex w-full items-center gap-4 rounded-2xl border px-4 py-3 text-left transition ${
+                    isActive
+                      ? "border-primary bg-primary text-white"
+                      : "border-slate-100 text-slate-600 hover:border-primary/20 hover:bg-primary/5 hover:text-slate-900"
+                  }`}
+                >
+                  <span
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+                      isActive ? "bg-white/20 text-white" : "bg-slate-50 text-slate-500"
                     }`}
                   >
+                    <Icon size={18} />
+                  </span>
+                  <span className="flex flex-col text-sm">
+                    <span className={`font-semibold ${isActive ? "text-white" : "text-slate-900"}`}>
+                      {label}
+                    </span>
                     <span
-                      className={`flex h-10 w-10 items-center justify-center rounded-xl ${
-                        isActive ? "bg-white/20 text-white" : "bg-slate-50 text-slate-500"
+                      className={`text-[11px] uppercase tracking-wide ${
+                        isActive ? "text-white/80" : "text-slate-400"
                       }`}
                     >
-                      <Icon size={18} />
+                      {description}
                     </span>
-                    <span className="flex flex-col text-sm">
-                      <span className={`font-semibold ${isActive ? "text-white" : "text-slate-900"}`}>
-                        {label}
-                      </span>
-                      <span
-                        className={`text-[11px] uppercase tracking-wide ${
-                          isActive ? "text-white/80" : "text-slate-400"
-                        }`}
-                      >
-                        {description}
-                      </span>
-                    </span>
-                  </button>
-                );
-              })}
-              {user && (
-                <button
-                  type="button"
-                  onClick={logout}
-                  className="group flex w-full items-center gap-4 rounded-2xl border border-slate-100 px-4 py-3 text-left text-sm font-semibold text-slate-600 transition hover:border-primary/20 hover:bg-primary/5 hover:text-primary"
-                >
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-500 transition group-hover:bg-white group-hover:text-primary">
-                    <LogoutIcon size={18} />
                   </span>
-                  Logout
                 </button>
-              )}
-            </nav>
+              );
+            })}
+
+            {user && (
+              <button
+                type="button"
+                onClick={logout}
+                className="group flex w-full items-center gap-4 rounded-2xl border border-slate-100 px-4 py-3 text-left text-sm font-semibold text-slate-600 transition hover:border-primary/20 hover:bg-primary/5 hover:text-primary"
+              >
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-500 transition group-hover:bg-white group-hover:text-primary">
+                  <LogoutIcon size={18} />
+                </span>
+                Logout
+              </button>
+            )}
+          </nav>
           </aside>
 
           <div className="w-full lg:w-2/3 space-y-6 h-full">{renderSectionContent()}</div>

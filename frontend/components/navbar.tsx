@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, type SVGAttributes } from "react";
+import { useEffect, useRef, useState, type SVGAttributes } from "react";
 
 import { useAuth } from "@/context/auth-context";
 
@@ -117,6 +117,57 @@ const BagIcon = ({ size = 20, ...props }: IconProps) => (
 
 const navLinks = ["Popular", "Shop", "Contact", "Pages", "Blogs"];
 
+const megaCategories = [
+  {
+    title: "Audio",
+    items: [
+      { label: "Soundbars" },
+      { label: "Party Speakers" },
+      { label: "Portable Speakers" },
+      { label: "Neckbands" },
+      { label: "TWS Buds" },
+    ],
+  },
+  {
+    title: "Mobile Accessories",
+    items: [
+      { label: "Power Banks" },
+      { label: "Cables" },
+      { label: "Wireless Chargers" },
+      { label: "Chargers" },
+      { label: "Mobile Holders" },
+    ],
+  },
+  {
+    title: "Computer Accessories",
+    items: [
+      { label: "Keyboard & Mouse" },
+      { label: "Wireless Keyboard" },
+      { label: "Gaming Keyboard" },
+      { label: "Docking Stations" },
+    ],
+  },
+  {
+    title: "Car Accessories",
+    items: [
+      { label: "Car Chargers" },
+      { label: "Bluetooth" },
+      { label: "Tyre Inflator" },
+      { label: "Mobile Holder" },
+    ],
+  },
+  {
+    title: "Smart Gadgets",
+    items: [
+      { label: "Ear Cleaners" },
+      { label: "Portable Fans" },
+      { label: "Selfie Stick" },
+      { label: "Flashlight" },
+      { label: "Stylus" },
+    ],
+  },
+];
+
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, loading: authLoading, openAuth } = useAuth();
@@ -158,10 +209,10 @@ export function Navbar() {
             </div>
 
             <div className="hidden flex-1 items-center gap-3 lg:flex">
-              <button className="group inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-transparent hover:bg-slate-100">
+              <button className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-transparent hover:bg-slate-100">
                 <MenuIcon className="text-primary" size={18} />
                 All Categories
-                <ChevronDownIcon className="text-slate-400 transition group-hover:text-slate-600" />
+                <ChevronDownIcon className="text-slate-400" />
               </button>
 
               <div className="relative flex flex-1 items-center max-w-[300px]">

@@ -3,12 +3,15 @@
 import { useEffect, useState } from "react";
 
 import { BestSellingCarousel } from "@/components/best-selling-carousel";
+import { BlogHighlights } from "@/components/blog-highlights";
 import { CategoryBrowser } from "@/components/category-browser";
+import { Footer } from "@/components/footer";
 import { Hero } from "@/components/hero";
 import { LoadingOverlay } from "@/components/loading-overlay";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { Navbar } from "@/components/navbar";
 import { StorePerks } from "@/components/store-perks";
+import { Testimonials } from "@/components/testimonials";
 import { NewArrivals } from "@/components/new-arrivals";
 
 export default function Home() {
@@ -44,7 +47,11 @@ export default function Home() {
           <CategoryBrowser />
           <NewArrivals />
           <BestSellingCarousel />
+          <Testimonials />
+          <BlogHighlights />
         </main>
+
+        <Footer />
 
         <MobileBottomNav />
       </div>

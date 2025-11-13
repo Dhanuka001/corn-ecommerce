@@ -20,6 +20,8 @@ declare global {
     callback: (response: GoogleCredentialResponse) => void;
     auto_select?: boolean;
     ux_mode?: "popup" | "redirect";
+    state_cookie_domain?: string;
+    itp_support?: boolean;
   }
 
   interface GooglePromptOptions {

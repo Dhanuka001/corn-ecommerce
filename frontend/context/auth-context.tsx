@@ -169,6 +169,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       client_id: googleClientId,
       auto_select: false,
       ux_mode: "popup",
+      state_cookie_domain: window.location.hostname,
+      itp_support: true,
       callback: (response) => {
         if (response.credential) {
           void handleGoogleCredential(response.credential);

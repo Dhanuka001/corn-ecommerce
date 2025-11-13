@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { BestSellingCarousel } from "@/components/best-selling-carousel";
 import { CategoryBrowser } from "@/components/category-browser";
 import { Hero } from "@/components/hero";
 import { LoadingOverlay } from "@/components/loading-overlay";
@@ -42,6 +43,7 @@ export default function Home() {
           <StorePerks />
           <CategoryBrowser />
           <NewArrivals />
+          <BestSellingCarousel />
         </main>
 
         <MobileBottomNav />

@@ -51,7 +51,9 @@ export function generateMetadata({
     title,
     description: product.description,
     openGraph: {
-      type: "product",
+      type: "website",
+      url: `${siteUrl}/product/${product.slug}`,
+      siteName: "Corn Ecommerce",
       title,
       description: product.description,
       images: product.gallery.map((src) => ({

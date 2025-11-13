@@ -156,6 +156,7 @@ type SectionKey = (typeof navigationItems)[number]["key"];
 export default function AccountPage() {
   const { user, openAuth, logout } = useAuth();
   const [activeSection, setActiveSection] = useState<SectionKey>("dashboard");
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const initials = useMemo(() => {
     if (!user) return "";
@@ -171,6 +172,12 @@ export default function AccountPage() {
     const joinedYear = new Date().getFullYear() - 1;
     return `Member since ${joinedYear}`;
   }, [user]);
+
+  const requestLogout = () => setShowLogoutConfirm(true);
+  const handleLogoutConfirm = async () => {
+    await logout();
+    setShowLogoutConfirm(false);
+  };
 
   const renderSectionContent = () => {
     if (!user) {
@@ -217,7 +224,7 @@ export default function AccountPage() {
                 </div>
                 <button
                   type="button"
-                  onClick={logout}
+                  onClick={requestLogout}
                   className="rounded-full border border-slate-200 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:border-primary/20 hover:bg-primary/5 hover:text-primary"
                 >
                   Sign out
@@ -444,7 +451,7 @@ export default function AccountPage() {
             {user && (
               <button
                 type="button"
-                onClick={logout}
+                onClick={requestLogout}
                 className="group flex w-full items-center gap-4 rounded-2xl border border-slate-100 px-4 py-3 text-left text-sm font-semibold text-slate-600 transition hover:border-primary/20 hover:bg-primary/5 hover:text-primary"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-500 transition group-hover:bg-white group-hover:text-primary">
@@ -460,6 +467,34 @@ export default function AccountPage() {
         </div>
       </main>
       <MobileBottomNav />
+
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 px-4 py-6">
+          <div className="w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-2xl">
+            <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <LogoutIcon size={24} />
+            </div>
+            <h3 className="text-xl font-semibold text-slate-900">Sign out of Corn?</h3>
+            <p className="mt-2 text-sm text-slate-500">
+              You&apos;ll need to log back in to manage your orders, downloads, and wishlist.
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <button
+                className="flex-1 rounded-full border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:border-primary/20 hover:bg-primary/5 hover:text-primary"
+                onClick={() => setShowLogoutConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="flex-1 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#e21717]"
+                onClick={handleLogoutConfirm}
+              >
+                Yes, sign me out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -141,17 +141,20 @@ export function Navbar() {
 
           <div className="flex flex-1 flex-wrap items-center gap-3 lg:gap-5">
             <div className="flex items-center gap-3 lg:min-w-[210px]">
-              <Image
-                src="/logo.png"
-                alt="Corn Electronics"
-                width={48}
-                height={48}
-                className="h-12 w-auto"
-                priority
-              />
-              <div>
-  
-              </div>
+              <Link
+                href="/"
+                className="flex items-center"
+                aria-label="Corn Electronics home"
+              >
+                <Image
+                  src="/logo.png"
+                  alt="Corn Electronics"
+                  width={48}
+                  height={48}
+                  className="h-12 w-auto"
+                  priority
+                />
+              </Link>
             </div>
 
             <div className="hidden flex-1 items-center gap-3 lg:flex">

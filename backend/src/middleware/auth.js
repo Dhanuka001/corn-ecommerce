@@ -20,20 +20,34 @@ const clearSessionCookie = (res) => {
   res.clearCookie(env.sessionCookieName, sessionCookieOptions);
 };
 
-const requireAuth = (req, res, next) => {
+const decodeSessionFromRequest = (req) => {
   const token = req.cookies?.[env.sessionCookieName];
   if (!token) {
-    return respond.error(res, 401, "Unauthorized");
+    return { token: null, payload: null, invalid: false };
   }
-
   try {
     const payload = jwt.verify(token, env.jwtSecret);
-    req.user = payload;
-    return next();
+    return { token, payload, invalid: false };
   } catch (error) {
-    clearSessionCookie(res);
+    return { token, payload: null, invalid: true };
+  }
+};
+
+const getSessionUser = (req) => {
+  const { payload } = decodeSessionFromRequest(req);
+  return payload || null;
+};
+
+const requireAuth = (req, res, next) => {
+  const { payload, invalid } = decodeSessionFromRequest(req);
+  if (!payload) {
+    if (invalid) {
+      clearSessionCookie(res);
+    }
     return respond.error(res, 401, "Unauthorized");
   }
+  req.user = payload;
+  return next();
 };
 
 const requireRole =
@@ -53,4 +67,5 @@ module.exports = {
   requireRole,
   setSessionCookie,
   clearSessionCookie,
+  getSessionUser,
 };

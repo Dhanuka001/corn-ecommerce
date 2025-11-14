@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type SVGAttributes } from "react";
 
 import { useAuth } from "@/context/auth-context";
+import { CartSlider } from "@/components/cart/cart-slider";
+import { demoCartItems } from "@/data/cart-preview";
 
 type IconProps = SVGAttributes<SVGSVGElement> & {
   size?: number;
@@ -170,6 +172,8 @@ const megaCategories = [
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [cartPreview] = useState(demoCartItems);
   const { user, loading: authLoading, openAuth } = useAuth();
 
   const displayName = user
@@ -179,7 +183,8 @@ export function Navbar() {
     : "";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
+    <>
+      <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-6 lg:gap-5 lg:px-2">
         <div className="flex flex-wrap items-center gap-3 lg:gap-6">
           <button
@@ -280,7 +285,11 @@ export function Navbar() {
                 0
               </span>
             </button>
-            <button className="relative flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-transparent hover:bg-slate-100">
+            <button
+              className="relative flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-transparent hover:bg-slate-100"
+              onClick={() => setCartOpen(true)}
+              aria-label="Open cart"
+            >
               <BagIcon />
               <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1 text-xs font-semibold text-white">
                 0
@@ -348,6 +357,12 @@ export function Navbar() {
           </nav>
         </div>
       )}
-    </header>
+      </header>
+      <CartSlider
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        items={cartPreview}
+      />
+    </>
   );
 }

@@ -2,7 +2,7 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -18,19 +18,49 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ci
           chmod 600 ~/.ssh/id_ci
-          ssh-keyscan -p "${{ secrets.VPS_SSH_PORT }}" -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
+          PORT="${{ secrets.VPS_SSH_PORT }}"
+          [ -z "$PORT" ] && PORT=22
+          ssh-keyscan -p "$PORT" -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Deploy via SSH
+      - name: Deploy over SSH (stop old, build, force-recreate)
         env:
-          VPS_APP_DIR: ${{ secrets.VPS_APP_DIR }}
-          GIT_BRANCH: ${{ secrets.GIT_BRANCH }}
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_APP_DIR: ${{ secrets.VPS_APP_DIR }}   # e.g. /opt/app
+          GIT_BRANCH:  ${{ secrets.GIT_BRANCH }}    # optional, defaults to main
+          VPS_HOST:    ${{ secrets.VPS_HOST }}
+          VPS_USER:    ${{ secrets.VPS_USER }}
           VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT }}
         run: |
-          PORT="$VPS_SSH_PORT"
-          [ -z "$PORT" ] && PORT=22
+          PORT="${VPS_SSH_PORT:-22}"
 
-          ssh -i ~/.ssh/id_ci -o StrictHostKeyChecking=yes -p "$PORT" \
-            "$VPS_USER@$VPS_HOST" \
-            "export GIT_BRANCH='${GIT_BRANCH}'; cd '${VPS_APP_DIR}' && infra/deploy.sh"
+          ssh -i ~/.ssh/id_ci -o StrictHostKeyChecking=yes -p "$PORT" "$VPS_USER@$VPS_HOST" <<'EOF'
+          set -euo pipefail
+
+          # --- 1) Pull latest code on the server
+          BRANCH="${GIT_BRANCH:-main}"
+          cd "$VPS_APP_DIR"
+          git fetch origin "$BRANCH"
+          git reset --hard "origin/$BRANCH"
+
+          # --- 2) Always run compose from infra folder
+          cd "$VPS_APP_DIR/infra"
+
+          # --- 3) Stop old stack & remove orphans (prevents name conflicts)
+          docker compose -f docker-compose.prod.yml down --remove-orphans || true
+
+          # (optional) if a stray project network lingers, remove it
+          docker network rm corn-ecommerce_web || true
+
+          # --- 4) Build fresh images on the VPS
+          docker compose -f docker-compose.prod.yml build
+
+          # --- 5) Start stack, force re-create & remove any leftovers
+          docker compose -f docker-compose.prod.yml up -d --force-recreate --remove-orphans
+
+          # --- 6) (optional) Apply Prisma migrations safely if backend exists
+          if docker compose -f docker-compose.prod.yml ps backend >/dev/null 2>&1; then
+            docker compose -f docker-compose.prod.yml exec -T backend sh -lc 'npx prisma generate && npx prisma migrate deploy || true'
+          fi
+
+          # --- 7) Show status
+          docker compose -f docker-compose.prod.yml ps
+          EOF

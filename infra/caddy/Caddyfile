@@ -1,14 +1,15 @@
-:80 {
+cornelectronics.com, www.cornelectronics.com {
     encode gzip
 
     handle_path /api* {
         reverse_proxy backend:8080
     }
 
-    # Don't cache HTML (Next assets stay cache-busted by filename)
+    # Don't cache HTML (Next assets are cache-busted by filename)
     header /* Cache-Control "no-store"
 
     handle {
         reverse_proxy frontend:3000
     }
 }
+CADDY

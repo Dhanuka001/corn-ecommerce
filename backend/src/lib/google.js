@@ -7,12 +7,18 @@ const VALID_ISSUERS = new Set([
   "https://accounts.google.com",
 ]);
 
+const allowedAudiences = Array.isArray(env.googleClientIds)
+  ? env.googleClientIds.filter(Boolean)
+  : env.googleClientId
+    ? [env.googleClientId]
+    : [];
+
 let googleClient;
 
-if (env.googleClientId && env.googleClientSecret) {
+if (allowedAudiences.length) {
   googleClient = new OAuth2Client(
-    env.googleClientId,
-    env.googleClientSecret,
+    allowedAudiences[0],
+    env.googleClientSecret || undefined,
   );
 }
 
@@ -21,7 +27,7 @@ async function verifyGoogleIdToken(idToken) {
     throw createHttpError(400, "Google credential is required.");
   }
 
-  if (!googleClient) {
+  if (!googleClient || !allowedAudiences.length) {
     throw createHttpError(
       500,
       "Google login is not configured on the server.",
@@ -31,7 +37,7 @@ async function verifyGoogleIdToken(idToken) {
   try {
     const ticket = await googleClient.verifyIdToken({
       idToken,
-      audience: env.googleClientId,
+      audience: allowedAudiences,
     });
     const payload = ticket.getPayload();
     if (!payload) {
@@ -55,7 +61,8 @@ async function verifyGoogleIdToken(idToken) {
       throw createHttpError(401, "Google credential issuer is invalid.");
     }
 
-    if (aud !== env.googleClientId) {
+    const normalizedAud = (aud || "").trim();
+    if (!allowedAudiences.includes(normalizedAud)) {
       throw createHttpError(401, "Google credential audience mismatch.");
     }
 

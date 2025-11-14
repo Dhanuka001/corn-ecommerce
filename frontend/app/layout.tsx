@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/auth-context";
+import { NotificationProvider } from "@/context/notification-context";
 import { GoogleIdentityScript } from "@/components/google-identity-script";
 
 const poppins = Poppins({
@@ -26,8 +27,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
-        <AuthProvider>{children}</AuthProvider>
-        <GoogleIdentityScript clientId={googleClientId} />
+        <NotificationProvider>
+          <AuthProvider>{children}</AuthProvider>
+          <GoogleIdentityScript clientId={googleClientId} />
+        </NotificationProvider>
       </body>
     </html>
   );

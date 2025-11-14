@@ -13,6 +13,7 @@ import {
 
 import { apiRequest } from "@/lib/api";
 import { AuthModal } from "@/components/auth/auth-modal";
+import { useNotifications } from "@/context/notification-context";
 
 type User = {
   id: string;
@@ -45,6 +46,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [formError, setFormError] = useState<string | null>(null);
   const [formLoading, setFormLoading] = useState(false);
   const googleInitializedRef = useRef(false);
+  const { notifySuccess, notifyError } = useNotifications();
+
+  const resolveUserGreeting = useCallback((currentUser: User) => {
+    if (currentUser.firstName) {
+      return currentUser.firstName;
+    }
+    if (currentUser.email) {
+      return currentUser.email.split("@")[0] || currentUser.email;
+    }
+    return "there";
+  }, []);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -85,13 +97,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         setUser(data.user);
         closeAuth();
+        notifySuccess(
+          "Signed in",
+          `Welcome back, ${resolveUserGreeting(data.user)}.`,
+        );
       } catch (error) {
-        setFormError(error instanceof Error ? error.message : "Login failed");
+        const message =
+          error instanceof Error ? error.message : "Login failed";
+        setFormError(message);
+        notifyError("Login failed", message);
       } finally {
         setFormLoading(false);
       }
     },
-    [closeAuth],
+    [closeAuth, notifyError, notifySuccess, resolveUserGreeting],
   );
 
   const handleRegister = useCallback(
@@ -110,24 +129,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         setUser(data.user);
         closeAuth();
-      } catch (error) {
-        setFormError(
-          error instanceof Error ? error.message : "Registration failed",
+        notifySuccess(
+          "Account created",
+          `${resolveUserGreeting(data.user)}, your profile is ready.`,
         );
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Registration failed";
+        setFormError(message);
+        notifyError("Registration failed", message);
       } finally {
         setFormLoading(false);
       }
     },
-    [closeAuth],
+    [closeAuth, notifyError, notifySuccess, resolveUserGreeting],
   );
 
   const logout = useCallback(async () => {
     try {
       await apiRequest("/auth/logout", { method: "POST" });
+      notifySuccess("Signed out", "You have been logged out.");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to sign out.";
+      notifyError("Logout failed", message);
     } finally {
       setUser(null);
     }
-  }, []);
+  }, [notifyError, notifySuccess]);
 
   const handleGoogleCredential = useCallback(
     async (credential: string) => {
@@ -140,17 +169,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         setUser(data.user);
         closeAuth();
+        notifySuccess(
+          "Signed in with Google",
+          `Welcome, ${resolveUserGreeting(data.user)}.`,
+        );
       } catch (error) {
-        setFormError(
+        const message =
           error instanceof Error
             ? error.message
-            : "Google sign-in failed. Please try again.",
-        );
+            : "Google sign-in failed. Please try again.";
+        setFormError(message);
+        notifyError("Google sign-in failed", message);
       } finally {
         setFormLoading(false);
       }
     },
-    [closeAuth],
+    [closeAuth, notifyError, notifySuccess, resolveUserGreeting],
   );
 
   const initializeGoogle = useCallback(() => {

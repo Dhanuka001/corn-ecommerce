@@ -15,9 +15,31 @@ services:
       context: ../backend
       dockerfile: Dockerfile
     env_file:
-      - ../backend/.env.production
+      - ../backend/.env.production 
     restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
     networks: [web]
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: corn
+      POSTGRES_PASSWORD: cornpass
+      POSTGRES_DB: corn
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks: [web]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U corn -d corn"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    
+    ports:
+      - "127.0.0.1:5432:5432"
 
   caddy:
     image: caddy:2-alpine
@@ -39,5 +61,6 @@ networks:
     driver: bridge
 
 volumes:
+  pgdata:
   caddy_data:
   caddy_config:

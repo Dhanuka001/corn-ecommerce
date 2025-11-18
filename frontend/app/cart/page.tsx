@@ -218,7 +218,7 @@ export default function CartPage() {
                       Estimated total
                     </p>
                     <p className="text-xs text-neutral-500">
-                      Pay in 4 with Klarna available
+                      Pay in 3 with Koko available
                     </p>
                   </div>
                   <p className="text-2xl font-semibold text-neutral-900">

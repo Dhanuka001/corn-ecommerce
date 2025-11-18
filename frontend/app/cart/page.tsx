@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import { Footer } from "@/components/footer";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { Navbar } from "@/components/navbar";
@@ -13,7 +11,6 @@ type CartItem = {
   shippingMethod: string;
   price: number;
   quantity: number;
-  image: string;
 };
 
 const items: CartItem[] = [
@@ -26,8 +23,6 @@ const items: CartItem[] = [
     shippingMethod: "Ship to address",
     price: 259.99,
     quantity: 1,
-    image:
-      "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: 2,
@@ -38,8 +33,6 @@ const items: CartItem[] = [
     shippingMethod: "Ship to address",
     price: 119.99,
     quantity: 1,
-    image:
-      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80",
   },
 ];
 
@@ -132,13 +125,10 @@ export default function CartPage() {
               {items.map((item) => (
                 <article key={item.id} className="p-5 sm:p-6">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
-                    <div className="relative h-32 w-full overflow-hidden rounded-xl bg-neutral-100 sm:w-32">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        className="object-cover"
-                      />
+                    <div className="flex h-32 w-full items-center justify-center rounded-xl bg-gradient-to-br from-neutral-100 via-neutral-50 to-neutral-200 sm:w-32">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-inner">
+                        <ProductIcon />
+                      </div>
                     </div>
 
                     <div className="flex-1 space-y-2">
@@ -187,6 +177,7 @@ export default function CartPage() {
                 </article>
               ))}
             </div>
+
           </section>
 
           <aside className="lg:sticky lg:top-12">
@@ -285,5 +276,22 @@ const ArrowIcon = () => (
       strokeLinejoin="round"
       d="M3.75 12h16.5m0 0L13.5 5.25M20.25 12 13.5 18.75"
     />
+  </svg>
+);
+
+const ProductIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="h-7 w-7 text-neutral-700"
+  >
+    <rect x="3" y="4" width="18" height="14" rx="2" ry="2" />
+    <path d="M3 10h18" />
+    <path d="M10 14h4" />
   </svg>
 );

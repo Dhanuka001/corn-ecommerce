@@ -135,13 +135,17 @@ export function MobileBottomNav() {
           <span>Shop</span>
         </Link>
         <Link
-          href="/#wishlist"
-          className="flex flex-1 flex-col items-center gap-1 text-xs font-semibold text-slate-500 transition"
+          href="/favorites"
+          className={`flex flex-1 flex-col items-center gap-1 text-xs font-semibold transition ${
+            pathname === "/favorites" ? "text-primary" : "text-slate-500"
+          }`}
         >
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-50">
-            <HeartIcon className="text-slate-500" />
+            <HeartIcon
+              className={pathname === "/favorites" ? "text-primary" : "text-slate-500"}
+            />
           </div>
-          <span>Wishlist</span>
+          <span>Favorites</span>
         </Link>
         <Link
           href="/cart"

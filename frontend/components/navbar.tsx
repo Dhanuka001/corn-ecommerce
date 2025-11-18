@@ -280,12 +280,16 @@ export function Navbar() {
                 0
               </span>
             </button>
-            <button className="relative flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-transparent hover:bg-slate-100">
+            <Link
+              href="/cart"
+              className="relative flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition hover:border-transparent hover:bg-slate-100"
+              aria-label="View cart"
+            >
               <BagIcon />
               <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1 text-xs font-semibold text-white">
                 0
               </span>
-            </button>
+            </Link>
           </div>
         </div>
 

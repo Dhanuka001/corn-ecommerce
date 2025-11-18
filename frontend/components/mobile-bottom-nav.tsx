@@ -65,6 +65,24 @@ const HeartIcon = ({ size = 22, ...props }: IconProps) => (
   </svg>
 );
 
+const BagIcon = ({ size = 22, ...props }: IconProps) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.8}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    width={size}
+    height={size}
+    aria-hidden
+    {...props}
+  >
+    <path d="M7 8V7a5 5 0 0 1 10 0v1" />
+    <path d="M5 9h14l-1 11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z" />
+  </svg>
+);
+
 const UserIcon = ({ size = 22, ...props }: IconProps) => (
   <svg
     viewBox="0 0 24 24"
@@ -124,6 +142,19 @@ export function MobileBottomNav() {
             <HeartIcon className="text-slate-500" />
           </div>
           <span>Wishlist</span>
+        </Link>
+        <Link
+          href="/cart"
+          className={`flex flex-1 flex-col items-center gap-1 text-xs font-semibold transition ${
+            pathname === "/cart" ? "text-primary" : "text-slate-500"
+          }`}
+        >
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-50">
+            <BagIcon
+              className={pathname === "/cart" ? "text-primary" : "text-slate-500"}
+            />
+          </div>
+          <span>Cart</span>
         </Link>
         <button
           type="button"

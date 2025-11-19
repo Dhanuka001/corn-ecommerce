@@ -73,7 +73,7 @@ export default function FavoritesPage() {
               </span>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {favorites.map((item) => (
                 <article
                   key={item.id}
@@ -115,11 +115,15 @@ export default function FavoritesPage() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:gap-4">
-                    <button className="inline-flex justify-center rounded-xl border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-800 transition hover:border-neutral-900 hover:bg-neutral-50">
-                      Move to bag
+                    <button
+                      className="inline-flex items-center justify-center rounded-xl border border-neutral-200 px-3 py-2 text-sm font-semibold text-neutral-800 transition hover:border-neutral-900 hover:bg-neutral-50"
+                      aria-label="Add to cart"
+                    >
+                      <CartIcon />
+                      <span className="sr-only">Add to cart</span>
                     </button>
                     <button className="inline-flex justify-center rounded-xl border border-primary bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg">
-                      Checkout with this
+                      Checkout
                     </button>
                   </div>
                 </article>
@@ -168,5 +172,23 @@ const ProductIcon = () => (
     <rect x="3" y="4" width="18" height="14" rx="2" ry="2" />
     <path d="M3 10h18" />
     <path d="M10 14h4" />
+  </svg>
+);
+
+const CartIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="h-5 w-5"
+    aria-hidden
+  >
+    <circle cx="9" cy="21" r="1" />
+    <circle cx="20" cy="21" r="1" />
+    <path d="M1 1h4l2.68 13.39A2 2 0 0 0 9.34 16H19a2 2 0 0 0 2-1.61L23 6H6" />
   </svg>
 );

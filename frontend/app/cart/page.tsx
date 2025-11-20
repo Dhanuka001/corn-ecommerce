@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Footer } from "@/components/footer";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { Navbar } from "@/components/navbar";
@@ -243,9 +245,12 @@ export default function CartPage() {
                 </div>
 
                 <div className="space-y-3 pt-2">
-                  <button className="h-12 w-full rounded-xl bg-primary text-sm font-semibold text-white transition hover:-translate-y-[2px] hover:shadow-xl">
+                  <Link
+                    href="/checkout"
+                    className="flex h-12 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-white transition hover:-translate-y-[2px] hover:shadow-xl"
+                  >
                     Checkout
-                  </button>
+                  </Link>
                   <button className="h-12 w-full rounded-xl border border-neutral-300 bg-white text-sm font-semibold text-neutral-900 transition hover:border-neutral-900 hover:-translate-y-[2px] hover:shadow-lg">
                     PayPal
                   </button>

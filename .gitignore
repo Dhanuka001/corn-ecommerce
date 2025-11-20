@@ -1,5 +1,5 @@
 # ============================================================
-# GLOBAL IGNORE SETTINGS /
+# GLOBAL IGNORE SETTINGS / added production env
 # ============================================================
 
 # Node.js dependencies

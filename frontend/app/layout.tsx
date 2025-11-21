@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/auth-context";
 import { NotificationProvider } from "@/context/notification-context";
 import { GoogleIdentityScript } from "@/components/google-identity-script";
+import { ChatWidget } from "@/components/chat-widget";
 
 const poppins = Poppins({
   variable: "--font-sans",
@@ -28,7 +29,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
         <NotificationProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            {children}
+            <ChatWidget />
+          </AuthProvider>
           <GoogleIdentityScript clientId={googleClientId} />
         </NotificationProvider>
       </body>

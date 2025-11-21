@@ -442,20 +442,6 @@ export default function CheckoutPage() {
               </div>
             </section>
 
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm font-semibold text-neutral-700 shadow-sm">
-                <ShieldCheckIcon className="text-neutral-500" />
-                SSL secure encryption
-              </div>
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm font-semibold text-neutral-700 shadow-sm">
-                <TruckIcon className="text-neutral-500" />
-                Fast delivery options
-              </div>
-              <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm font-semibold text-neutral-700 shadow-sm">
-                <RefreshIcon className="text-neutral-500" />
-                14-day return policy
-              </div>
-            </div>
           </form>
 
           <aside className="lg:sticky lg:top-10">

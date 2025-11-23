@@ -38,17 +38,33 @@ const items: CartItem[] = [
   },
 ];
 
-const perks = [
-  { title: "Faster checkout", subtitle: "Save addresses & preferences." },
-  { title: "Hassle-free returns", subtitle: "Instant labels and updates." },
-  { title: "Real-time tracking", subtitle: "Stay updated at every step." },
-];
-
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("en-LK", {
     style: "currency",
     currency: "LKR",
   }).format(value);
+
+const MobileCheckoutBar = ({ total }: { total: string }) => (
+  <div className="fixed inset-x-0 bottom-[86px] z-40 px-4 pb-[calc(env(safe-area-inset-bottom)+0.4rem)] lg:hidden">
+    <div className="mx-auto flex max-w-3xl items-center gap-3 rounded-2xl border border-neutral-200 bg-white/95 px-4 py-3 shadow-[0_14px_40px_rgba(15,23,42,0.14)] backdrop-blur">
+      <div className="flex-1">
+        <p className="text-[11px] uppercase tracking-[0.14em] text-neutral-400">
+          Total
+        </p>
+        <p className="text-lg font-semibold leading-tight text-neutral-900">
+          {total}
+        </p>
+        <p className="text-[11px] text-neutral-500">Shipping & tax at checkout</p>
+      </div>
+      <Link
+        href="/checkout"
+        className="inline-flex h-12 min-w-[130px] items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(79,70,229,0.28)] transition hover:-translate-y-0.5"
+      >
+        Checkout
+      </Link>
+    </div>
+  </div>
+);
 
 export default function CartPage() {
   const subtotal = items.reduce(
@@ -60,100 +76,90 @@ export default function CartPage() {
   const estimatedTotal = subtotal + estimatedShipping + estimatedTax;
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-white text-neutral-900">
       <Navbar />
 
-      <div className="bg-neutral-900 px-4 py-3 text-center text-sm font-semibold tracking-tight text-white">
-        Free U.S. shipping over $99 + free returns. Corn Club unlocks early
-        drops.
+      <div className="bg-neutral-900 px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.12em] text-white">
+        Free U.S. shipping over $99 + free returns. Corn Club unlocks early drops.
       </div>
 
-      <main className="mx-auto w-full max-w-7xl px-4 pb-16 pt-10 lg:pt-12">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.7fr)_minmax(360px,0.9fr)]">
-          <section className="space-y-6">
-            <div className="space-y-1">
-              <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-semibold text-neutral-900">
-                  Your Bag
-                </h1>
+      <main className="mx-auto w-full max-w-5xl px-4 pb-40 pt-6 lg:max-w-6xl lg:pb-16">
+        <div className="lg:grid lg:grid-cols-[minmax(0,1.65fr)_minmax(320px,0.85fr)] lg:gap-8">
+          <section className="space-y-4">
+            <div className="flex items-baseline justify-between">
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-semibold tracking-tight">Your Bag</h1>
                 <span className="text-sm font-medium text-neutral-500">
                   ({items.length} {items.length === 1 ? "item" : "items"})
                 </span>
               </div>
-              <p className="text-sm text-neutral-600">
-                Review items, delivery, and quantities. Cart stays on the left,
-                summary on the right.
-              </p>
+              <span className="hidden text-sm font-semibold text-neutral-900 lg:inline">
+                {formatCurrency(subtotal)}
+              </span>
             </div>
 
-            <div className="divide-y divide-neutral-200 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-              {items.map((item) => (
-                <article key={item.id} className="p-5 sm:p-6">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
-                    <div className="flex h-32 w-full items-center justify-center rounded-xl bg-gradient-to-br from-neutral-100 via-neutral-50 to-neutral-200 sm:w-32">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-inner">
-                        <ProductIcon />
-                      </div>
+            <div className="overflow-hidden rounded-2xl border border-neutral-200 shadow-[0_12px_32px_rgba(15,23,42,0.08)]">
+              {items.map((item, index) => (
+                <article
+                  key={item.id}
+                  className={`flex gap-3 px-4 py-3 ${index !== items.length - 1 ? "border-b border-neutral-100" : ""}`}
+                >
+                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-neutral-200 bg-gradient-to-br from-neutral-50 via-white to-neutral-100 shadow-inner">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-neutral-200/70">
+                      <ProductIcon />
                     </div>
+                  </div>
 
-                    <div className="flex-1 space-y-2">
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="space-y-1">
-                          <p className="text-lg font-semibold text-neutral-900">
-                            {item.name}
-                          </p>
-                          <p className="text-sm text-neutral-500">
-                            SKU: {item.sku}
-                          </p>
-                        </div>
-                        <p className="text-lg font-semibold text-neutral-900">
-                          {formatCurrency(item.price)}
+                  <div className="min-w-0 flex-1 space-y-1.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 space-y-0.5">
+                        <p className="truncate text-[15px] font-semibold leading-snug text-neutral-900">
+                          {item.name}
+                        </p>
+                        <p className="text-[11px] uppercase tracking-[0.16em] text-neutral-400">
+                          SKU {item.sku}
                         </p>
                       </div>
-                      <p className="text-sm text-neutral-600">
-                        Color: {item.color} · {item.variant}
+                      <p className="text-base font-semibold leading-none text-neutral-900">
+                        {formatCurrency(item.price)}
                       </p>
-                      <div className="mt-4 grid gap-3 sm:grid-cols-[auto,1fr] sm:items-center">
-                        <div className="flex items-center gap-3">
-                          <label className="text-sm font-semibold text-neutral-800">
-                            Qty
-                          </label>
-                          <div className="flex h-10 items-center rounded-lg border border-neutral-200 px-3 text-sm font-medium text-neutral-900 shadow-inner">
-                            {item.quantity}
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-4 text-sm">
-                          <label className="flex items-center gap-2 font-semibold text-neutral-800">
-                            <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-neutral-300">
-                              <span className="h-2 w-2 rounded-full bg-neutral-900" />
-                            </span>
-                            {item.shippingMethod}
-                          </label>
-                          <button className="text-neutral-500 transition hover:text-neutral-900">
-                            Save for later
-                          </button>
-                          <button className="text-neutral-500 transition hover:text-neutral-900">
-                            Remove
-                          </button>
-                        </div>
+                    </div>
+
+                    <p className="text-xs text-neutral-500">
+                      {item.color} · {item.variant}
+                    </p>
+                    <p className="text-[11px] text-neutral-500">{item.shippingMethod}</p>
+
+                    <div className="flex items-center gap-3 text-xs font-medium text-neutral-700">
+                      <div className="flex items-center gap-2 rounded-full border border-neutral-200 px-3 py-1 shadow-inner">
+                        <span className="text-[11px] uppercase tracking-wide text-neutral-400">
+                          Qty
+                        </span>
+                        <span className="text-sm text-neutral-900">{item.quantity}</span>
                       </div>
+                      <button className="text-neutral-500 underline-offset-4 transition hover:text-neutral-900">
+                        Save for later
+                      </button>
+                      <span className="h-3 w-px bg-neutral-200" />
+                      <button className="text-neutral-500 underline-offset-4 transition hover:text-rose-500">
+                        Remove
+                      </button>
                     </div>
                   </div>
                 </article>
               ))}
             </div>
-
           </section>
 
-          <aside className="lg:sticky lg:top-12">
-            <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-md">
-              <div className="border-b border-neutral-100 px-6 py-5">
-                <h2 className="text-xl font-semibold text-neutral-900">
+          <aside className="hidden lg:sticky lg:top-10 lg:block">
+            <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
+              <div className="border-b border-neutral-100 px-5 py-4">
+                <h2 className="text-lg font-semibold tracking-tight text-neutral-900">
                   Order Summary
                 </h2>
               </div>
 
-              <div className="space-y-4 px-6 py-5">
+              <div className="space-y-4 px-5 py-4">
                 <div className="space-y-2 text-sm text-neutral-700">
                   <div className="flex items-center justify-between">
                     <span>Subtotal ({items.length})</span>
@@ -207,7 +213,7 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                <div className="space-y-3 pt-2">
+                <div className="space-y-3 pt-1">
                   <Link
                     href="/checkout"
                     className="flex h-12 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-white transition hover:-translate-y-[2px] hover:shadow-xl"
@@ -224,28 +230,13 @@ export default function CartPage() {
         </div>
       </main>
 
+      <MobileCheckoutBar total={formatCurrency(estimatedTotal)} />
+
       <Footer />
       <MobileBottomNav />
     </div>
   );
 }
-
-const ArrowIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className="mt-0.5 h-5 w-5 text-neutral-900"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M3.75 12h16.5m0 0L13.5 5.25M20.25 12 13.5 18.75"
-    />
-  </svg>
-);
 
 const ProductIcon = () => (
   <svg

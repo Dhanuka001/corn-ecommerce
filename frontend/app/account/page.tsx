@@ -1,10 +1,24 @@
 "use client";
 
-import { useMemo, useState, type SVGAttributes } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState, type SVGAttributes } from "react";
 
 import { useAuth } from "@/context/auth-context";
+import { useNotifications } from "@/context/notification-context";
 import { Navbar } from "@/components/navbar";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
+import { AddressFormModal } from "@/components/account/address-form-modal";
+import { AddressList } from "@/components/account/address-list";
+import {
+  createAddress,
+  deleteAddress,
+  getAddresses,
+  updateAddress,
+  type Address,
+  type AddressPayload,
+} from "@/lib/api/addresses";
+import { getOrders, type Order } from "@/lib/api/orders";
+import { OrderCard } from "@/components/account/order-card";
 
 type IconProps = SVGAttributes<SVGSVGElement> & {
   size?: number;
@@ -155,8 +169,18 @@ type SectionKey = (typeof navigationItems)[number]["key"];
 
 export default function AccountPage() {
   const { user, openAuth, logout } = useAuth();
+  const { notifyError, notifySuccess } = useNotifications();
   const [activeSection, setActiveSection] = useState<SectionKey>("dashboard");
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [addressesLoading, setAddressesLoading] = useState(false);
+  const [addressFormOpen, setAddressFormOpen] = useState(false);
+  const [addressFormLoading, setAddressFormLoading] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState<Address | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [cancelLoadingId, setCancelLoadingId] = useState<string | null>(null);
 
   const initials = useMemo(() => {
     if (!user) return "";
@@ -177,6 +201,80 @@ export default function AccountPage() {
   const handleLogoutConfirm = async () => {
     await logout();
     setShowLogoutConfirm(false);
+  };
+
+  useEffect(() => {
+    const loadAddresses = async () => {
+      if (!user || activeSection !== "addresses") return;
+      setAddressesLoading(true);
+      try {
+        const data = await getAddresses();
+        setAddresses(data.items);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Unable to load addresses.";
+        notifyError("Addresses unavailable", message);
+      } finally {
+        setAddressesLoading(false);
+      }
+    };
+    void loadAddresses();
+  }, [activeSection, user]);
+
+  useEffect(() => {
+    const loadOrders = async () => {
+      if (!user || activeSection !== "orders") return;
+      setOrdersLoading(true);
+      try {
+        const data = await getOrders();
+        setOrders(data.orders);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Unable to load orders.";
+        notifyError("Orders unavailable", message);
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
+    void loadOrders();
+  }, [activeSection, user]);
+
+  const handleSaveAddress = async (payload: AddressPayload) => {
+    setAddressFormLoading(true);
+    try {
+      if (editingAddress) {
+        const { address } = await updateAddress(editingAddress.id, payload);
+        setAddresses((prev) =>
+          prev.map((item) => (item.id === editingAddress.id ? address : item)),
+        );
+        notifySuccess("Address updated", "We saved your changes.");
+      } else {
+        const { address } = await createAddress(payload);
+        setAddresses((prev) => [address, ...prev]);
+        notifySuccess("Address added", "New delivery address created.");
+      }
+      setAddressFormOpen(false);
+      setEditingAddress(null);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to save address.";
+      notifyError("Save failed", message);
+    } finally {
+      setAddressFormLoading(false);
+    }
+  };
+
+  const handleDeleteAddress = async (address: Address) => {
+    setConfirmingDelete(null);
+    try {
+      await deleteAddress(address.id);
+      setAddresses((prev) => prev.filter((item) => item.id !== address.id));
+      notifySuccess("Address removed", "The address was deleted.");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to delete address.";
+      notifyError("Delete failed", message);
+    }
   };
 
   const renderSectionContent = () => {
@@ -279,14 +377,45 @@ export default function AccountPage() {
         );
       case "orders":
         return (
-          <section className="rounded-[32px] border border-slate-100 bg-white p-8 text-center shadow-[0_25px_70px_rgba(15,23,42,0.06)]">
-            <p className="text-xl font-semibold text-slate-900">You don&apos;t have any orders!</p>
-            <p className="mt-2 text-sm text-slate-500">
-              Every order you place will show up here with tracking details.
-            </p>
-            <button className="mt-6 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white">
-              Start shopping
-            </button>
+          <section className="rounded-[32px] border border-slate-100 bg-white p-8 shadow-[0_25px_70px_rgba(15,23,42,0.06)]">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">Your orders</h2>
+                <p className="text-sm text-slate-500">
+                  Track recent purchases and payment status.
+                </p>
+              </div>
+              <button className="rounded-full border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-800 transition hover:border-neutral-900 hover:bg-neutral-50">
+                Need help?
+              </button>
+            </div>
+            <div className="mt-6 space-y-4">
+              {ordersLoading ? (
+                Array.from({ length: 3 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="h-32 rounded-2xl border border-neutral-200 bg-neutral-50 shadow-inner"
+                  />
+                ))
+              ) : orders.length === 0 ? (
+                <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-neutral-200 bg-white px-6 py-8 text-center shadow-sm">
+                  <p className="text-lg font-semibold text-neutral-900">
+                    You don&apos;t have any orders!
+                  </p>
+                  <p className="text-sm text-neutral-600">
+                    Every order you place will show up here with tracking details.
+                  </p>
+                  <Link
+                    href="/shop"
+                    className="rounded-full border border-primary bg-primary px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg"
+                  >
+                    Start shopping
+                  </Link>
+                </div>
+              ) : (
+                orders.map((order) => <OrderCard key={order.id} order={order} />)
+              )}
+            </div>
           </section>
         );
       case "downloads":
@@ -301,20 +430,71 @@ export default function AccountPage() {
       case "addresses":
         return (
           <section className="rounded-[32px] border border-slate-100 bg-white p-8 shadow-[0_25px_70px_rgba(15,23,42,0.06)]">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-semibold text-slate-900">Saved addresses</h2>
-                <p className="text-sm text-slate-500">
-                  Add shipping and billing details for faster checkout.
+            {!user ? (
+              <div className="text-center">
+                <p className="text-lg font-semibold text-slate-900">
+                  Sign in to manage addresses
                 </p>
+                <p className="mt-2 text-sm text-slate-500">
+                  Save shipping and billing details for faster checkout.
+                </p>
+                <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+                  <button
+                    className="rounded-full border border-primary bg-primary px-6 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg"
+                    onClick={() => openAuth("login")}
+                  >
+                    Sign in
+                  </button>
+                  <button
+                    className="rounded-full border border-slate-200 px-6 py-2 text-sm font-semibold text-slate-800 transition hover:border-slate-300 hover:bg-slate-100"
+                    onClick={() => openAuth("register")}
+                  >
+                    Create account
+                  </button>
+                </div>
               </div>
-              <button className="rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/5">
-                Add address
-              </button>
-            </div>
-            <div className="mt-6 rounded-2xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-500">
-              No addresses yet.
-            </div>
+            ) : (
+              <>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900">Saved addresses</h2>
+                    <p className="text-sm text-slate-500">
+                      Add shipping and billing details for faster checkout.
+                    </p>
+                  </div>
+                  <button
+                    className="rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/5"
+                    onClick={() => {
+                      setEditingAddress(null);
+                      setAddressFormOpen(true);
+                    }}
+                  >
+                    Add address
+                  </button>
+                </div>
+                <div className="mt-6">
+                  {addressesLoading ? (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {Array.from({ length: 2 }).map((_, index) => (
+                        <div
+                          key={index}
+                          className="h-24 rounded-2xl border border-neutral-200 bg-neutral-50"
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <AddressList
+                      addresses={addresses}
+                      onEdit={(addr) => {
+                        setEditingAddress(addr);
+                        setAddressFormOpen(true);
+                      }}
+                      onDelete={setConfirmingDelete}
+                    />
+                  )}
+                </div>
+              </>
+            )}
           </section>
         );
       case "details":
@@ -477,6 +657,46 @@ export default function AccountPage() {
         </div>
       </main>
       <MobileBottomNav />
+
+      <AddressFormModal
+        isOpen={addressFormOpen}
+        title={editingAddress ? "Edit address" : "Add new address"}
+        initialValues={editingAddress ?? undefined}
+        loading={addressFormLoading}
+        onClose={() => {
+          setAddressFormOpen(false);
+          setEditingAddress(null);
+        }}
+        onSubmit={handleSaveAddress}
+      />
+
+      {confirmingDelete ? (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 px-4 py-6">
+          <div className="w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-2xl">
+            <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <LogoutIcon size={24} />
+            </div>
+            <h3 className="text-xl font-semibold text-slate-900">Delete address?</h3>
+            <p className="mt-2 text-sm text-slate-500">
+              This address will be removed from your account.
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <button
+                className="flex-1 rounded-full border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-600 transition hover:border-primary/20 hover:bg-primary/5 hover:text-primary"
+                onClick={() => setConfirmingDelete(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="flex-1 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#e21717]"
+                onClick={() => confirmingDelete && handleDeleteAddress(confirmingDelete)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {showLogoutConfirm && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 px-4 py-6">

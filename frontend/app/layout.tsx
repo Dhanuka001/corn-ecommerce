@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/auth-context";
+import { CartProvider } from "@/context/cart-context";
+import { FavoritesProvider } from "@/context/favorites-context";
 import { NotificationProvider } from "@/context/notification-context";
 import { GoogleIdentityScript } from "@/components/google-identity-script";
 import { ChatWidget } from "@/components/chat-widget";
@@ -30,7 +32,9 @@ export default function RootLayout({
       <body className={`${poppins.variable} antialiased`}>
         <NotificationProvider>
           <AuthProvider>
-            {children}
+            <CartProvider>
+              <FavoritesProvider>{children}</FavoritesProvider>
+            </CartProvider>
             <ChatWidget />
           </AuthProvider>
           <GoogleIdentityScript clientId={googleClientId} />

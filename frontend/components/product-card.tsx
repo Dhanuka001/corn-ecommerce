@@ -100,10 +100,10 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="text-sm font-semibold uppercase tracking-wide text-slate-400">
           Product preview
         </div>
-        <div className="absolute inset-x-6 bottom-4 z-20 flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-slate-700 shadow-[0_10px_28px_rgba(15,23,42,0.12)] transition duration-300 opacity-100 translate-y-0 lg:border-0 lg:bg-primary/95 lg:text-white lg:shadow-[0_18px_38px_-18px_rgba(79,70,229,0.55)] lg:opacity-0 lg:translate-y-3 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">
+        <div className="absolute inset-x-6 bottom-4 z-20 flex items-center justify-center gap-2 rounded-full bg-primary/95 px-4 py-2 text-white shadow-[0_18px_38px_-18px_rgba(79,70,229,0.55)] transition duration-300 translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100">
           <Link
             href={`/product/${product.slug}`}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10 transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white lg:border-white/25 lg:bg-white/10 lg:hover:bg-white/20"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10 transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             aria-label={`View ${product.name}`}
           >
             <EyeIcon size={16} />
@@ -111,7 +111,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <button
             type="button"
             onClick={goToCart}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:border-white/25 lg:bg-white/10 lg:text-white lg:hover:bg-white/20"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             aria-label={`Go to cart from ${product.name}`}
           >
             <CartIcon size={16} />
@@ -119,7 +119,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <button
             type="button"
             onClick={goToFavorites}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:border-white/25 lg:bg-white/10 lg:text-white lg:hover:bg-white/20"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10 transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             aria-label={`Go to favorites from ${product.name}`}
           >
             <HeartIcon size={16} />

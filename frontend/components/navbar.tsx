@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type SVGAttributes } from "react";
 
 import { useAuth } from "@/context/auth-context";
+import { useCart } from "@/context/cart-context";
+import { useFavorites } from "@/context/favorites-context";
 
 type IconProps = SVGAttributes<SVGSVGElement> & {
   size?: number;
@@ -176,12 +178,17 @@ const megaCategories = [
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, loading: authLoading, openAuth } = useAuth();
+  const { cart } = useCart();
+  const { items: favoriteItems } = useFavorites();
 
   const displayName = user
     ? user.firstName
       ? `${user.firstName} ${user.lastName ?? ""}`.trim()
       : user.email
     : "";
+
+  const favoriteCount = favoriteItems.length;
+  const cartCount = cart?.summary?.totalQuantity ?? 0;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -286,7 +293,7 @@ export function Navbar() {
             >
               <HeartIcon />
               <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1 text-xs font-semibold text-white">
-                0
+                {favoriteCount}
               </span>
             </Link>
             <Link
@@ -296,7 +303,7 @@ export function Navbar() {
             >
               <BagIcon />
               <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1 text-xs font-semibold text-white">
-                0
+                {cartCount}
               </span>
             </Link>
           </div>

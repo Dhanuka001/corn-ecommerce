@@ -1,12 +1,23 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
-import { products } from "@/data/products";
-
-import { ProductCard } from "./product-card";
+import { CatalogProductCard } from "./catalog-product-card";
+import { fetchProducts } from "@/lib/catalog-api";
+import type { ProductSummary } from "@/types/catalog";
 
 export function NewArrivals() {
+  const [items, setItems] = useState<ProductSummary[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      const data = await fetchProducts();
+      setItems(data.slice(0, 4));
+    };
+    void load();
+  }, []);
+
   return (
     <section
       className="mt-10 space-y-6 px-4 sm:mt-12 lg:mt-16 lg:px-0"
@@ -17,7 +28,7 @@ export function NewArrivals() {
           New Arrivals
         </h2>
         <Link
-          href="/#shop"
+          href="/shop"
           className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-normal text-slate-600 transition hover:border-slate-300 hover:bg-slate-200"
         >
           View All
@@ -25,8 +36,8 @@ export function NewArrivals() {
       </header>
 
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        {products.map((product) => (
-          <ProductCard key={product.sku} product={product} />
+        {items.map((product) => (
+          <CatalogProductCard key={product.id} product={product} />
         ))}
       </div>
     </section>

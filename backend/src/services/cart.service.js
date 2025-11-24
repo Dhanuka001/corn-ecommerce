@@ -38,6 +38,7 @@ const CART_WITH_ITEMS_INCLUDE = {
 };
 
 const MAX_QTY = 99;
+const TRX_OPTIONS = { maxWait: 10000, timeout: 10000 };
 
 const toCartResponse = (cart) => {
   if (!cart) {
@@ -251,7 +252,7 @@ const ensureCart = async ({ cartId, userId }) => {
       data: {},
       include: CART_WITH_ITEMS_INCLUDE,
     });
-  });
+  }, TRX_OPTIONS);
 
   if (!cart) {
     throw createHttpError(500, "Unable to initialize cart.");
@@ -315,7 +316,7 @@ const addItem = async ({ cartId, productId, variantId, qty }) => {
     }
 
     return loadCartWithItems(tx, cartId);
-  });
+  }, TRX_OPTIONS);
 
   return toCartResponse(cart);
 };
@@ -376,7 +377,7 @@ const updateItemQuantity = async ({ cartId, itemId, qty }) => {
     });
 
     return loadCartWithItems(tx, cartId);
-  });
+  }, TRX_OPTIONS);
 
   return toCartResponse(cart);
 };
@@ -393,7 +394,7 @@ const removeItem = async ({ cartId, itemId }) => {
 
     await tx.cartItem.delete({ where: { id: itemId } });
     return loadCartWithItems(tx, cartId);
-  });
+  }, TRX_OPTIONS);
 
   return toCartResponse(cart);
 };

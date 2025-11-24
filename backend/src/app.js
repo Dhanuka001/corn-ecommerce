@@ -8,6 +8,7 @@ const healthRouter = require("./routes/health");
 const authRouter = require("./routes/auth");
 const catalogRouter = require("./routes/catalog");
 const cartRouter = require("./routes/cart");
+const favoritesRouter = require("./routes/favorites");
 const checkoutRouter = require("./routes/checkout");
 const ordersRouter = require("./routes/orders");
 const paymentsCodRouter = require("./routes/payments/cod");
@@ -34,6 +35,7 @@ app.use("/health", healthRouter);
 app.use("/auth", authRouter);
 app.use(catalogRouter);
 app.use("/cart", cartRouter);
+app.use("/favorites", favoritesRouter);
 app.use("/checkout", checkoutRouter);
 app.use("/orders", ordersRouter);
 

@@ -82,6 +82,10 @@ export default function CartPage() {
     );
   };
 
+  const removeItem = (id: number) => {
+    setLineItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
   const subtotal = lineItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
@@ -89,6 +93,7 @@ export default function CartPage() {
   const estimatedShipping = 14.99;
   const estimatedTax = 0;
   const estimatedTotal = subtotal + estimatedShipping + estimatedTax;
+  const hasItems = lineItems.length > 0;
 
   return (
     <div className="min-h-screen bg-white text-neutral-900">
@@ -113,163 +118,191 @@ export default function CartPage() {
                 </span>
               </div>
 
-            <div className="overflow-hidden rounded-2xl border border-neutral-200 shadow-[0_12px_32px_rgba(15,23,42,0.08)]">
-              {lineItems.map((item, index) => (
-                <article
-                  key={item.id}
-                  className={`flex gap-3 px-4 py-3 ${index !== lineItems.length - 1 ? "border-b border-neutral-100" : ""}`}
-                >
-                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-neutral-200 bg-gradient-to-br from-neutral-50 via-white to-neutral-100 shadow-inner">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-neutral-200/70">
-                      <ProductIcon />
+            {hasItems ? (
+              <div className="overflow-hidden rounded-2xl border border-neutral-200 shadow-[0_12px_32px_rgba(15,23,42,0.08)]">
+                {lineItems.map((item, index) => (
+                  <article
+                    key={item.id}
+                    className={`flex gap-3 px-4 py-3 ${index !== lineItems.length - 1 ? "border-b border-neutral-100" : ""}`}
+                  >
+                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-neutral-200 bg-gradient-to-br from-neutral-50 via-white to-neutral-100 shadow-inner">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-neutral-200/70">
+                        <ProductIcon />
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="min-w-0 flex-1 space-y-1.5">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0 space-y-0.5">
-                        <p className="truncate text-[15px] font-semibold leading-snug text-neutral-900">
-                          {item.name}
-                        </p>
-                        <p className="text-[11px] uppercase tracking-[0.16em] text-neutral-400">
-                          SKU {item.sku}
+                    <div className="min-w-0 flex-1 space-y-1.5">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 space-y-0.5">
+                          <p className="truncate text-[15px] font-semibold leading-snug text-neutral-900">
+                            {item.name}
+                          </p>
+                          <p className="text-[11px] uppercase tracking-[0.16em] text-neutral-400">
+                            SKU {item.sku}
+                          </p>
+                        </div>
+                        <p className="text-base font-semibold leading-none text-neutral-900">
+                          {formatCurrency(item.price)}
                         </p>
                       </div>
-                      <p className="text-base font-semibold leading-none text-neutral-900">
-                        {formatCurrency(item.price)}
+
+                      <p className="text-xs text-neutral-500">
+                        {item.color} · {item.variant}
                       </p>
-                    </div>
+                      <p className="text-[11px] text-neutral-500">{item.shippingMethod}</p>
 
-                    <p className="text-xs text-neutral-500">
-                      {item.color} · {item.variant}
-                    </p>
-                    <p className="text-[11px] text-neutral-500">{item.shippingMethod}</p>
-
-                    <div className="flex items-center gap-3 text-xs font-medium text-neutral-700">
-                      <div className="inline-flex items-center rounded-full border border-neutral-200 bg-white/90 px-1.5 py-0.5 shadow-sm ring-1 ring-neutral-100">
-                        <span className="sr-only">Quantity</span>
+                      <div className="flex items-center gap-3 text-xs font-medium text-neutral-700">
+                        <div className="inline-flex items-center rounded-full border border-neutral-200 bg-white/90 px-1.5 py-0.5 shadow-sm ring-1 ring-neutral-100">
+                          <span className="sr-only">Quantity</span>
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(item.id, -1)}
+                            className="flex h-9 w-9 items-center justify-center rounded-full text-lg font-semibold text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900"
+                            aria-label={`Decrease quantity for ${item.name}`}
+                          >
+                            &minus;
+                          </button>
+                          <span className="mx-1.5 w-9 text-center text-sm font-semibold text-neutral-900">
+                            {item.quantity}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(item.id, 1)}
+                            className="flex h-9 w-9 items-center justify-center rounded-full text-lg font-semibold text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900"
+                            aria-label={`Increase quantity for ${item.name}`}
+                          >
+                            +
+                          </button>
+                        </div>
+                        <span className="h-4 w-px bg-neutral-200" />
                         <button
                           type="button"
-                          onClick={() => updateQuantity(item.id, -1)}
-                          className="flex h-9 w-9 items-center justify-center rounded-full text-lg font-semibold text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900"
-                          aria-label={`Decrease quantity for ${item.name}`}
+                          className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900"
+                          aria-label={`Save ${item.name} for later`}
+                          onClick={() => removeItem(item.id)}
                         >
-                          &minus;
+                          <BookmarkIcon />
                         </button>
-                        <span className="mx-1.5 w-9 text-center text-sm font-semibold text-neutral-900">
-                          {item.quantity}
-                        </span>
                         <button
                           type="button"
-                          onClick={() => updateQuantity(item.id, 1)}
-                          className="flex h-9 w-9 items-center justify-center rounded-full text-lg font-semibold text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900"
-                          aria-label={`Increase quantity for ${item.name}`}
+                          className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 transition hover:bg-neutral-100 hover:text-rose-500"
+                          aria-label={`Remove ${item.name}`}
+                          onClick={() => removeItem(item.id)}
                         >
-                          +
+                          <TrashIcon />
                         </button>
                       </div>
-                      <span className="h-4 w-px bg-neutral-200" />
-                      <button
-                        type="button"
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900"
-                        aria-label={`Save ${item.name} for later`}
-                      >
-                        <BookmarkIcon />
-                      </button>
-                      <button
-                        type="button"
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 transition hover:bg-neutral-100 hover:text-rose-500"
-                        aria-label={`Remove ${item.name}`}
-                      >
-                        <TrashIcon />
-                      </button>
                     </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-4 rounded-2xl border border-neutral-200 bg-white px-5 py-10 text-center shadow-[0_12px_32px_rgba(15,23,42,0.06)] sm:flex-row sm:items-center sm:justify-between sm:text-left">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-neutral-200 bg-neutral-50 shadow-inner">
+                    <ProductIcon />
                   </div>
-                </article>
-              ))}
-            </div>
+                  <div className="space-y-1">
+                    <p className="text-lg font-semibold text-neutral-900">
+                      Your cart is empty
+                    </p>
+                    <p className="text-sm text-neutral-500">
+                      Start shopping to add Corn essentials.
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href="/"
+                  className="inline-flex h-11 items-center justify-center rounded-xl bg-neutral-900 px-5 text-sm font-semibold text-white transition hover:-translate-y-[2px] hover:shadow-lg"
+                >
+                  Start shopping
+                </Link>
+              </div>
+            )}
           </section>
 
-          <aside className="hidden lg:sticky lg:top-10 lg:block">
-            <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
-              <div className="border-b border-neutral-100 px-5 py-4">
-                <h2 className="text-lg font-semibold tracking-tight text-neutral-900">
-                  Order Summary
-                </h2>
-              </div>
-
-              <div className="space-y-4 px-5 py-4">
-                <div className="space-y-2 text-sm text-neutral-700">
-                  <div className="flex items-center justify-between">
-                    <span>Subtotal ({lineItems.length})</span>
-                    <span className="font-semibold text-neutral-900">
-                      {formatCurrency(subtotal)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Estimated tax</span>
-                    <span className="font-semibold text-neutral-900">
-                      {formatCurrency(estimatedTax)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Estimated shipping</span>
-                    <span className="font-semibold text-neutral-900">
-                      {formatCurrency(estimatedShipping)}
-                    </span>
-                  </div>
+          {hasItems ? (
+            <aside className="hidden lg:sticky lg:top-10 lg:block">
+              <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
+                <div className="border-b border-neutral-100 px-5 py-4">
+                  <h2 className="text-lg font-semibold tracking-tight text-neutral-900">
+                    Order Summary
+                  </h2>
                 </div>
 
-                <div className="h-px bg-gradient-to-r from-transparent via-neutral-300 to-transparent" />
+                <div className="space-y-4 px-5 py-4">
+                  <div className="space-y-2 text-sm text-neutral-700">
+                    <div className="flex items-center justify-between">
+                      <span>Subtotal ({lineItems.length})</span>
+                      <span className="font-semibold text-neutral-900">
+                        {formatCurrency(subtotal)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Estimated tax</span>
+                      <span className="font-semibold text-neutral-900">
+                        {formatCurrency(estimatedTax)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Estimated shipping</span>
+                      <span className="font-semibold text-neutral-900">
+                        {formatCurrency(estimatedShipping)}
+                      </span>
+                    </div>
+                  </div>
 
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-neutral-900">
-                      Estimated total
-                    </p>
-                    <p className="text-xs text-neutral-500">
-                      Pay in 3 with Koko available
+                  <div className="h-px bg-gradient-to-r from-transparent via-neutral-300 to-transparent" />
+
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-neutral-900">
+                        Estimated total
+                      </p>
+                      <p className="text-xs text-neutral-500">
+                        Pay in 3 with Koko available
+                      </p>
+                    </div>
+                    <p className="text-2xl font-semibold text-neutral-900">
+                      {formatCurrency(estimatedTotal)}
                     </p>
                   </div>
-                  <p className="text-2xl font-semibold text-neutral-900">
-                    {formatCurrency(estimatedTotal)}
-                  </p>
-                </div>
 
-                <div className="space-y-3">
-                  <label className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500">
-                    Apply promo code
-                  </label>
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    <input
-                      type="text"
-                      placeholder="Enter code"
-                      className="h-11 flex-1 rounded-xl border border-neutral-200 bg-neutral-50 px-3 text-sm outline-none ring-0 transition focus:border-neutral-900 focus:bg-white"
-                    />
-                    <button className="h-11 rounded-xl border border-neutral-900 px-5 text-sm font-semibold text-neutral-900 transition hover:-translate-y-0.5 hover:shadow-lg">
-                      Apply
+                  <div className="space-y-3">
+                    <label className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500">
+                      Apply promo code
+                    </label>
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                      <input
+                        type="text"
+                        placeholder="Enter code"
+                        className="h-11 flex-1 rounded-xl border border-neutral-200 bg-neutral-50 px-3 text-sm outline-none ring-0 transition focus:border-neutral-900 focus:bg-white"
+                      />
+                      <button className="h-11 rounded-xl border border-neutral-900 px-5 text-sm font-semibold text-neutral-900 transition hover:-translate-y-0.5 hover:shadow-lg">
+                        Apply
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-1">
+                    <Link
+                      href="/checkout"
+                      className="flex h-12 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-white transition hover:-translate-y-[2px] hover:shadow-xl"
+                    >
+                      Checkout
+                    </Link>
+                    <button className="h-12 w-full rounded-xl border border-neutral-300 bg-white text-sm font-semibold text-neutral-900 transition hover:border-neutral-900 hover:-translate-y-[2px] hover:shadow-lg">
+                      PayPal
                     </button>
                   </div>
                 </div>
-
-                <div className="space-y-3 pt-1">
-                  <Link
-                    href="/checkout"
-                    className="flex h-12 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-white transition hover:-translate-y-[2px] hover:shadow-xl"
-                  >
-                    Checkout
-                  </Link>
-                  <button className="h-12 w-full rounded-xl border border-neutral-300 bg-white text-sm font-semibold text-neutral-900 transition hover:border-neutral-900 hover:-translate-y-[2px] hover:shadow-lg">
-                    PayPal
-                  </button>
-                </div>
               </div>
-            </div>
-          </aside>
+            </aside>
+          ) : null}
         </div>
       </main>
 
-      <MobileCheckoutBar total={formatCurrency(estimatedTotal)} />
+      {hasItems ? <MobileCheckoutBar total={formatCurrency(estimatedTotal)} /> : null}
 
       <Footer />
       <MobileBottomNav />
@@ -303,7 +336,7 @@ const BookmarkIcon = () => (
     strokeWidth={1.8}
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="h-4.5 w-4.5"
+    className="h-[18px] w-[18px]"
     aria-hidden
   >
     <path d="M6 4h12a2 2 0 0 1 2 2v14l-8-4-8 4V6a2 2 0 0 1 2-2Z" />
@@ -319,7 +352,7 @@ const TrashIcon = () => (
     strokeWidth={1.8}
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="h-4.5 w-4.5"
+    className="h-[18px] w-[18px]"
     aria-hidden
   >
     <path d="M3 6h18" />

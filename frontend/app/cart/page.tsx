@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 
 import { Footer } from "@/components/footer";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
@@ -15,7 +18,7 @@ type CartItem = {
   quantity: number;
 };
 
-const items: CartItem[] = [
+const initialItems: CartItem[] = [
   {
     id: 1,
     name: "CornBeam Noise-Canceling Headphones",
@@ -67,7 +70,19 @@ const MobileCheckoutBar = ({ total }: { total: string }) => (
 );
 
 export default function CartPage() {
-  const subtotal = items.reduce(
+  const [lineItems, setLineItems] = useState<CartItem[]>(initialItems);
+
+  const updateQuantity = (id: number, delta: number) => {
+    setLineItems((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
+          : item,
+      ),
+    );
+  };
+
+  const subtotal = lineItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
   );
@@ -86,23 +101,23 @@ export default function CartPage() {
       <main className="mx-auto w-full max-w-5xl px-4 pb-40 pt-6 lg:max-w-6xl lg:pb-16">
         <div className="lg:grid lg:grid-cols-[minmax(0,1.65fr)_minmax(320px,0.85fr)] lg:gap-8">
           <section className="space-y-4">
-            <div className="flex items-baseline justify-between">
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-semibold tracking-tight">Your Bag</h1>
-                <span className="text-sm font-medium text-neutral-500">
-                  ({items.length} {items.length === 1 ? "item" : "items"})
+              <div className="flex items-baseline justify-between">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-semibold tracking-tight">Your Bag</h1>
+                  <span className="text-sm font-medium text-neutral-500">
+                  ({lineItems.length} {lineItems.length === 1 ? "item" : "items"})
+                  </span>
+                </div>
+                <span className="hidden text-sm font-semibold text-neutral-900 lg:inline">
+                  {formatCurrency(subtotal)}
                 </span>
               </div>
-              <span className="hidden text-sm font-semibold text-neutral-900 lg:inline">
-                {formatCurrency(subtotal)}
-              </span>
-            </div>
 
             <div className="overflow-hidden rounded-2xl border border-neutral-200 shadow-[0_12px_32px_rgba(15,23,42,0.08)]">
-              {items.map((item, index) => (
+              {lineItems.map((item, index) => (
                 <article
                   key={item.id}
-                  className={`flex gap-3 px-4 py-3 ${index !== items.length - 1 ? "border-b border-neutral-100" : ""}`}
+                  className={`flex gap-3 px-4 py-3 ${index !== lineItems.length - 1 ? "border-b border-neutral-100" : ""}`}
                 >
                   <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-neutral-200 bg-gradient-to-br from-neutral-50 via-white to-neutral-100 shadow-inner">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-neutral-200/70">
@@ -131,11 +146,27 @@ export default function CartPage() {
                     <p className="text-[11px] text-neutral-500">{item.shippingMethod}</p>
 
                     <div className="flex items-center gap-3 text-xs font-medium text-neutral-700">
-                      <div className="flex items-center gap-2 rounded-full border border-neutral-200 px-3 py-1 shadow-inner">
-                        <span className="text-[11px] uppercase tracking-wide text-neutral-400">
-                          Qty
+                      <div className="inline-flex items-center rounded-full border border-neutral-200 bg-white/90 px-1.5 py-0.5 shadow-sm ring-1 ring-neutral-100">
+                        <span className="sr-only">Quantity</span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.id, -1)}
+                          className="flex h-9 w-9 items-center justify-center rounded-full text-lg font-semibold text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900"
+                          aria-label={`Decrease quantity for ${item.name}`}
+                        >
+                          &minus;
+                        </button>
+                        <span className="mx-1.5 w-9 text-center text-sm font-semibold text-neutral-900">
+                          {item.quantity}
                         </span>
-                        <span className="text-sm text-neutral-900">{item.quantity}</span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.id, 1)}
+                          className="flex h-9 w-9 items-center justify-center rounded-full text-lg font-semibold text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900"
+                          aria-label={`Increase quantity for ${item.name}`}
+                        >
+                          +
+                        </button>
                       </div>
                       <button className="text-neutral-500 underline-offset-4 transition hover:text-neutral-900">
                         Save for later
@@ -162,7 +193,7 @@ export default function CartPage() {
               <div className="space-y-4 px-5 py-4">
                 <div className="space-y-2 text-sm text-neutral-700">
                   <div className="flex items-center justify-between">
-                    <span>Subtotal ({items.length})</span>
+                    <span>Subtotal ({lineItems.length})</span>
                     <span className="font-semibold text-neutral-900">
                       {formatCurrency(subtotal)}
                     </span>

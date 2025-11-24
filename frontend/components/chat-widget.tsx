@@ -58,7 +58,7 @@ export function ChatWidget() {
   if (pathname?.startsWith("/cart")) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+170px)] z-[80] sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-auto">
+    <div className="pointer-events-none fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+88px)] z-[80] sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-auto">
       {isOpen ? (
         <div className="pointer-events-auto mb-3 w-full rounded-2xl border border-neutral-200 bg-white shadow-[0_16px_50px_-24px_rgba(0,0,0,0.45)] sm:w-[380px]">
           <header className="flex items-center justify-between gap-3 rounded-t-2xl border-b border-neutral-100 bg-white px-4 py-3">

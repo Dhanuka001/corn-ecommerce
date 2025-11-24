@@ -126,7 +126,7 @@ export function MobileBottomNav() {
           <span>Home</span>
         </Link>
         <Link
-          href="/#shop"
+          href="/shop"
           className="flex flex-1 flex-col items-center gap-1 text-xs font-semibold text-slate-500 transition"
         >
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-50">

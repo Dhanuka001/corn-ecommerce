@@ -28,7 +28,7 @@ export function Footer() {
   const social = ["facebook", "x", "linkedin", "youtube", "instagram"];
 
   return (
-    <footer className="mt-16 bg-[#0f0f0f] text-white">
+    <footer id="contact" className="mt-16 bg-[#0f0f0f] text-white">
       <div className="mx-auto w-full max-w-7xl px-4 py-12 lg:py-16">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_minmax(0,1.25fr)]">
           <div className="space-y-6">

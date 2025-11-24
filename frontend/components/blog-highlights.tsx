@@ -31,7 +31,11 @@ const posts = [
 
 export function BlogHighlights() {
   return (
-    <section className="px-4 py-14 sm:py-16" aria-label="Featured blogs">
+    <section
+      id="blog"
+      className="px-4 py-14 sm:py-16"
+      aria-label="Featured blogs"
+    >
       <div className="mx-auto w-full max-w-7xl">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-3xl font-semibold text-slate-900">

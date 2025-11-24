@@ -22,50 +22,56 @@ jobs:
           [ -z "$PORT" ] && PORT=22
           ssh-keyscan -p "$PORT" -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Deploy over SSH (down + build + force-recreate)
+      - name: Deploy over SSH (safe clone + build + restart)
         env:
           VPS_HOST:     ${{ secrets.VPS_HOST }}
           VPS_USER:     ${{ secrets.VPS_USER }}
           VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT }}
-          VPS_APP_DIR:  ${{ secrets.VPS_APP_DIR }}   # e.g. /opt/app
-          GIT_BRANCH:   ${{ secrets.GIT_BRANCH }}    # optional; defaults to main
+          VPS_APP_DIR:  ${{ secrets.VPS_APP_DIR }}   # /opt/app
+          GIT_BRANCH:   ${{ secrets.GIT_BRANCH }}    # main
         run: |
           PORT="${VPS_SSH_PORT:-22}"
 
-          # Pass variables into the remote shell; provide safe defaults
           ssh -i ~/.ssh/id_ci -o StrictHostKeyChecking=yes -p "$PORT" \
             "$VPS_USER@$VPS_HOST" \
             "VPS_APP_DIR='${VPS_APP_DIR:-/opt/app}' GIT_BRANCH='${GIT_BRANCH:-main}' bash -s" <<'EOF'
           set -euo pipefail
 
-          # Safe defaults even with `set -u`
           : "${VPS_APP_DIR:=/opt/app}"
           : "${GIT_BRANCH:=main}"
 
-          echo "[1/6] Pulling latest code for branch: $GIT_BRANCH"
-          cd "$VPS_APP_DIR"
-          git fetch origin "$GIT_BRANCH"
-          git reset --hard "origin/$GIT_BRANCH"
+          echo "[1/6] Checking repo state"
+          if [ ! -d "$VPS_APP_DIR/.git" ]; then
+            echo "⚠️  No git repository found. Cloning fresh..."
+            rm -rf "$VPS_APP_DIR"
+            git clone -b "$GIT_BRANCH" https://github.com/Dhanuka001/corn-ecommerce "$VPS_APP_DIR"
+            cd "$VPS_APP_DIR"
+          else
+            echo "✔ Repo exists — pulling latest"
+            cd "$VPS_APP_DIR"
+            git fetch origin "$GIT_BRANCH"
+            git reset --hard "origin/$GIT_BRANCH"
+          fi
 
-          echo "[2/6] Moving to infra folder"
+          echo "[2/6] Going to infra folder"
           cd "$VPS_APP_DIR/infra"
 
-          echo "[3/6] Stopping old stack (prevents name conflicts)"
+          echo "[3/6] Stopping old containers"
           docker compose -f docker-compose.prod.yml down --remove-orphans || true
           docker network rm corn-ecommerce_web || true
 
-          echo "[4/6] Building images"
+          echo "[4/6] Building new containers"
           docker compose -f docker-compose.prod.yml build
 
-          echo "[5/6] Starting stack (force recreate + remove orphans)"
+          echo "[5/6] Starting stack"
           docker compose -f docker-compose.prod.yml up -d --force-recreate --remove-orphans
 
-          echo "[6/6] Applying Prisma migrations (safe)"
+          echo "[6/6] Running Prisma migrations"
           if docker compose -f docker-compose.prod.yml ps backend >/dev/null 2>&1; then
             docker compose -f docker-compose.prod.yml exec -T backend sh -lc \
               'npx prisma generate && npx prisma migrate deploy || true'
           fi
 
-          echo "Status:"
+          echo "Deployment completed successfully!"
           docker compose -f docker-compose.prod.yml ps
           EOF

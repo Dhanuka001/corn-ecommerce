@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import type { MouseEvent } from "react";
 
 import type { Product } from "@/data/products";
 
@@ -71,11 +73,25 @@ type ProductCardProps = {
 };
 
 export function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter();
+
+  const goToCart = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    router.push("/cart");
+  };
+
+  const goToFavorites = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    router.push("/favorites");
+  };
+
   return (
     <article className="group relative flex flex-col rounded-3xl border border-slate-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-slate-200 hover:shadow-xl">
       <Link
         href={`/product/${product.slug}`}
-        className="absolute inset-0 z-10 rounded-3xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        className="absolute inset-0 z-0 rounded-3xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
         <span className="sr-only">View {product.name}</span>
       </Link>
@@ -84,16 +100,30 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="text-sm font-semibold uppercase tracking-wide text-slate-400">
           Product preview
         </div>
-        <div className="pointer-events-none absolute inset-x-6 bottom-4 flex translate-y-3 items-center justify-center gap-2 rounded-full bg-primary/95 px-4 py-2 text-white opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10" aria-hidden>
+        <div className="absolute inset-x-6 bottom-4 z-20 flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-slate-700 shadow-[0_10px_28px_rgba(15,23,42,0.12)] transition duration-300 opacity-100 translate-y-0 lg:border-0 lg:bg-primary/95 lg:text-white lg:shadow-[0_18px_38px_-18px_rgba(79,70,229,0.55)] lg:opacity-0 lg:translate-y-3 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">
+          <Link
+            href={`/product/${product.slug}`}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10 transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white lg:border-white/25 lg:bg-white/10 lg:hover:bg-white/20"
+            aria-label={`View ${product.name}`}
+          >
             <EyeIcon size={16} />
-          </span>
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white" aria-hidden>
+          </Link>
+          <button
+            type="button"
+            onClick={goToCart}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:border-white/25 lg:bg-white/10 lg:text-white lg:hover:bg-white/20"
+            aria-label={`Go to cart from ${product.name}`}
+          >
             <CartIcon size={16} />
-          </span>
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10" aria-hidden>
+          </button>
+          <button
+            type="button"
+            onClick={goToFavorites}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:border-white/25 lg:bg-white/10 lg:text-white lg:hover:bg-white/20"
+            aria-label={`Go to favorites from ${product.name}`}
+          >
             <HeartIcon size={16} />
-          </span>
+          </button>
         </div>
       </div>
 

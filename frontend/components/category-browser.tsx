@@ -10,6 +10,7 @@ const categories = [
   { label: "Karaoke Speakers", image: "/categories/karoke-speaker.png" },
   { label: "Smart Watches", image: "/categories/smart%20watch.png" },
   { label: "Mobile & Tablets", image: "/categories/mobile-tablet.png" },
+  { label: "Powerbanks", image: "/categories/powerbank.png" },
   { label: "Home Appliances", image: "/categories/home-appliences.png" },
 ];
 

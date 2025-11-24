@@ -38,18 +38,19 @@ model User {
 }
 
 model Address {
-  id         String   @id @default(cuid())
-  userId     String?
-  user       User?    @relation(fields: [userId], references: [id])
-  fullName   String
-  phone      String
-  line1      String
-  line2      String?
-  city       String
-  district   String
-  postalCode String?
-  country    String   @default("LK")
-  createdAt  DateTime @default(now())
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  fullName     String
+  phone        String
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  district     String
+  postalCode   String?
+  country      String   @default("LK")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Order {
@@ -159,4 +160,20 @@ model ProductOnCategory {
   category   Category @relation(fields: [categoryId], references: [id])
 
   @@id([productId, categoryId])
+}
+
+model ShippingZone {
+  id        String         @id @default(cuid())
+  name      String
+  districts String[]
+  rates     ShippingRate[]
+}
+
+model ShippingRate {
+  id             String       @id @default(cuid())
+  zoneId         String
+  zone           ShippingZone @relation(fields: [zoneId], references: [id])
+  minSubtotalLKR Int          @default(0)
+  priceLKR       Int
+  label          String
 }

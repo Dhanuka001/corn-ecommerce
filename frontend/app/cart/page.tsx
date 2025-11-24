@@ -2,11 +2,18 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 import { Footer } from "@/components/footer";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { Navbar } from "@/components/navbar";
 import { useCart } from "@/context/cart-context";
+import { useNotifications } from "@/context/notification-context";
+import { useAuth } from "@/context/auth-context";
+import { getAddresses, type Address } from "@/lib/api/addresses";
+import { CheckoutAddressSelector } from "@/components/checkout/checkout-address-selector";
+import { CheckoutSummary } from "@/components/checkout/checkout-summary";
+import { fetchCheckoutSummary } from "@/lib/api/checkout";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("en-LK", {
@@ -15,11 +22,83 @@ const formatCurrency = (value: number) =>
   }).format(value);
 
 export default function CartPage() {
+  const { user, openAuth } = useAuth();
   const { cart, loading, pending, updateQuantity, removeItem } = useCart();
+  const { notifyError } = useNotifications();
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [addressLoading, setAddressLoading] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [summary, setSummary] = useState<{
+    subTotalLKR: number;
+    shippingLKR: number;
+    discountLKR: number;
+    totalLKR: number;
+    shippingRateLabel?: string;
+  } | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
 
   const items = cart?.items ?? [];
   const subtotal = cart?.summary?.subTotalLKR ?? 0;
   const totalQuantity = cart?.summary?.totalQuantity ?? items.length;
+
+  const cartId = cart?.id ?? null;
+
+  const loadAddresses = async () => {
+    if (!user) return;
+    setAddressLoading(true);
+    try {
+      const data = await getAddresses();
+      setAddresses(data.items);
+      if (!selectedAddressId && data.items.length) {
+        setSelectedAddressId(data.items[0].id);
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to load addresses.";
+      notifyError("Addresses unavailable", message);
+    } finally {
+      setAddressLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    void loadAddresses();
+  }, [user]);
+
+  const fetchSummary = async (addressId: string) => {
+    if (!cartId || !addressId) return;
+    setSummaryLoading(true);
+    try {
+      const data = await fetchCheckoutSummary({
+        cartId,
+        shippingAddressId: addressId,
+      });
+      setSummary({
+        subTotalLKR: data.subTotalLKR,
+        shippingLKR: data.shippingLKR,
+        discountLKR: data.discountLKR,
+        totalLKR: data.totalLKR,
+        shippingRateLabel: data.shippingRate.label,
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to update shipping.";
+      if (message.toLowerCase().includes("cart is empty")) {
+        window.location.href = "/cart";
+      } else {
+        notifyError("Shipping update failed", message);
+      }
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedAddressId) {
+      void fetchSummary(selectedAddressId);
+    }
+  }, [selectedAddressId, cartId]);
 
   const handleQtyChange = (itemId: string, qty: number) => {
     if (qty < 1) {
@@ -28,6 +107,8 @@ export default function CartPage() {
       void updateQuantity(itemId, qty);
     }
   };
+
+  const canCheckout = !!selectedAddressId && !!summary;
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -169,55 +250,65 @@ export default function CartPage() {
                 })}
               </div>
             )}
+
+            <div className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">
+                    Shipping address
+                  </p>
+                  <p className="text-lg font-semibold text-neutral-900">
+                    Deliver to
+                  </p>
+                </div>
+                <Link
+                  href="/account/addresses"
+                  className="text-sm font-semibold text-primary transition hover:text-red-500"
+                >
+                  Manage addresses
+                </Link>
+              </div>
+              {addressLoading ? (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {Array.from({ length: 2 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="h-24 rounded-2xl border border-neutral-200 bg-neutral-50"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <CheckoutAddressSelector
+                  addresses={addresses}
+                  selectedAddressId={selectedAddressId}
+                  onChange={(id) => setSelectedAddressId(id)}
+                />
+              )}
+            </div>
           </section>
 
           <aside className="lg:sticky lg:top-12">
-            <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-md">
-              <div className="border-b border-neutral-100 px-6 py-5">
-                <h2 className="text-xl font-semibold text-neutral-900">
-                  Order Summary
-                </h2>
-              </div>
-
-              <div className="space-y-4 px-6 py-5">
-                <div className="space-y-2 text-sm text-neutral-700">
-                  <div className="flex items-center justify-between">
-                    <span>Subtotal ({totalQuantity})</span>
-                    <span className="font-semibold text-neutral-900">
-                      {formatCurrency(subtotal)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Shipping</span>
-                    <span className="font-semibold text-neutral-900">
-                      Calculated at checkout
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Tax</span>
-                    <span className="font-semibold text-neutral-900">—</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between border-t border-neutral-100 pt-4 text-base font-semibold text-neutral-900">
-                  <span>Total</span>
-                  <span>{formatCurrency(subtotal)}</span>
-                </div>
-              </div>
-
-              <div className="space-y-3 border-t border-neutral-100 px-6 py-5">
-                <button
-                  className="w-full rounded-full border border-primary bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60"
-                  disabled={items.length === 0 || pending}
-                >
-                  Checkout
-                </button>
-                <Link
-                  href="/shop"
-                  className="flex w-full items-center justify-center gap-2 rounded-full border border-neutral-200 bg-white px-5 py-3 text-sm font-semibold text-neutral-800 transition hover:border-neutral-900"
-                >
-                  Continue shopping
-                </Link>
-              </div>
+            <CheckoutSummary
+              subTotalLKR={summary?.subTotalLKR ?? subtotal}
+              shippingLKR={summary?.shippingLKR ?? 0}
+              discountLKR={summary?.discountLKR ?? 0}
+              totalLKR={summary?.totalLKR ?? subtotal}
+              shippingRateLabel={summary?.shippingRateLabel}
+              loading={summaryLoading}
+            />
+            <div className="mt-4 space-y-3">
+              <button
+                className="w-full rounded-full border border-primary bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60"
+                disabled={!canCheckout || pending}
+              >
+                Continue to payment
+              </button>
+              <Link
+                href="/shop"
+                className="flex w-full items-center justify-center gap-2 rounded-full border border-neutral-200 bg-white px-5 py-3 text-sm font-semibold text-neutral-800 transition hover:border-neutral-900"
+              >
+                Continue shopping
+              </Link>
             </div>
           </aside>
         </div>

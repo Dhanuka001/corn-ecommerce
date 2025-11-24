@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
         hostname: "cornelectronics.com",
       },
       {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
         protocol: "http",
         hostname: "localhost",
       },

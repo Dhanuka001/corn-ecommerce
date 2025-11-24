@@ -264,12 +264,62 @@ const productSeeds = [
   },
 ];
 
+const shippingZoneSeeds = [
+  {
+    name: "Colombo / Gampaha",
+    districts: ["Colombo", "Gampaha"],
+    rates: [
+      { label: "Standard Delivery (Metro)", priceLKR: 450, minSubtotalLKR: 0 },
+      { label: "Standard Delivery (Metro) - Free", priceLKR: 0, minSubtotalLKR: 10000 },
+    ],
+  },
+  {
+    name: "Outstation",
+    districts: [
+      "Anuradhapura",
+      "Badulla",
+      "Batticaloa",
+      "Galle",
+      "Hambantota",
+      "Jaffna",
+      "Kandy",
+      "Kegalle",
+      "Kilinochchi",
+      "Kurunegala",
+      "Mannar",
+      "Matale",
+      "Matara",
+      "Monaragala",
+      "Mullaitivu",
+      "Nuwara Eliya",
+      "Polonnaruwa",
+      "Puttalam",
+      "Ratnapura",
+      "Trincomalee",
+      "Vavuniya",
+    ],
+    rates: [
+      { label: "Standard Delivery (Outstation)", priceLKR: 650, minSubtotalLKR: 0 },
+      {
+        label: "Standard Delivery (Outstation) - Free",
+        priceLKR: 0,
+        minSubtotalLKR: 15000,
+      },
+    ],
+  },
+];
+
 async function resetCatalog() {
+  await prisma.cartItem.deleteMany();
+  await prisma.cart.deleteMany();
+  await prisma.favorite?.deleteMany?.();
   await prisma.productOnCategory.deleteMany();
   await prisma.productImage.deleteMany();
   await prisma.variant.deleteMany();
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
+  await prisma.shippingRate.deleteMany();
+  await prisma.shippingZone.deleteMany();
 }
 
 async function seedCategories() {
@@ -323,8 +373,24 @@ async function main() {
   await resetCatalog();
   await seedCategories();
   await seedProducts();
+  console.log("Seeding shipping zones...");
+  for (const zone of shippingZoneSeeds) {
+    await prisma.shippingZone.create({
+      data: {
+        name: zone.name,
+        districts: zone.districts,
+        rates: {
+          create: zone.rates.map((rate) => ({
+            label: rate.label,
+            priceLKR: rate.priceLKR,
+            minSubtotalLKR: rate.minSubtotalLKR,
+          })),
+        },
+      },
+    });
+  }
   console.log(
-    `Seeded ${categorySeeds.length} categories & ${productSeeds.length} products.`,
+    `Seeded ${categorySeeds.length} categories, ${productSeeds.length} products, and ${shippingZoneSeeds.length} shipping zones.`,
   );
 }
 

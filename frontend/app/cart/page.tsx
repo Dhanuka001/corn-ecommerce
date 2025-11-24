@@ -13,7 +13,7 @@ import { useAuth } from "@/context/auth-context";
 import { getAddresses, type Address } from "@/lib/api/addresses";
 import { CheckoutAddressSelector } from "@/components/checkout/checkout-address-selector";
 import { CheckoutSummary } from "@/components/checkout/checkout-summary";
-import { fetchCheckoutSummary } from "@/lib/api/checkout";
+import { fetchCheckoutSummary, placeOrder } from "@/lib/api/checkout";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("en-LK", {
@@ -23,8 +23,8 @@ const formatCurrency = (value: number) =>
 
 export default function CartPage() {
   const { user, openAuth } = useAuth();
-  const { cart, loading, pending, updateQuantity, removeItem } = useCart();
-  const { notifyError } = useNotifications();
+  const { cart, loading, pending, updateQuantity, removeItem, refresh } = useCart();
+  const { notifyError, notifySuccess } = useNotifications();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [addressLoading, setAddressLoading] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -36,6 +36,7 @@ export default function CartPage() {
     shippingRateLabel?: string;
   } | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
+  const [placingOrder, setPlacingOrder] = useState(false);
 
   const items = cart?.items ?? [];
   const subtotal = cart?.summary?.subTotalLKR ?? 0;
@@ -67,7 +68,9 @@ export default function CartPage() {
   }, [user]);
 
   const fetchSummary = async (addressId: string) => {
-    if (!cartId || !addressId) return;
+    if (!cartId || !addressId || items.length === 0) {
+      return;
+    }
     setSummaryLoading(true);
     try {
       const data = await fetchCheckoutSummary({
@@ -95,10 +98,10 @@ export default function CartPage() {
   };
 
   useEffect(() => {
-    if (selectedAddressId) {
+    if (selectedAddressId && items.length > 0) {
       void fetchSummary(selectedAddressId);
     }
-  }, [selectedAddressId, cartId]);
+  }, [selectedAddressId, cartId, items.length]);
 
   const handleQtyChange = (itemId: string, qty: number) => {
     if (qty < 1) {
@@ -109,6 +112,37 @@ export default function CartPage() {
   };
 
   const canCheckout = !!selectedAddressId && !!summary;
+
+  const handlePlaceOrder = async () => {
+    if (!selectedAddressId || !summary) {
+      notifyError("Address required", "Select a shipping address first.");
+      return;
+    }
+    setPlacingOrder(true);
+    try {
+      const idempotencyKey =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : Math.random().toString(36).slice(2);
+      const result = await placeOrder({
+        shippingAddressId: selectedAddressId,
+        billingAddressId: selectedAddressId,
+        paymentMethod: "COD",
+        idempotencyKey,
+      });
+      await refresh();
+      notifySuccess(
+        "Order placed",
+        `Order ${result.orderNo} confirmed. Total ${formatCurrency(result.totalLKR)}.`,
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to place order.";
+      notifyError("Checkout failed", message);
+    } finally {
+      setPlacingOrder(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -299,9 +333,10 @@ export default function CartPage() {
             <div className="mt-4 space-y-3">
               <button
                 className="w-full rounded-full border border-primary bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60"
-                disabled={!canCheckout || pending}
+                disabled={!canCheckout || pending || placingOrder}
+                onClick={handlePlaceOrder}
               >
-                Continue to payment
+                {placingOrder ? "Placing order..." : "Place order"}
               </button>
               <Link
                 href="/shop"

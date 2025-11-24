@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -42,8 +43,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [pending, setPending] = useState(false);
+  const initializedRef = useRef(false);
+  const lastUserIdRef = useRef<string | null>(null);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async ({ force = false } = {}) => {
+    if (!force && initializedRef.current) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const nextCart = await fetchCart();
@@ -54,13 +61,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
       notifyError("Cart unavailable", message);
       setCart(null);
     } finally {
+      initializedRef.current = true;
       setLoading(false);
     }
   }, [notifyError]);
 
   useEffect(() => {
     if (authLoading) return;
-    void refresh();
+    if (initializedRef.current && lastUserIdRef.current === (user?.id ?? null)) {
+      return;
+    }
+    initializedRef.current = true;
+    lastUserIdRef.current = user?.id ?? null;
+    void refresh({ force: true });
   }, [authLoading, user?.id, refresh]);
 
   const addItem = useCallback(

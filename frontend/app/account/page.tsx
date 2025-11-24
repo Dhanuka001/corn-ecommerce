@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState, type SVGAttributes } from "react";
 
 import { useAuth } from "@/context/auth-context";
@@ -16,6 +17,8 @@ import {
   type Address,
   type AddressPayload,
 } from "@/lib/api/addresses";
+import { getOrders, type Order } from "@/lib/api/orders";
+import { OrderCard } from "@/components/account/order-card";
 
 type IconProps = SVGAttributes<SVGSVGElement> & {
   size?: number;
@@ -175,6 +178,9 @@ export default function AccountPage() {
   const [addressFormLoading, setAddressFormLoading] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState<Address | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [cancelLoadingId, setCancelLoadingId] = useState<string | null>(null);
 
   const initials = useMemo(() => {
     if (!user) return "";
@@ -213,6 +219,24 @@ export default function AccountPage() {
       }
     };
     void loadAddresses();
+  }, [activeSection, user]);
+
+  useEffect(() => {
+    const loadOrders = async () => {
+      if (!user || activeSection !== "orders") return;
+      setOrdersLoading(true);
+      try {
+        const data = await getOrders();
+        setOrders(data.orders);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Unable to load orders.";
+        notifyError("Orders unavailable", message);
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
+    void loadOrders();
   }, [activeSection, user]);
 
   const handleSaveAddress = async (payload: AddressPayload) => {
@@ -353,14 +377,45 @@ export default function AccountPage() {
         );
       case "orders":
         return (
-          <section className="rounded-[32px] border border-slate-100 bg-white p-8 text-center shadow-[0_25px_70px_rgba(15,23,42,0.06)]">
-            <p className="text-xl font-semibold text-slate-900">You don&apos;t have any orders!</p>
-            <p className="mt-2 text-sm text-slate-500">
-              Every order you place will show up here with tracking details.
-            </p>
-            <button className="mt-6 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white">
-              Start shopping
-            </button>
+          <section className="rounded-[32px] border border-slate-100 bg-white p-8 shadow-[0_25px_70px_rgba(15,23,42,0.06)]">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">Your orders</h2>
+                <p className="text-sm text-slate-500">
+                  Track recent purchases and payment status.
+                </p>
+              </div>
+              <button className="rounded-full border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-800 transition hover:border-neutral-900 hover:bg-neutral-50">
+                Need help?
+              </button>
+            </div>
+            <div className="mt-6 space-y-4">
+              {ordersLoading ? (
+                Array.from({ length: 3 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="h-32 rounded-2xl border border-neutral-200 bg-neutral-50 shadow-inner"
+                  />
+                ))
+              ) : orders.length === 0 ? (
+                <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-neutral-200 bg-white px-6 py-8 text-center shadow-sm">
+                  <p className="text-lg font-semibold text-neutral-900">
+                    You don&apos;t have any orders!
+                  </p>
+                  <p className="text-sm text-neutral-600">
+                    Every order you place will show up here with tracking details.
+                  </p>
+                  <Link
+                    href="/shop"
+                    className="rounded-full border border-primary bg-primary px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg"
+                  >
+                    Start shopping
+                  </Link>
+                </div>
+              ) : (
+                orders.map((order) => <OrderCard key={order.id} order={order} />)
+              )}
+            </div>
           </section>
         );
       case "downloads":

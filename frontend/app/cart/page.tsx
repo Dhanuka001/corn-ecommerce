@@ -168,12 +168,20 @@ export default function CartPage() {
                           +
                         </button>
                       </div>
-                      <button className="text-neutral-500 underline-offset-4 transition hover:text-neutral-900">
-                        Save for later
+                      <span className="h-4 w-px bg-neutral-200" />
+                      <button
+                        type="button"
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900"
+                        aria-label={`Save ${item.name} for later`}
+                      >
+                        <BookmarkIcon />
                       </button>
-                      <span className="h-3 w-px bg-neutral-200" />
-                      <button className="text-neutral-500 underline-offset-4 transition hover:text-rose-500">
-                        Remove
+                      <button
+                        type="button"
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 transition hover:bg-neutral-100 hover:text-rose-500"
+                        aria-label={`Remove ${item.name}`}
+                      >
+                        <TrashIcon />
                       </button>
                     </div>
                   </div>
@@ -283,5 +291,41 @@ const ProductIcon = () => (
     <rect x="3" y="4" width="18" height="14" rx="2" ry="2" />
     <path d="M3 10h18" />
     <path d="M10 14h4" />
+  </svg>
+);
+
+const BookmarkIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.8}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="h-4.5 w-4.5"
+    aria-hidden
+  >
+    <path d="M6 4h12a2 2 0 0 1 2 2v14l-8-4-8 4V6a2 2 0 0 1 2-2Z" />
+  </svg>
+);
+
+const TrashIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.8}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="h-4.5 w-4.5"
+    aria-hidden
+  >
+    <path d="M3 6h18" />
+    <path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6" />
+    <path d="M6 6v13a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6" />
+    <path d="M10 11v6" />
+    <path d="M14 11v6" />
   </svg>
 );

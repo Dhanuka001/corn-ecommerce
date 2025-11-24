@@ -77,7 +77,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [authLoading, user?.id, refresh]);
 
   const addItem = useCallback(
-    async ({ productId, variantId, qty = 1 }) => {
+    async ({
+      productId,
+      variantId,
+      qty = 1,
+    }: {
+      productId: string;
+      variantId?: string | null;
+      qty?: number;
+    }) => {
       setPending(true);
       try {
         const nextCart = await addCartItem({

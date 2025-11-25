@@ -19,6 +19,7 @@ import {
 } from "@/lib/api/addresses";
 import { getOrders, type Order } from "@/lib/api/orders";
 import { OrderCard } from "@/components/account/order-card";
+import { fetchFavorites } from "@/lib/favorites-api";
 
 type IconProps = SVGAttributes<SVGSVGElement> & {
   size?: number;
@@ -180,6 +181,7 @@ export default function AccountPage() {
   const [confirmingDelete, setConfirmingDelete] = useState<Address | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [favoritesCount, setFavoritesCount] = useState<number>(0);
   const [cancelLoadingId, setCancelLoadingId] = useState<string | null>(null);
 
   const initials = useMemo(() => {
@@ -223,7 +225,7 @@ export default function AccountPage() {
 
   useEffect(() => {
     const loadOrders = async () => {
-      if (!user || activeSection !== "orders") return;
+      if (!user || (activeSection !== "orders" && activeSection !== "dashboard")) return;
       setOrdersLoading(true);
       try {
         const data = await getOrders();
@@ -237,7 +239,22 @@ export default function AccountPage() {
       }
     };
     void loadOrders();
-  }, [activeSection, user]);
+  }, [activeSection, user, notifyError]);
+
+  useEffect(() => {
+    const loadFavorites = async () => {
+      if (!user || activeSection !== "dashboard") return;
+      try {
+        const items = await fetchFavorites();
+        setFavoritesCount(items.length);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Unable to load wishlist.";
+        notifyError("Wishlist unavailable", message);
+      }
+    };
+    void loadFavorites();
+  }, [activeSection, user, notifyError]);
 
   const handleSaveAddress = async (payload: AddressPayload) => {
     setAddressFormLoading(true);
@@ -323,22 +340,36 @@ export default function AccountPage() {
                 <button
                   type="button"
                   onClick={requestLogout}
-                  className="rounded-full border border-slate-200 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:border-primary/20 hover:bg-primary/5 hover:text-primary"
+                  className="inline-flex items-center gap-2 rounded-full border border-red-200 px-5 py-2 text-sm font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-50"
                 >
+                  <LogoutIcon size={18} />
                   Sign out
                 </button>
               </div>
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
                 {[
-                  { label: "Open orders", value: "02" },
-                  { label: "Downloads", value: "04" },
-                  { label: "Wishlist", value: "06" },
+                  {
+                    label: "Open orders",
+                    value: orders.filter(
+                      (order) => !["FULFILLED", "CANCELLED", "REFUNDED"].includes(order.status),
+                    ).length,
+                  },
+                  {
+                    label: "Downloads",
+                    value: 0,
+                  },
+                  {
+                    label: "Wishlist",
+                    value: favoritesCount,
+                  },
                 ].map((item) => (
                   <div
                     key={item.label}
                     className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-5 text-center"
                   >
-                    <p className="text-2xl font-semibold text-slate-900">{item.value}</p>
+                    <p className="text-2xl font-semibold text-slate-900">
+                      {item.value.toString().padStart(2, "0")}
+                    </p>
                     <p className="text-xs uppercase tracking-wide text-slate-500">
                       {item.label}
                     </p>

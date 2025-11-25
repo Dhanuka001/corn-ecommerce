@@ -119,7 +119,7 @@ const navLinks = [
   { label: "Popular", href: "/#best-selling" },
   { label: "Shop", href: "/shop" },
   { label: "Contact", href: "/#contact" },
-  { label: "Blogs", href: "/#blog" },
+  { label: "Blog", href: "/blog" },
 ];
 
 const megaCategories = [

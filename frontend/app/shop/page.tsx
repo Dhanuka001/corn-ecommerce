@@ -47,7 +47,7 @@ export default function ShopPage() {
                   Jump to best sellers
                 </Link>
                 <Link
-                  href="/#blog"
+                  href="/blog"
                   className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-white transition hover:border-white/50"
                 >
                   Read Corn stories

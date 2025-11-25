@@ -22,6 +22,7 @@ type User = {
   lastName?: string | null;
   avatarUrl?: string | null;
   role: string;
+  suspended: boolean;
 };
 
 type AuthMode = "login" | "register";

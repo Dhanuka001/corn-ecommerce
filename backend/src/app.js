@@ -19,6 +19,9 @@ const adminProductsRouter = require("./routes/admin/products");
 const adminCategoriesRouter = require("./routes/admin/categories");
 const adminSettingsRouter = require("./routes/admin/settings");
 const adminOrdersRouter = require("./routes/admin/orders");
+const adminUsersRouter = require("./routes/admin/users");
+const adminAuditRouter = require("./routes/admin/audit");
+const adminOverviewRouter = require("./routes/admin/overview");
 
 const app = express();
 
@@ -29,7 +32,17 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json());
+app.use(
+  express.json({
+    limit: env.requestBodyLimit,
+  }),
+);
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: env.requestBodyLimit,
+  }),
+);
 app.use(cookieParser());
 
 app.use("/health", healthRouter);
@@ -49,6 +62,9 @@ app.use("/admin/products", adminProductsRouter);
 app.use("/admin/categories", adminCategoriesRouter);
 app.use("/admin/settings", adminSettingsRouter);
 app.use("/admin/orders", adminOrdersRouter);
+app.use("/admin/users", adminUsersRouter);
+app.use("/admin/audit", adminAuditRouter);
+app.use("/admin/overview", adminOverviewRouter);
 
 app.use((_req, res) => respond.error(res, 404, "Route not found"));
 

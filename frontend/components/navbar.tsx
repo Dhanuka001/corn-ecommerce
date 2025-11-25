@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState, type SVGAttributes } from "react";
+import { useState, type SVGAttributes } from "react";
 
 import { useAuth } from "@/context/auth-context";
 import { useCart } from "@/context/cart-context";
@@ -117,62 +117,11 @@ const BagIcon = ({ size = 20, ...props }: IconProps) => (
   </svg>
 );
 
-const navLinks = [
+const baseNavLinks = [
   { label: "Popular", href: "/#best-selling" },
   { label: "Shop", href: "/shop" },
   { label: "Contact", href: "/#contact" },
   { label: "Blogs", href: "/#blog" },
-];
-
-const megaCategories = [
-  {
-    title: "Audio",
-    items: [
-      { label: "Soundbars" },
-      { label: "Party Speakers" },
-      { label: "Portable Speakers" },
-      { label: "Neckbands" },
-      { label: "TWS Buds" },
-    ],
-  },
-  {
-    title: "Mobile Accessories",
-    items: [
-      { label: "Power Banks" },
-      { label: "Cables" },
-      { label: "Wireless Chargers" },
-      { label: "Chargers" },
-      { label: "Mobile Holders" },
-    ],
-  },
-  {
-    title: "Computer Accessories",
-    items: [
-      { label: "Keyboard & Mouse" },
-      { label: "Wireless Keyboard" },
-      { label: "Gaming Keyboard" },
-      { label: "Docking Stations" },
-    ],
-  },
-  {
-    title: "Car Accessories",
-    items: [
-      { label: "Car Chargers" },
-      { label: "Bluetooth" },
-      { label: "Tyre Inflator" },
-      { label: "Mobile Holder" },
-    ],
-  },
-  {
-    title: "Smart Gadgets",
-    items: [
-      { label: "Ear Cleaners" },
-      { label: "Portable Fans" },
-      { label: "Selfie Stick" },
-      { label: "Flashlight" },
-      { label: "Stylus" },
-    ],
-  },
 ];
 
 export function Navbar() {
@@ -180,6 +129,10 @@ export function Navbar() {
   const { user, loading: authLoading, openAuth } = useAuth();
   const { cart } = useCart();
   const { items: favoriteItems } = useFavorites();
+  const isAdmin = user?.role === "ADMIN" || user?.role === "STAFF";
+  const navLinks = isAdmin
+    ? [...baseNavLinks, { label: "Admin", href: "/admin" }]
+    : baseNavLinks;
 
   const displayName = user
     ? user.firstName

@@ -49,12 +49,14 @@ model User {
   lastName     String?
   phone        String?
   role         Role      @default(CUSTOMER)
+  suspended    Boolean   @default(false)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   addresses    Address[]
   orders       Order[]
   cart         Cart?
   favorites    Favorite[]
+  auditLogs    AuditLog[]
 }
 
 model Address {
@@ -251,4 +253,27 @@ model ShippingRate {
   minSubtotalLKR Int          @default(0)
   priceLKR       Int
   label          String
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  route     String
+  method    String
+  action    String?
+  before    Json?
+  after     Json?
+  createdAt DateTime @default(now())
+}
+
+model StoreSetting {
+  id                   Int      @id @default(1)
+  codEnabled           Boolean  @default(true)
+  payhereMerchantId    String?
+  payhereMerchantSecret String?
+  payhereSandbox       Boolean  @default(true)
+  shippingNotes        String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }

@@ -21,7 +21,7 @@ export function BlogCard({ post }: { post: Blog }) {
           height={360}
           className="h-48 w-full object-cover transition duration-500 group-hover:scale-105"
         />
-        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[#FF4D4D] shadow-sm">
+        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[#ED1C24] shadow-sm">
           {post.category}
         </span>
       </div>
@@ -38,7 +38,7 @@ export function BlogCard({ post }: { post: Blog }) {
           <span>{post.readTime}</span>
           <Link
             href="#"
-            className="inline-flex items-center gap-1 text-[#FF4D4D] transition hover:text-[#ff3a3a]"
+            className="inline-flex items-center gap-1 text-[#ED1C24] transition"
           >
             Read more →
           </Link>

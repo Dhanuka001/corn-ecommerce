@@ -40,7 +40,7 @@ export function TrendingSidebar({
                   className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                 />
               </div>
-              <p className="text-sm font-semibold text-[#0A1931] line-clamp-2 group-hover:text-[#FF4D4D]">
+              <p className="text-sm font-semibold text-[#0A1931] line-clamp-2 group-hover:text-[#ED1C24]">
                 {item.title}
               </p>
             </Link>
@@ -48,15 +48,15 @@ export function TrendingSidebar({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-gradient-to-br from-white via-[#ffeded] to-white p-5 shadow-md">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#FF4D4D]">
+      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white p-5 shadow-md">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ED1C24]">
           Featured · Corn Labs
         </p>
         <h4 className="mt-2 text-lg font-semibold text-[#0A1931]">{featured.title}</h4>
         <p className="mt-2 text-sm text-neutral-600">{featured.body}</p>
         <Link
           href="#"
-          className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[#FF4D4D] transition hover:text-[#ff2f2f]"
+          className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[#ED1C24] transition hover:text-[#c8161d]"
         >
           {featured.cta} →
         </Link>

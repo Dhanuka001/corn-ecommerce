@@ -70,7 +70,7 @@ export function BlogListingShell({
             key={page}
             className={`h-10 w-10 rounded-full border text-sm font-semibold transition ${
               page === 1
-                ? "border-transparent bg-[#FF4D4D] text-white shadow-md shadow-[#FF4D4D]/20"
+                ? "border-transparent bg-[#ED1C24] text-white shadow-md shadow-[#ED1C24]/20"
                 : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-900"
             }`}
           >

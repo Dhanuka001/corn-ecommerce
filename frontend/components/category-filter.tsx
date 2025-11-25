@@ -19,7 +19,7 @@ export function CategoryFilter({ categories, active, onChange }: CategoryFilterP
               onClick={() => onChange(cat)}
               className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition shadow-[0_2px_6px_rgba(15,23,42,0.06)] ${
                 isActive
-                  ? "bg-[#FF4D4D] text-white shadow-md shadow-[#FF4D4D]/25"
+                  ? "bg-[#ED1C24] text-white shadow-md shadow-[#ED1C24]/25"
                   : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
               }`}
             >

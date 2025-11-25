@@ -112,7 +112,7 @@ const featured = {
 
 export default function BlogPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-white to-neutral-50">
+    <div className="min-h-screen bg-white">
       <div className="mx-auto w-full max-w-6xl px-4 pb-20 pt-12">
         <div className="text-center">
           <h1 className="text-3xl font-semibold text-[#0A1931] sm:text-4xl">

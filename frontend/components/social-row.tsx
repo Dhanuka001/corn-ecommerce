@@ -75,7 +75,7 @@ export function SocialRow() {
         <a
           key={label}
           href={href}
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 transition hover:border-[#FF4D4D] hover:text-[#FF4D4D]"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-500 transition hover:border-[#ED1C24] hover:text-[#ED1C24]"
           aria-label={label}
         >
           <Icon />

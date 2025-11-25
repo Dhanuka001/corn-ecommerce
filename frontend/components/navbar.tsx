@@ -118,7 +118,7 @@ const BagIcon = ({ size = 20, ...props }: IconProps) => (
 const navLinks = [
   { label: "Popular", href: "/#best-selling" },
   { label: "Shop", href: "/shop" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Contact", href: "/contact" },
   { label: "Blog", href: "/blog" },
 ];
 

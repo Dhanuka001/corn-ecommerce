@@ -36,7 +36,7 @@ export default function ContactPage() {
       <div className="border-b border-neutral-100 bg-white">
         <div className="mx-auto w-full max-w-6xl px-4 pb-14 pt-14">
           <div className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#FF4D4D]">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#ED1C24]">
               Corn Support
             </p>
             <h1 className="mt-3 text-4xl font-semibold leading-tight text-[#0A1931] sm:text-5xl">

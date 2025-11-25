@@ -83,7 +83,7 @@ export function ContactForm() {
           rows={4}
         />
       </div>
-      {error ? <p className="text-sm font-semibold text-[#FF4D4D]">{error}</p> : null}
+      {error ? <p className="text-sm font-semibold text-[#ED1C24]">{error}</p> : null}
       {status === "submitted" ? (
         <p className="text-sm font-semibold text-emerald-600">
           Thanks! We received your message.
@@ -91,7 +91,7 @@ export function ContactForm() {
       ) : null}
       <button
         type="submit"
-        className="mt-2 inline-flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#FF4D4D] to-[#ff6b6b] text-sm font-semibold text-white shadow-[0_20px_50px_rgba(255,77,77,0.28)] transition hover:-translate-y-0.5"
+        className="mt-2 inline-flex h-12 w-full items-center justify-center rounded-xl bg-[#ED1C24] text-sm font-semibold text-white shadow-sm transition hover:bg-[#d01921]"
       >
         Submit
       </button>
@@ -119,12 +119,12 @@ function Field({
   rows?: number;
 }) {
   const baseClasses =
-    "w-full rounded-xl border border-neutral-200 bg-white px-3 py-3 text-sm text-neutral-900 shadow-inner outline-none transition focus:border-[#FF4D4D] focus:ring-2 focus:ring-[#FF4D4D]/15";
+    "w-full rounded-xl border border-neutral-200 bg-white px-3 py-3 text-sm text-neutral-900 shadow-inner outline-none transition focus:border-[#ED1C24] focus:ring-2 focus:ring-[#ED1C24]/15";
 
   return (
     <label className="space-y-1 text-sm font-semibold text-neutral-700">
       <span>
-        {label} {required ? <span className="text-[#FF4D4D]">*</span> : null}
+        {label} {required ? <span className="text-[#ED1C24]">*</span> : null}
       </span>
       {as === "textarea" ? (
         <textarea

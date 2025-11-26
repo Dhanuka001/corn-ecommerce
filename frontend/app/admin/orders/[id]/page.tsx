@@ -248,7 +248,7 @@ export default function AdminOrderDetailPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
                   Line items
                 </p>
-                <Badge tone="slate">{order.items.length} items</Badge>
+                <Badge tone="slate">{`${order.items.length} items`}</Badge>
               </div>
               <div className="mt-4 overflow-hidden rounded-xl border border-slate-100">
                 <table className="min-w-full text-sm">
@@ -283,7 +283,7 @@ export default function AdminOrderDetailPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
                   Timeline
                 </p>
-                <Badge tone="slate">{order.timeline.length} events</Badge>
+                <Badge tone="slate">{`${order.timeline.length} events`}</Badge>
               </div>
               <div className="mt-4 space-y-3">
                 {order.timeline.length ? (

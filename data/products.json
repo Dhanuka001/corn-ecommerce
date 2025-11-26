@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "slug": "cozy-beige-cardigan",
+    "name": "Cozy Beige Cardigan",
+    "price": 4900,
+    "category": "Women",
+    "images": ["/images/cardigan1.jpg"],
+    "description": "Soft warm cardigan in premium neutral tones."
+  }
+]

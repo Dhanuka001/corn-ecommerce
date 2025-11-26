@@ -119,7 +119,7 @@ const BagIcon = ({ size = 20, ...props }: IconProps) => (
 
 const baseNavLinks = [
   { label: "Popular", href: "/#best-selling" },
-  { label: "Shop", href: "/shop" },
+  { label: "Shop All", href: "/shop" },
   { label: "Contact", href: "/#contact" },
   { label: "Blogs", href: "/#blog" },
 ];
@@ -180,19 +180,25 @@ export function Navbar() {
                 <ChevronDownIcon className="text-slate-400" />
               </button>
 
-              <div className="relative flex flex-1 items-center max-w-[300px]">
+              <form
+                action="/shop"
+                method="get"
+                className="relative flex flex-1 items-center max-w-[300px]"
+              >
                 <input
                   type="text"
+                  name="q"
                   placeholder="I am shopping for..."
                   className="w-full rounded-full border border-slate-200 px-5 py-2 pr-14 text-[15px] text-slate-700 outline-none placeholder:text-slate-400"
                 />
                 <button
+                  type="submit"
                   aria-label="Search"
                   className="absolute right-2 flex h-9 w-9 items-center justify-center rounded-full bg-transparent text-slate-600 transition"
                 >
                   <SearchIcon className="text-slate-600" size={16} />
                 </button>
-              </div>
+              </form>
             </div>
           </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 const categories = [
@@ -13,6 +14,13 @@ const categories = [
   { label: "Powerbanks", image: "/categories/powerbank.png" },
   { label: "Home Appliances", image: "/categories/home-appliences.png" },
 ];
+
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
 const ArrowIcon = ({ direction }: { direction: "left" | "right" }) => (
   <svg
@@ -102,26 +110,30 @@ export function CategoryBrowser() {
           ref={scrollRef}
           className="flex gap-4 overflow-x-auto scroll-smooth pb-4 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none]"
         >
-          {categories.map((category) => (
-            <article
-              key={category.label}
-              className="flex w-1/2 flex-shrink-0 flex-col items-center gap-4 rounded-3xl px-4 py-2 text-center snap-start sm:w-1/3 lg:w-1/5"
-            >
-              <div className="relative flex h-28 w-28 items-center justify-center">
-                <Image
-                  src={category.image || "/logo.png"}
-                  alt={`${category.label} icon`}
-                  width={112}
-                  height={112}
-                  className="h-24 w-24 object-contain"
-                  priority
-                />
-              </div>
-              <p className="text-sm font-semibold text-slate-700">
-                {category.label}
-              </p>
-            </article>
-          ))}
+          {categories.map((category) => {
+            const slug = slugify(category.label);
+            return (
+              <Link
+                key={category.label}
+                href={`/shop?categories=${encodeURIComponent(slug)}`}
+                className="flex w-1/2 flex-shrink-0 flex-col items-center gap-4 rounded-3xl px-4 py-2 text-center snap-start transition hover:-translate-y-1 hover:bg-white sm:w-1/3 lg:w-1/5"
+              >
+                <div className="relative flex h-28 w-28 items-center justify-center">
+                  <Image
+                    src={category.image || "/logo.png"}
+                    alt={`${category.label} icon`}
+                    width={112}
+                    height={112}
+                    className="h-24 w-24 object-contain"
+                    priority
+                  />
+                </div>
+                <p className="text-sm font-semibold text-slate-700">
+                  {category.label}
+                </p>
+              </Link>
+            );
+          })}
         </div>
       </div>
 

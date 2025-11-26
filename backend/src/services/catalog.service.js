@@ -124,7 +124,17 @@ const listCategories = async () => {
   return roots;
 };
 
-const listProducts = async ({ q, category, sort, page, limit }) => {
+const listProducts = async ({
+  q,
+  category,
+  categories,
+  minPrice,
+  maxPrice,
+  inStock,
+  sort,
+  page,
+  limit,
+}) => {
   const filters = { active: true }; // only expose purchasable SKUs
 
   if (q) {
@@ -135,21 +145,60 @@ const listProducts = async ({ q, category, sort, page, limit }) => {
     ];
   }
 
-  if (category) {
-    const normalizedCategory = category.toLowerCase();
+  const categorySlugs = [
+    ...(Array.isArray(categories) ? categories : []),
+    ...(category ? [category] : []),
+  ]
+    .map((item) => item?.toString().trim().toLowerCase())
+    .filter(Boolean)
+    .slice(0, 8);
+
+  if (categorySlugs.length) {
     filters.categories = {
       some: {
         category: {
-          slug: normalizedCategory,
+          slug: { in: categorySlugs },
         },
       },
     };
   }
 
+  const hasPriceBounds =
+    (typeof minPrice === "number" && Number.isFinite(minPrice)) ||
+    (typeof maxPrice === "number" && Number.isFinite(maxPrice));
+
+  if (hasPriceBounds) {
+    const minBound =
+      typeof minPrice === "number" && Number.isFinite(minPrice)
+        ? Math.max(0, Math.floor(minPrice))
+        : undefined;
+    const maxBound =
+      typeof maxPrice === "number" && Number.isFinite(maxPrice)
+        ? Math.max(0, Math.floor(maxPrice))
+        : undefined;
+
+    const [gte, lte] =
+      minBound !== undefined && maxBound !== undefined && minBound > maxBound
+        ? [maxBound, minBound]
+        : [minBound, maxBound];
+
+    filters.priceLKR = {};
+    if (gte !== undefined) {
+      filters.priceLKR.gte = gte;
+    }
+    if (lte !== undefined) {
+      filters.priceLKR.lte = lte;
+    }
+  }
+
+  if (inStock === true) {
+    filters.stock = { gt: 0 };
+  }
+
   const orderBy = buildSort(sort);
   const pagination = sanitizePagination(page, limit);
 
-  const [rawData, total] = await Promise.all([
+  const [rawData, total, priceAgg] = await Promise.all([
     prisma.product.findMany({
       where: filters,
       select: PRODUCT_LIST_SELECT,
@@ -158,6 +207,11 @@ const listProducts = async ({ q, category, sort, page, limit }) => {
       take: pagination.limit,
     }),
     prisma.product.count({ where: filters }),
+    prisma.product.aggregate({
+      where: filters,
+      _min: { priceLKR: true },
+      _max: { priceLKR: true },
+    }),
   ]);
 
   const data = rawData.map((product) => ({
@@ -172,6 +226,10 @@ const listProducts = async ({ q, category, sort, page, limit }) => {
       page: pagination.page,
       limit: pagination.limit,
       pages: Math.ceil(total / pagination.limit) || 1,
+      priceRange: {
+        min: priceAgg._min.priceLKR ?? 0,
+        max: priceAgg._max.priceLKR ?? 0,
+      },
     },
   };
 };

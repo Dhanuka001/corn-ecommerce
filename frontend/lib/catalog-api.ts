@@ -1,6 +1,45 @@
 import { API_BASE_URL } from "./api";
-import type { ProductDetail } from "@/types/catalog";
-import type { ProductSummary } from "@/types/catalog";
+import type {
+  CatalogCategory,
+  ProductDetail,
+  ProductListResponse,
+  ProductSummary,
+} from "@/types/catalog";
+
+type FetchProductsParams = {
+  q?: string;
+  category?: string;
+  categories?: string[];
+  sort?: string;
+  page?: number;
+  limit?: number;
+  inStock?: boolean;
+  minPrice?: number;
+  maxPrice?: number;
+};
+
+const buildQuery = (params: Record<string, string | number | boolean | string[] | undefined>) => {
+  const search = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        if (item !== undefined && item !== null && String(item).trim()) {
+          search.append(key, String(item).trim());
+        }
+      });
+      return;
+    }
+    search.append(key, String(value));
+  });
+  const query = search.toString();
+  return query ? `?${query}` : "";
+};
+
+const emptyListResponse = (limit = 12): ProductListResponse => ({
+  data: [],
+  meta: { total: 0, page: 1, limit, pages: 1, priceRange: { min: 0, max: 0 } },
+});
 
 export async function fetchProductBySlug(
   slug: string,
@@ -19,8 +58,48 @@ export async function fetchProductBySlug(
   return payload.product ?? null;
 }
 
-export async function fetchProducts(): Promise<ProductSummary[]> {
-  const response = await fetch(`${API_BASE_URL}/products`, {
+export async function fetchProducts(
+  params: FetchProductsParams = {},
+): Promise<ProductListResponse> {
+  const defaultLimit = params.limit ?? 24;
+  const response = await fetch(`${API_BASE_URL}/products${buildQuery({
+    q: params.q,
+    category: params.category,
+    categories: params.categories,
+    sort: params.sort,
+    page: params.page,
+    limit: params.limit,
+    inStock: params.inStock,
+    minPrice: params.minPrice,
+    maxPrice: params.maxPrice,
+  })}`, {
+    method: "GET",
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    return emptyListResponse(defaultLimit);
+  }
+
+  const payload = (await response.json()) as ProductListResponse | { data?: ProductSummary[] };
+
+  if (!("data" in payload)) {
+    return emptyListResponse(defaultLimit);
+  }
+
+  const meta =
+    "meta" in payload && payload.meta
+      ? payload.meta
+      : { total: payload.data?.length ?? 0, page: 1, limit: defaultLimit, pages: 1 };
+
+  return {
+    data: payload.data ?? [],
+    meta: { priceRange: { min: 0, max: 0 }, ...meta },
+  };
+}
+
+export async function fetchCatalogCategories(): Promise<CatalogCategory[]> {
+  const response = await fetch(`${API_BASE_URL}/categories`, {
     method: "GET",
     cache: "no-store",
   });
@@ -29,9 +108,6 @@ export async function fetchProducts(): Promise<ProductSummary[]> {
     return [];
   }
 
-  const payload = (await response.json()) as {
-    data?: ProductSummary[];
-  };
-
-  return payload.data ?? [];
+  const payload = (await response.json()) as { categories?: CatalogCategory[] };
+  return payload.categories ?? [];
 }

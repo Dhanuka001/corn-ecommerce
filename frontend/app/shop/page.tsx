@@ -1,118 +1,123 @@
-import Link from "next/link";
+export const dynamic = "force-dynamic";
 
 import { CatalogProductCard } from "@/components/catalog-product-card";
 import { Footer } from "@/components/footer";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { Navbar } from "@/components/navbar";
-import { fetchProducts } from "@/lib/catalog-api";
+import { ShopShell } from "./shop-shell";
+import { fetchCatalogCategories, fetchProducts } from "@/lib/catalog-api";
+import type { CatalogCategory, ProductListMeta } from "@/types/catalog";
 
-const quickFilters = [
-  "All gear",
-  "Newest drops",
-  "Audio",
-  "Mobile accessories",
-  "Smart gadgets",
-  "Travel essentials",
-];
+type ShopPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
 
-export default async function ShopPage() {
-  const products = await fetchProducts();
-  const totalProducts = products.length;
-  const averageRating = "4.8";
+const parseString = (value: string | string[] | undefined) =>
+  Array.isArray(value) ? value[0] : value || undefined;
+const parseNumber = (value: string | string[] | undefined) => {
+  const raw = parseString(value);
+  if (!raw) return undefined;
+  const num = Number(raw);
+  return Number.isFinite(num) ? num : undefined;
+};
+const parseBool = (value: string | string[] | undefined) => {
+  const raw = parseString(value);
+  if (raw === "true" || raw === "1") return true;
+  if (raw === "false" || raw === "0") return false;
+  return undefined;
+};
+const parseCategoryArray = (value: string | string[] | undefined) => {
+  if (!value) return [] as string[];
+  const list = Array.isArray(value) ? value : String(value).split(",");
+  return list
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean)
+    .slice(0, 8);
+};
+
+const flattenCategories = (categories: CatalogCategory[]) =>
+  categories.flatMap((category) => [
+    { id: category.id, name: category.name, slug: category.slug, position: category.position },
+    ...(category.children?.length
+      ? category.children.map((child) => ({
+          id: child.id,
+          name: child.name,
+          slug: child.slug,
+          position: child.position,
+        }))
+      : []),
+  ]);
+
+export default async function ShopPage({ searchParams }: ShopPageProps) {
+  const params = await searchParams;
+  const filters = {
+    q: parseString(params.q),
+    categories: Array.from(
+      new Set([
+        ...parseCategoryArray(params.category),
+        ...parseCategoryArray(params.categories),
+      ]),
+    ),
+    inStock: parseBool(params.inStock) ?? false,
+    minPrice: parseNumber(params.minPrice),
+    maxPrice: parseNumber(params.maxPrice),
+    sort: parseString(params.sort) || "newest",
+    page: parseNumber(params.page) ?? 1,
+    limit: 24,
+  };
+
+  const [{ data: products, meta }, categories] = await Promise.all([
+    fetchProducts(filters),
+    fetchCatalogCategories(),
+  ]);
+
+  const priceRange: NonNullable<ProductListMeta["priceRange"]> = {
+    min: meta.priceRange?.min ?? 0,
+    max: meta.priceRange?.max ?? 0,
+  };
+  const flatCategories = flattenCategories(categories);
 
   return (
     <div className="min-h-screen bg-zinc-50">
       <Navbar />
 
-      <main className="mx-auto w-full max-w-7xl px-4 py-10 lg:py-14">
-        <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-6 py-10 sm:px-10 lg:px-14">
-          <div className="grid gap-6 lg:grid-cols-[1.2fr,1fr] lg:items-center">
-            <div className="space-y-4 text-white">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
-                Shop
-              </p>
-              <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
-                Corn gear showroom
-              </h1>
-              <p className="max-w-2xl text-base text-white/80 sm:text-lg">
-                Live catalog pulled from the backend. Add to cart and favorites with synced cookies.
-              </p>
-              <div className="flex flex-wrap gap-3 pt-2 text-sm font-semibold">
-                <Link
-                  href="/#best-selling"
-                  className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-white transition hover:bg-white/20"
-                >
-                  Jump to best sellers
-                </Link>
-                <Link
-                  href="/#blog"
-                  className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-white transition hover:border-white/50"
-                >
-                  Read Corn stories
-                </Link>
-              </div>
-            </div>
-            <div className="grid gap-4 rounded-2xl bg-white/5 p-5 text-white shadow-lg backdrop-blur">
-              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div>
-                  <p className="text-sm text-white/70">Ready to ship</p>
-                  <p className="text-2xl font-semibold">
-                    {totalProducts} product{totalProducts === 1 ? "" : "s"}
-                  </p>
-                </div>
-                <span className="rounded-full bg-primary/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-primary">
-                  Beta
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-white/60">Warranty</p>
-                  <p className="text-lg font-semibold">3 years</p>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-white/60">Avg. rating</p>
-                  <p className="text-lg font-semibold">{averageRating} / 5</p>
-                </div>
-              </div>
-            </div>
+      <main className="mx-auto w-full max-w-7xl px-4 py-8 lg:py-12">
+        <header className="mb-6 flex flex-col gap-3 border-b border-slate-100 pb-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.32em] text-primary">
+              Shop all
+            </p>
+            <h1 className="text-3xl font-semibold leading-tight text-slate-900 sm:text-4xl">
+              All products
+            </h1>
+            <p className="text-sm text-slate-600">
+              Filter by category, availability, and price. Server-side filtering keeps it fast.
+            </p>
           </div>
-        </section>
+        
+        </header>
 
-        <section className="mt-10 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.32em] text-slate-500">
-                Curated grid
-              </p>
-              <h2 className="text-2xl font-semibold text-slate-900">
-                Explore Corn catalog
-              </h2>
-              <p className="text-sm text-slate-600">
-                Backend products rendered in the grid below.
+        <ShopShell
+          categories={flatCategories}
+          filters={filters}
+          priceRange={priceRange}
+          total={meta.total}
+        >
+          {products.length ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {products.map((product) => (
+                <CatalogProductCard key={`shop-${product.id}`} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-3xl border border-slate-100 bg-white p-10 text-center shadow-sm">
+              <p className="text-lg font-semibold text-slate-900">No products found</p>
+              <p className="mt-2 text-sm text-slate-600">
+                Try clearing filters or selecting a different category.
               </p>
             </div>
-            <button className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300">
-              Sort: Featured
-            </button>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            {quickFilters.map((filter) => (
-              <span
-                key={filter}
-                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm"
-              >
-                {filter}
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {products.map((product) => (
-              <CatalogProductCard key={`shop-${product.id}`} product={product} />
-            ))}
-          </div>
-        </section>
+          )}
+        </ShopShell>
       </main>
 
       <Footer />

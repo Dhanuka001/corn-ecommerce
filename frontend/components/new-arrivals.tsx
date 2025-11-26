@@ -12,7 +12,7 @@ export function NewArrivals() {
 
   useEffect(() => {
     const load = async () => {
-      const data = await fetchProducts();
+      const { data } = await fetchProducts({ sort: "newest", limit: 12 });
       setItems(data.slice(0, 4));
     };
     void load();

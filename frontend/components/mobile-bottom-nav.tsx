@@ -132,7 +132,7 @@ export function MobileBottomNav() {
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-50">
             <ShopIcon className="text-slate-500" />
           </div>
-          <span>Shop</span>
+          <span>Shop All</span>
         </Link>
         <Link
           href="/favorites"

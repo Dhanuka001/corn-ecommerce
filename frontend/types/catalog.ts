@@ -5,6 +5,12 @@ export type ProductImage = {
   position: number;
 };
 
+export type ProductCategory = {
+  id: string;
+  slug: string;
+  name: string;
+};
+
 export type Variant = {
   id: string;
   name: string;
@@ -22,10 +28,33 @@ export type ProductSummary = {
   compareAtLKR?: number | null;
   stock: number;
   images: ProductImage[];
+  categories?: ProductCategory[];
 };
 
 export type ProductDetail = ProductSummary & {
   description?: string | null;
   variants: Variant[];
-  categories: { id: string; slug: string; name: string }[];
+  categories: ProductCategory[];
+};
+
+export type ProductListMeta = {
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+  priceRange?: { min: number; max: number };
+};
+
+export type ProductListResponse = {
+  data: ProductSummary[];
+  meta: ProductListMeta;
+};
+
+export type CatalogCategory = {
+  id: string;
+  slug: string;
+  name: string;
+  position: number;
+  parentId?: string | null;
+  children?: CatalogCategory[];
 };

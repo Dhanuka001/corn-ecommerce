@@ -7,5 +7,32 @@
     "category": "Women",
     "images": ["/images/new-arrival-real.jpg"],
     "description": "Soft warm cardigan in premium neutral tones."
+  },
+  {
+    "id": 2,
+    "slug": "structured-linen-blouse",
+    "name": "Structured Linen Blouse",
+    "price": 7200,
+    "category": "Women",
+    "images": ["/images/hero-female-pin.jpg"],
+    "description": "Crisp linen with a bow collar, tailored for elevated everyday wear."
+  },
+  {
+    "id": 3,
+    "slug": "editorial-midi-dress",
+    "name": "Editorial Midi Dress",
+    "price": 8800,
+    "category": "Women",
+    "images": ["/images/hero-female-premium.jpg"],
+    "description": "Minimal lines and soft drape in a premium neutral palette."
+  },
+  {
+    "id": 4,
+    "slug": "textured-knit-set",
+    "name": "Textured Knit Set",
+    "price": 6400,
+    "category": "Women",
+    "images": ["/images/hero-female.jpg"],
+    "description": "Layerable knit duo with gentle texture and easy movement."
   }
 ]

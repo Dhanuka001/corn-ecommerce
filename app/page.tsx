@@ -5,6 +5,7 @@ import { HeroSection } from "@/components/HeroSection";
 import { Navbar } from "@/components/Navbar";
 import { NewArrivalSection } from "@/components/NewArrivalSection";
 import { ProductGrid } from "@/components/ProductGrid";
+import { Testimonials } from "@/components/Testimonials";
 import { getProducts } from "@/lib/getProducts";
 
 export default async function Home() {
@@ -16,32 +17,38 @@ export default async function Home() {
       <Navbar />
 
       <HeroSection
-        eyebrow="Collection 01 / AW"
-        title="Structured silhouettes, softened in neutral light."
-        subtitle="ZARA-like edge meets BeigeAura calm—sculpted tailoring, elongated lines, and tactile fabrics that move from day to night."
+        eyebrow="The Soft Warm Minimal Aesthetic"
+        title="Neutral silhouettes."
+        subtitle="Structured ease in warm neutrals—tailored layers that move."
         ctaLabel="Shop collection"
         ctaHref="#featured"
         secondaryLabel="View lookbook"
         secondaryHref="#journal"
-        imageSrc="/images/hero-old-money-man.jpg"
-        imageAlt="Premium old-money linen look in warm beige tones"
+        imageSrc="/images/hero-female-pin.jpg"
+        imageAlt="Premium female editorial look in warm beige tones"
       />
 
       <main className="mx-auto flex max-w-6xl flex-col gap-12 px-6 py-12">
 
-        <NewArrivalSection />
+        <div className="animate-fade-in-up">
+          <NewArrivalSection />
+        </div>
 
-        <CategorySection title="Shop by feeling" />
+        <div className="animate-fade-in-up">
+          <CategorySection title="Shop by feeling" />
+        </div>
 
-        <ProductGrid
-          title="Featured essentials"
-          description="Cozy knits, airy layers, and grounding staples in warm beige tones."
-          products={featured}
-        />
+        <div id="featured" className="animate-fade-in-up">
+          <ProductGrid
+            title="Featured essentials"
+            description="Cozy knits, airy layers, and grounding staples in warm beige tones."
+            products={featured}
+          />
+        </div>
 
         <section
           id="lifestyle"
-          className="overflow-hidden rounded-3xl border border-beige-dark/40 bg-white/80 shadow-[0_30px_80px_-60px_rgba(26,26,26,0.4)]"
+          className="animate-fade-in-up overflow-hidden rounded-3xl border border-beige-dark/40 bg-white/80 shadow-[0_30px_80px_-60px_rgba(26,26,26,0.4)]"
         >
           <div className="grid items-center gap-0 md:grid-cols-2">
             <div className="space-y-4 px-8 py-12 md:px-10">
@@ -83,6 +90,10 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
+        <div className="animate-fade-in-up">
+          <Testimonials />
+        </div>
       </main>
 
       <Footer />

@@ -9,6 +9,7 @@ type NewArrivalSectionProps = {
   ctaHref?: string;
   imageSrc?: string;
   imageAlt?: string;
+  className?: string;
 };
 
 export function NewArrivalSection({
@@ -19,9 +20,12 @@ export function NewArrivalSection({
   ctaHref = "#featured",
   imageSrc = "/images/new-arrival-real.jpg",
   imageAlt = "New arrival look",
+  className = "",
 }: NewArrivalSectionProps) {
   return (
-    <section className="overflow-hidden rounded-3xl border border-beige-dark/40 bg-white shadow-[0_30px_80px_-65px_rgba(26,26,26,0.45)]">
+    <section
+      className={`overflow-hidden rounded-3xl border border-beige-dark/40 bg-white shadow-[0_30px_80px_-65px_rgba(26,26,26,0.45)] ${className}`}
+    >
       <div className="grid gap-10 px-6 py-10 md:grid-cols-[1.1fr_1fr] md:px-10 md:py-12">
         <div className="flex flex-col justify-center gap-5">
           <span className="text-5xl font-semibold tracking-tight text-text">{badge}</span>

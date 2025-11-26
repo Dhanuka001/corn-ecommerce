@@ -30,19 +30,63 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3 text-sm font-medium">
+        <div className="flex items-center gap-4 text-sm font-medium">
           <Link
             href="/#journal"
             className="hidden border border-white/60 px-4 py-2 text-white transition sm:inline-flex hover:border-white hover:text-white group-hover:border-text/50 group-hover:text-text"
           >
             Journal
           </Link>
-          <Link
-            href="/#cart"
-            className="rounded-full bg-text px-4 py-2 text-beige-light transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-text/10"
-          >
-            Bag
-          </Link>
+          <div className="flex items-center gap-3 text-white group-hover:text-text">
+            <Link href="/#search" aria-label="Search" className="transition hover:opacity-80">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.8"
+                stroke="currentColor"
+                className="h-5 w-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m21 21-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"
+                />
+              </svg>
+            </Link>
+            <Link href="/#account" aria-label="Profile" className="transition hover:opacity-80">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.8"
+                stroke="currentColor"
+                className="h-5 w-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm-4 7c-3.866 0-7 2.239-7 5v.5a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5V19c0-2.761-3.134-5-7-5Z"
+                />
+              </svg>
+            </Link>
+            <Link href="/#cart" aria-label="Cart" className="transition hover:opacity-80">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.8"
+                stroke="currentColor"
+                className="h-5 w-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 4h1.17a1 1 0 0 1 .98.804L6.7 12.2a1 1 0 0 0 .98.8h8.64a1 1 0 0 0 .98-.8l.64-3.2H7.4m12.6-3H6.6m10.4 13a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-8 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"
+                />
+              </svg>
+            </Link>
+          </div>
         </div>
       </div>
     </header>

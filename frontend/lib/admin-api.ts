@@ -79,12 +79,18 @@ export const updateAdminCategory = (id: string, payload: Partial<AdminCategory>)
     body: JSON.stringify(payload),
   });
 
-export const fetchAdminOrders = (params: { status?: string; q?: string; page?: number }) =>
+export const fetchAdminOrders = (params: {
+  status?: string;
+  q?: string;
+  page?: number;
+  limit?: number;
+}) =>
   apiRequest<Paginated<AdminOrder>>(
     `/admin/orders${buildQuery({
       status: params.status,
       q: params.q,
       page: params.page,
+      limit: params.limit,
     })}`,
     { method: "GET" },
   );

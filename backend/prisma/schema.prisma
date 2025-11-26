@@ -19,6 +19,26 @@ enum Role {
   ADMIN
 }
 
+enum PaymentMethod {
+  COD
+  PAYHERE
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  PARTIAL
+  REFUNDED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  FULFILLED
+  REFUNDED
+}
+
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
@@ -34,31 +54,50 @@ model User {
   addresses    Address[]
   orders       Order[]
   cart         Cart?
+  favorites    Favorite[]
 }
 
 model Address {
-  id         String   @id @default(cuid())
-  userId     String?
-  user       User?    @relation(fields: [userId], references: [id])
-  fullName   String
-  phone      String
-  line1      String
-  line2      String?
-  city       String
-  district   String
-  postalCode String?
-  country    String   @default("LK")
-  createdAt  DateTime @default(now())
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  fullName     String
+  phone        String
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  district     String
+  postalCode   String?
+  country      String   @default("LK")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  shippingOrders Order[] @relation("OrderShip")
+  billingOrders  Order[] @relation("OrderBill")
 }
 
 model Order {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  status    String   @default("PENDING")
-  total     Decimal  @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String        @id @default(cuid())
+  orderNo        String        @unique
+  idempotencyKey String?       @unique
+  userId         String?
+  user           User?         @relation(fields: [userId], references: [id])
+  status         OrderStatus   @default(PENDING)
+  paymentMethod  PaymentMethod
+  paymentStatus  PaymentStatus @default(UNPAID)
+  items          OrderItem[]
+  shippingAddrId String
+  shippingAddr   Address       @relation("OrderShip", fields: [shippingAddrId], references: [id])
+  billingAddrId  String
+  billingAddr    Address       @relation("OrderBill", fields: [billingAddrId], references: [id])
+  subTotalLKR    Int
+  shippingLKR    Int
+  discountLKR    Int
+  totalLKR       Int
+  payhereRef     String?
+  timeline       OrderEvent[]
+  payment        Payment?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 }
 
 model Cart {
@@ -112,6 +151,8 @@ model Product {
   images       ProductImage[]
   variants     Variant[]
   cartItems    CartItem[]
+  orderItems   OrderItem[]
+  favorites    Favorite[]
   categories   ProductOnCategory[]
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
@@ -126,6 +167,20 @@ model Variant {
   priceLKR  Int
   stock     Int     @default(0)
   cartItems CartItem[]
+  orderItems OrderItem[]
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
 }
 
 model ProductImage {
@@ -144,4 +199,56 @@ model ProductOnCategory {
   category   Category @relation(fields: [categoryId], references: [id])
 
   @@id([productId, categoryId])
+}
+
+model OrderItem {
+  id           String  @id @default(cuid())
+  orderId      String
+  productId    String
+  variantId    String?
+  name         String
+  sku          String
+  qty          Int
+  unitLKR      Int
+  lineTotalLKR Int
+  order        Order   @relation(fields: [orderId], references: [id])
+  product      Product @relation(fields: [productId], references: [id])
+  variant      Variant? @relation(fields: [variantId], references: [id])
+}
+
+model Payment {
+  id          String         @id @default(cuid())
+  orderId     String         @unique
+  order       Order          @relation(fields: [orderId], references: [id])
+  method      PaymentMethod
+  status      PaymentStatus
+  amountLKR   Int
+  providerRef String?
+  rawPayload  Json?
+  createdAt   DateTime       @default(now())
+}
+
+model OrderEvent {
+  id        String   @id @default(cuid())
+  orderId   String
+  type      String
+  note      String?
+  createdAt DateTime @default(now())
+  order     Order    @relation(fields: [orderId], references: [id])
+}
+
+model ShippingZone {
+  id        String         @id @default(cuid())
+  name      String
+  districts String[]
+  rates     ShippingRate[]
+}
+
+model ShippingRate {
+  id             String       @id @default(cuid())
+  zoneId         String
+  zone           ShippingZone @relation(fields: [zoneId], references: [id])
+  minSubtotalLKR Int          @default(0)
+  priceLKR       Int
+  label          String
 }

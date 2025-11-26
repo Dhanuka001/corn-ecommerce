@@ -1,8 +1,10 @@
+import Link from "next/link";
+
+import { CatalogProductCard } from "@/components/catalog-product-card";
 import { Footer } from "@/components/footer";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { Navbar } from "@/components/navbar";
-import { ProductCard } from "@/components/product-card";
-import { products } from "@/data/products";
+import { fetchProducts } from "@/lib/catalog-api";
 
 const quickFilters = [
   "All gear",
@@ -13,13 +15,10 @@ const quickFilters = [
   "Travel essentials",
 ];
 
-export default function ShopPage() {
+export default async function ShopPage() {
+  const products = await fetchProducts();
   const totalProducts = products.length;
-  const averageRating =
-    totalProducts === 0
-      ? "0.0"
-      : (products.reduce((sum, product) => sum + product.rating, 0) /
-          totalProducts).toFixed(1);
+  const averageRating = "4.8";
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -36,8 +35,7 @@ export default function ShopPage() {
                 Corn gear showroom
               </h1>
               <p className="max-w-2xl text-base text-white/80 sm:text-lg">
-                First rough cut of the Corn shop experience. Browse a dummy grid
-                of our hero products while we wire up inventory and filters.
+                Live catalog pulled from the backend. Add to cart and favorites with synced cookies.
               </p>
               <div className="flex flex-wrap gap-3 pt-2 text-sm font-semibold">
                 <Link
@@ -90,7 +88,7 @@ export default function ShopPage() {
                 Explore Corn catalog
               </h2>
               <p className="text-sm text-slate-600">
-                Dummy listing that reuses our product card component.
+                Backend products rendered in the grid below.
               </p>
             </div>
             <button className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300">
@@ -111,7 +109,7 @@ export default function ShopPage() {
 
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => (
-              <ProductCard key={`shop-${product.slug}`} product={product} />
+              <CatalogProductCard key={`shop-${product.id}`} product={product} />
             ))}
           </div>
         </section>
@@ -122,4 +120,3 @@ export default function ShopPage() {
     </div>
   );
 }
-import Link from "next/link";

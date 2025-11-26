@@ -4,16 +4,14 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 const categories = [
-  "Chargers",
-  "Cables",
-  "Bluetooth Speakers",
-  "Karaoke Speakers",
-  "Smart Watches",
-  "Mobile & Tablets",
-  "Health & Sports",
-  "Home Appliances",
-  "Games & Videos",
-  "Televisions",
+  { label: "Chargers", image: "/categories/charger.png" },
+  { label: "Cables", image: "/categories/cable.png" },
+  { label: "Bluetooth Speakers", image: "/categories/bluetooth-speaker.png" },
+  { label: "Karaoke Speakers", image: "/categories/karoke-speaker.png" },
+  { label: "Smart Watches", image: "/categories/smart%20watch.png" },
+  { label: "Mobile & Tablets", image: "/categories/mobile-tablet.png" },
+  { label: "Powerbanks", image: "/categories/powerbank.png" },
+  { label: "Home Appliances", image: "/categories/home-appliences.png" },
 ];
 
 const ArrowIcon = ({ direction }: { direction: "left" | "right" }) => (
@@ -106,21 +104,21 @@ export function CategoryBrowser() {
         >
           {categories.map((category) => (
             <article
-              key={category}
+              key={category.label}
               className="flex w-1/2 flex-shrink-0 flex-col items-center gap-4 rounded-3xl px-4 py-2 text-center snap-start sm:w-1/3 lg:w-1/5"
             >
-              <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-slate-100">
+              <div className="relative flex h-28 w-28 items-center justify-center">
                 <Image
-                  src="/logo.png"
-                  alt={`${category} icon`}
-                  width={80}
-                  height={80}
-                  className="h-20 w-20 object-contain"
+                  src={category.image || "/logo.png"}
+                  alt={`${category.label} icon`}
+                  width={112}
+                  height={112}
+                  className="h-24 w-24 object-contain"
                   priority
                 />
               </div>
               <p className="text-sm font-semibold text-slate-700">
-                {category}
+                {category.label}
               </p>
             </article>
           ))}

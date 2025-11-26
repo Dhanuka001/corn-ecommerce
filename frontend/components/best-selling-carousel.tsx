@@ -1,12 +1,23 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
-import { products } from "@/data/products";
-
-import { ProductCard } from "./product-card";
+import { CatalogProductCard } from "./catalog-product-card";
+import { fetchProducts } from "@/lib/catalog-api";
+import type { ProductSummary } from "@/types/catalog";
 
 export function BestSellingCarousel() {
+  const [items, setItems] = useState<ProductSummary[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      const data = await fetchProducts();
+      setItems(data.slice(0, 4));
+    };
+    void load();
+  }, []);
+
   return (
     <section
       id="best-selling"
@@ -31,8 +42,8 @@ export function BestSellingCarousel() {
       </div>
 
       <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        {products.map((product) => (
-          <ProductCard key={`best-${product.sku}`} product={product} />
+        {items.map((product) => (
+          <CatalogProductCard key={`best-${product.id}`} product={product} />
         ))}
       </div>
     </section>

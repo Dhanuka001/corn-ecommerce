@@ -29,7 +29,7 @@ export function HeroSection({
   eyebrow = "BeigeAura Studio",
   title = "Sculpted silhouettes in grounded neutrals.",
   subtitle = "ZARA-like edge with MUJI calm—clean lines, draped layers, and tactile fabrics built for luminous days.",
-  ctaLabel = "Shop capsule",
+  ctaLabel = "Shop collection",
   ctaHref = "/#featured",
   secondaryLabel = "View lookbook",
   secondaryHref = "/#journal",
@@ -96,7 +96,7 @@ export function HeroSection({
               priority
             />
             <div className="absolute left-4 top-4 rounded-full bg-white/80 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-text">
-              Capsule 01
+              Collection 01
             </div>
           </div>
         </div>

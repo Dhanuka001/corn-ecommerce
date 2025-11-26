@@ -17,10 +17,10 @@ export default async function Home() {
 
       <main className="mx-auto flex max-w-6xl flex-col gap-12 px-6 py-12">
         <HeroSection
-          eyebrow="Capsule 01 / AW"
+          eyebrow="Collection 01 / AW"
           title="Structured silhouettes, softened in neutral light."
           subtitle="ZARA-like edge meets BeigeAura calm—sculpted tailoring, elongated lines, and tactile fabrics that move from day to night."
-          ctaLabel="Shop capsule"
+          ctaLabel="Shop collection"
           ctaHref="#featured"
           secondaryLabel="View lookbook"
           secondaryHref="#journal"

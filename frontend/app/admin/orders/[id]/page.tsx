@@ -174,10 +174,10 @@ export default function AdminOrderDetailPage() {
                 <div className="flex flex-wrap items-center gap-3">
                   <Badge tone={statusTone(order.status)}>{order.status}</Badge>
                   <Badge tone={statusTone(order.paymentStatus)}>
-                    Payment {order.paymentStatus}
+                    {`Payment ${order.paymentStatus}`}
                   </Badge>
-                  <Badge tone="slate">Method {order.paymentMethod}</Badge>
-                  <Badge tone="slate">Items {order.items.length}</Badge>
+                  <Badge tone="slate">{`Method ${order.paymentMethod}`}</Badge>
+                  <Badge tone="slate">{`Items ${order.items.length}`}</Badge>
                 </div>
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">
                   <div className="rounded-xl bg-slate-50 px-3 py-2">

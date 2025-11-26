@@ -91,7 +91,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
               All products
             </h1>
             <p className="text-sm text-slate-600">
-              Filter by category, availability, and price. Server-side filtering keeps it fast.
+              Filter by category, availability, and price to see only the items you want.
             </p>
           </div>
         

@@ -17,7 +17,7 @@ const slides: Slide[] = [
     subtitle: "Built for everyday life",
     features: ["Phones & tablets", "Speakers & wearables", "Chargers & accessories"],
     image: "/hero/new-hro.png",
-    accent: "#7c5cff",
+    accent: "#8c5bff",
   },
 ];
 

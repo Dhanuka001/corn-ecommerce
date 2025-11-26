@@ -15,18 +15,19 @@ export default async function Home() {
     <div className="min-h-screen bg-beige-light text-text">
       <Navbar />
 
+      <HeroSection
+        eyebrow="Collection 01 / AW"
+        title="Structured silhouettes, softened in neutral light."
+        subtitle="ZARA-like edge meets BeigeAura calm—sculpted tailoring, elongated lines, and tactile fabrics that move from day to night."
+        ctaLabel="Shop collection"
+        ctaHref="#featured"
+        secondaryLabel="View lookbook"
+        secondaryHref="#journal"
+        imageSrc="/images/hero-old-money-man.jpg"
+        imageAlt="Premium old-money linen look in warm beige tones"
+      />
+
       <main className="mx-auto flex max-w-6xl flex-col gap-12 px-6 py-12">
-        <HeroSection
-          eyebrow="Collection 01 / AW"
-          title="Structured silhouettes, softened in neutral light."
-          subtitle="ZARA-like edge meets BeigeAura calm—sculpted tailoring, elongated lines, and tactile fabrics that move from day to night."
-          ctaLabel="Shop collection"
-          ctaHref="#featured"
-          secondaryLabel="View lookbook"
-          secondaryHref="#journal"
-          imageSrc="/images/hero-luxury.svg"
-          imageAlt="Luxury lifestyle still in warm beige tones"
-        />
 
         <NewArrivalSection />
 
@@ -72,7 +73,7 @@ export default async function Home() {
             </div>
             <div className="relative h-full w-full bg-beige">
               <Image
-                src="/images/lifestyle.svg"
+                src="/images/lifestyle-real.jpg"
                 alt="Lifestyle collage"
                 width={1200}
                 height={800}

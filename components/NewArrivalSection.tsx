@@ -17,7 +17,7 @@ export function NewArrivalSection({
   subtitle = "Discover the latest capsule in warm, grounded neutrals.",
   ctaLabel = "Shop now",
   ctaHref = "#featured",
-  imageSrc = "/images/new-arrival.svg",
+  imageSrc = "/images/new-arrival-real.jpg",
   imageAlt = "New arrival look",
 }: NewArrivalSectionProps) {
   return (

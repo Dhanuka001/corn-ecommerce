@@ -100,6 +100,11 @@ export type ShippingZone = {
   rates: ShippingRate[];
 };
 
+export type ShippingZoneInput = Omit<ShippingZone, "id" | "rates"> & {
+  id?: string;
+  rates: (Omit<ShippingRate, "id"> & { id?: string })[];
+};
+
 export type StoreSetting = {
   id: number;
   codEnabled: boolean;

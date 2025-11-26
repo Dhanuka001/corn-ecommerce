@@ -8,7 +8,7 @@ import type {
   AuditLogEntry,
   Paginated,
   SettingsPayload,
-  ShippingZone,
+  ShippingZoneInput,
 } from "@/types/admin";
 
 const buildQuery = (params: Record<string, string | number | undefined>) => {
@@ -118,7 +118,7 @@ export const saveAdminSettings = (payload: {
   payhereMerchantSecret?: string | null;
   payhereSandbox?: boolean;
   shippingNotes?: string | null;
-  shippingZones?: ShippingZone[];
+  shippingZones?: ShippingZoneInput[];
 }) =>
   apiRequest<SettingsPayload>("/admin/settings", {
     method: "POST",

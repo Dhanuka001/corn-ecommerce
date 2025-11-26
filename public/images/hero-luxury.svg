@@ -1,0 +1,25 @@
+<svg width="1600" height="2000" viewBox="0 0 1600 2000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F7F3EE" />
+      <stop offset="100%" stop-color="#E8E2DA" />
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#CFC4B8" />
+      <stop offset="100%" stop-color="#B2A59F" />
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="2000" fill="url(#bg)"/>
+  <circle cx="360" cy="360" r="240" fill="#E8E2DA"/>
+  <circle cx="1280" cy="1700" r="260" fill="#D1C5B8" fill-opacity="0.75"/>
+  <rect x="480" y="260" width="680" height="1480" rx="70" fill="white" stroke="#D4C8BD" stroke-width="3"/>
+  <rect x="540" y="340" width="560" height="1320" rx="60" fill="#F5EEE6"/>
+  <rect x="600" y="420" width="440" height="1180" rx="54" fill="#E8E2DA"/>
+  <rect x="640" y="500" width="360" height="1040" rx="48" fill="#CFC4B8"/>
+  <rect x="680" y="560" width="280" height="920" rx="44" fill="url(#sheen)"/>
+  <path d="M700 780 C740 720 920 720 960 780 L960 1280 C940 1340 860 1380 830 1380 C780 1380 720 1340 700 1280 Z" fill="#E6DDD2"/>
+  <path d="M820 620 C820 570 900 550 930 590 L1020 710 C1050 750 990 810 940 780 L860 730 C835 714 820 685 820 650 Z" fill="#9C8B7F"/>
+  <rect x="650" y="1280" width="320" height="180" rx="28" fill="#B2A59F" opacity="0.95"/>
+  <text x="810" y="1400" text-anchor="middle" font-family="Georgia, serif" font-size="58" fill="#F7F3EE">Maison Calm</text>
+  <text x="800" y="1600" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="32" fill="#6A5C52">Light-drenched interiors, sculpted silhouettes.</text>
+</svg>

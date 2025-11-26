@@ -1,0 +1,14 @@
+<svg width="800" height="1000" viewBox="0 0 800 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F7F3EE" />
+      <stop offset="100%" stop-color="#E8E2DA" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="1000" rx="32" fill="url(#grad)"/>
+  <rect x="240" y="200" width="320" height="520" rx="26" fill="#D9CFC4"/>
+  <rect x="260" y="220" width="280" height="480" rx="22" fill="#E8E2DA"/>
+  <path d="M270 320 C300 260 500 260 530 320 L530 650 C520 690 440 710 400 710 C360 710 280 690 270 650 Z" fill="#C9BEB2"/>
+  <line x1="400" y1="220" x2="400" y2="700" stroke="#B2A59F" stroke-width="6" stroke-linecap="round" />
+  <text x="400" y="820" text-anchor="middle" font-family="Georgia, serif" font-size="40" fill="#9C8B7F">Cozy Beige</text>
+</svg>

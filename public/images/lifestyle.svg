@@ -1,0 +1,21 @@
+<svg width="1400" height="640" viewBox="0 0 1400 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F7F3EE" />
+      <stop offset="100%" stop-color="#E8E2DA" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#B2A59F" />
+      <stop offset="100%" stop-color="#9C8B7F" />
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="640" fill="url(#bg)"/>
+  <circle cx="320" cy="200" r="140" fill="#E8E2DA"/>
+  <circle cx="1100" cy="520" r="180" fill="#D9CFC4"/>
+  <rect x="480" y="140" width="420" height="360" rx="40" fill="#FFFFFF" stroke="#D4C8BD" stroke-width="3"/>
+  <rect x="520" y="180" width="340" height="280" rx="26" fill="#F3ECE4"/>
+  <rect x="560" y="210" width="260" height="220" rx="22" fill="#E8E2DA"/>
+  <rect x="580" y="230" width="220" height="180" rx="18" fill="url(#accent)"/>
+  <text x="700" y="470" text-anchor="middle" font-family="Georgia, serif" font-size="44" fill="#7A6B60">Slow Living</text>
+  <text x="700" y="520" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#6A5C52">Light, texture, and calm spaces.</text>
+</svg>

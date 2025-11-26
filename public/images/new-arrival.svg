@@ -1,0 +1,18 @@
+<svg width="1200" height="1400" viewBox="0 0 1200 1400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F7F3EE" />
+      <stop offset="100%" stop-color="#E8E2DA" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1400" rx="60" fill="url(#bg)"/>
+  <circle cx="600" cy="650" r="380" fill="#E3DAD1"/>
+  <rect x="480" y="260" width="240" height="720" rx="80" fill="#C9BEB2"/>
+  <rect x="520" y="280" width="160" height="680" rx="70" fill="#E8E2DA"/>
+  <rect x="500" y="620" width="200" height="360" rx="50" fill="#B2A59F"/>
+  <rect x="450" y="860" width="300" height="200" rx="60" fill="#9C8B7F" opacity="0.9"/>
+  <path d="M520 460 C540 410 660 410 680 460 L680 820 C670 870 610 900 600 900 C580 900 530 870 520 820 Z" fill="#D3C7BC"/>
+  <path d="M600 340 C600 300 650 290 670 330 L740 470 C760 510 710 560 670 530 L610 480 C605 476 600 460 600 440 Z" fill="#A28E7F"/>
+  <text x="600" y="1120" text-anchor="middle" font-family="Georgia, serif" font-size="52" fill="#7A6B60">New Arrival</text>
+  <text x="600" y="1180" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="26" fill="#6A5C52">Layered neutrals, modern lines.</text>
+</svg>

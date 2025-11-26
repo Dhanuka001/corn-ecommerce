@@ -84,7 +84,7 @@ export default function AdminOrderDetailPage() {
             Please sign in as admin to view orders.
           </p>
           <button
-            onClick={openAuth}
+            onClick={() => openAuth("login")}
             className="mt-3 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
           >
             Open sign-in

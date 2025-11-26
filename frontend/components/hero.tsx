@@ -1,134 +1,157 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-const ArrowIcon = ({ size = 16 }: { size?: number }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    width={size}
-    height={size}
-    aria-hidden
-  >
-    <path d="M5 12h14" />
-    <path d="m13 6 6 6-6 6" />
-  </svg>
-);
+type Slide = {
+  title: string;
+  subtitle: string;
+  features: string[];
+  image: string;
+  accent: string;
+};
 
-const sliderItems = [
+const slides: Slide[] = [
   {
-    title: "Apple Watch Ultra",
-    cta: "Shop Now",
-    image: "/s1.png",
-  },
-  {
-    title: "Galaxy S24 Ultra 5G",
-    cta: "Shop Now",
-    image: "/s2.png",
-  },
-  {
-    title: "Home Security Hub",
-    cta: "Shop Now",
-    image: "/s3.png",
-  },
-];
-
-const promoCards = [
-  {
-    title: "Smart Security Home Camera",
-    image: "/c1.png",
-  },
-  {
-    title: "Galaxy S24 Ultra 5G",
-    image: "/c2.png",
+    title: "Power your day with Corn gadgets",
+    subtitle: "Built for everyday life",
+    features: ["Phones & tablets", "Speakers & wearables", "Chargers & accessories"],
+    image: "/hero/new-hro.png",
+    accent: "#8c5bff",
   },
 ];
 
 export function Hero() {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [index, setIndex] = useState(0);
 
   useEffect(() => {
     const id = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % sliderItems.length);
-    }, 5000);
-
+      setIndex((prev) => (prev + 1) % slides.length);
+    }, 5500);
     return () => clearInterval(id);
   }, []);
 
+  const active = useMemo(() => slides[index], [index]);
+
+  const next = () => setIndex((prev) => (prev + 1) % slides.length);
+  const prev = () => setIndex((prev) => (prev - 1 + slides.length) % slides.length);
+
   return (
-    <section className="grid auto-rows-[240px] grid-cols-1 gap-4 px-0 -mt-10 lg:mt-0 lg:auto-rows-[260px] lg:grid-cols-4 lg:gap-6 lg:px-0">
-      <div className="relative h-full overflow-hidden rounded-none shadow-none sm:rounded-2xl sm:shadow-lg lg:col-span-3 lg:row-span-2 lg:min-h-[520px] lg:rounded-[10px] lg:shadow-none">
-        {sliderItems.map((item, index) => {
-          const isActive = index === currentSlide;
+    <section className="relative w-full overflow-hidden bg-gradient-to-r from-[#0a0c14] via-[#0a0f1f] to-[#0b1028] text-white shadow-2xl">
+      <div className="relative h-[420px] w-full sm:h-[520px] lg:h-[620px]">
+        <div className="absolute inset-0">
+          <div
+            className="absolute inset-0 opacity-70"
+            style={{
+              background:
+                "radial-gradient(circle at 20% 30%, rgba(124,92,255,0.24), transparent 40%), radial-gradient(circle at 80% 50%, rgba(47,128,237,0.18), transparent 45%)",
+            }}
+          />
+          <div className="absolute right-10 top-1/2 -translate-y-1/2 h-72 w-72 blur-3xl opacity-60" style={{ background: `radial-gradient(circle at center, ${active.accent}55, transparent 60%)` }} />
+        </div>
 
-          return (
-            <article
-              key={item.title}
-              className={`absolute inset-0 flex h-full items-end transition-all duration-700 ${
-                isActive
-                  ? "translate-y-0 opacity-100"
-                  : "translate-y-6 opacity-0"
-              }`}
-              aria-hidden={!isActive}
-            >
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                priority={index === 0}
-                sizes="(min-width: 1024px) 75vw, 100vw"
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
-              <div className="relative w-full px-6 pb-6 lg:px-10 lg:pb-10">
-                <button className="rounded-full bg-primary px-7  mb-6 py-3 text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-red-600">
-                  {item.cta}
-                </button>
+        <div className="relative flex h-full items-center">
+          <div className="w-full px-6 py-8 sm:px-10 lg:px-14">
+            <div className="max-w-xl space-y-4 transition duration-500" key={active.title}>
+              <p className="text-xs font-semibold uppercase tracking-[0.4em] text-primary">
+                {active.subtitle}
+              </p>
+              <h1 className="text-3xl font-bold uppercase leading-tight sm:text-4xl lg:text-5xl">
+                {active.title}
+              </h1>
+              <div className="flex flex-wrap gap-3 text-sm text-slate-200 sm:text-base">
+                {active.features.map((feature) => (
+                  <span
+                    key={feature}
+                    className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide backdrop-blur-sm sm:text-sm"
+                  >
+                    {feature}
+                  </span>
+                ))}
               </div>
-            </article>
-          );
-        })}
+              <button className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-primary/90">
+                Shop now
+              </button>
+            </div>
+          </div>
+        </div>
 
-        <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2 lg:bottom-8 lg:left-10 lg:translate-x-0">
-          {sliderItems.map((_, index) => {
-            const isActive = index === currentSlide;
+        <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 sm:right-10 lg:right-16">
+          <div className="relative">
+            <div
+              className="absolute inset-[-12%] rounded-full opacity-60 blur-2xl"
+              style={{
+                background: `radial-gradient(circle at center, ${active.accent}55, transparent 65%)`,
+                animation: "pulse-glow 4s ease-in-out infinite",
+              }}
+            />
+            <Image
+              key={active.image}
+              src={active.image}
+              alt={active.title}
+              width={920}
+              height={560}
+              priority
+              className="relative h-[320px] w-[520px] object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.45)] sm:h-[380px] sm:w-[640px] lg:h-[500px] lg:w-[820px]"
+              style={{ animation: "float 6s ease-in-out infinite" }}
+            />
+          </div>
+        </div>
 
-            return (
-              <span
-                key={index}
-                className={`h-2 w-7 rounded-full transition-colors ${
-                  isActive ? "bg-white" : "bg-white/30"
-                }`}
-              />
-            );
-          })}
+        <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-white/10 px-3 py-2 backdrop-blur">
+          <button
+            onClick={prev}
+            className="h-8 w-8 rounded-full bg-white/10 text-white transition hover:bg-white/20"
+            aria-label="Previous slide"
+          >
+            ‹
+          </button>
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              className={`h-2 w-6 rounded-full transition ${
+                i === index ? "bg-white" : "bg-white/30"
+              }`}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+          <button
+            onClick={next}
+            className="h-8 w-8 rounded-full bg-white/10 text-white transition hover:bg-white/20"
+            aria-label="Next slide"
+          >
+            ›
+          </button>
         </div>
       </div>
-
-      {promoCards.map((card) => (
-        <article
-          key={card.title}
-          className="relative hidden h-full overflow-hidden rounded-2xl shadow-md sm:block lg:col-span-1 lg:row-span-1 lg:rounded-[10px] lg:shadow-xl lg:ring-1 lg:ring-white/20 lg:backdrop-blur"
-        >
-          <Image
-            src={card.image}
-            alt={card.title}
-            fill
-            sizes="(min-width: 1024px) 25vw, 50vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-          <button className="absolute bottom-4 left-4 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-white transition hover:text-primary lg:bottom-6 lg:left-6">
-            Shop Now
-            <ArrowIcon />
-          </button>
-        </article>
-      ))}
+      <style jsx global>{`
+        @keyframes float {
+          0% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+          100% {
+            transform: translateY(0);
+          }
+        }
+        @keyframes pulse-glow {
+          0% {
+            opacity: 0.5;
+            transform: scale(0.98);
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.03);
+          }
+          100% {
+            opacity: 0.5;
+            transform: scale(0.98);
+          }
+        }
+      `}</style>
     </section>
   );
 }

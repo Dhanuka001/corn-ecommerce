@@ -41,14 +41,16 @@ export default function Home() {
       >
         <Navbar />
 
-        <main className="mx-auto w-full max-w-7xl space-y-4 py-10 sm:space-y-10">
+        <main className="space-y-10 pb-10">
           <Hero />
-          <StorePerks />
-          <CategoryBrowser />
-          <NewArrivals />
-          <BestSellingCarousel />
-          <Testimonials />
-          <BlogHighlights />
+          <div className="mx-auto w-full max-w-7xl space-y-8 px-4 sm:px-6 lg:px-0">
+            <StorePerks />
+            <CategoryBrowser />
+            <NewArrivals />
+            <BestSellingCarousel />
+            <Testimonials />
+            <BlogHighlights />
+          </div>
         </main>
 
         <Footer />

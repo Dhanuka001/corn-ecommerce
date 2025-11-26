@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { MouseEvent } from "react";
+import { useRouter } from "next/navigation";
+import type { KeyboardEvent, MouseEvent } from "react";
 
 import { useCart } from "@/context/cart-context";
 import { useFavorites } from "@/context/favorites-context";
@@ -75,11 +76,23 @@ type CatalogProductCardProps = {
 };
 
 export function CatalogProductCard({ product }: CatalogProductCardProps) {
+  const router = useRouter();
   const { addItem, pending: cartPending } = useCart();
   const { isFavorite, toggleFavorite, pending: favPending } = useFavorites();
 
   const saved = isFavorite(product.id);
   const thumbnail = product.images?.[0];
+
+  const navigateToProduct = () => {
+    router.push(`/product/${product.slug}`);
+  };
+
+  const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      navigateToProduct();
+    }
+  };
 
   const handleAddToCart = async (event: MouseEvent) => {
     event.preventDefault();
@@ -94,13 +107,14 @@ export function CatalogProductCard({ product }: CatalogProductCardProps) {
   };
 
   return (
-    <article className="group relative flex flex-col rounded-3xl border border-slate-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-slate-200 hover:shadow-xl">
+    <article
+      className="group relative flex flex-col rounded-3xl border border-slate-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-slate-200 hover:shadow-xl"
+      role="button"
+      tabIndex={0}
+      onClick={navigateToProduct}
+      onKeyDown={handleCardKeyDown}
+    >
       <div className="relative z-0 flex h-56 items-center justify-center overflow-hidden rounded-2xl bg-slate-50">
-        <Link
-          href={`/product/${product.slug}`}
-          className="absolute inset-0"
-          aria-label={`View ${product.name}`}
-        />
         {thumbnail?.url ? (
           <Image
             src={thumbnail.url}
@@ -118,6 +132,7 @@ export function CatalogProductCard({ product }: CatalogProductCardProps) {
             href={`/product/${product.slug}`}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10"
             aria-label={`View ${product.name}`}
+            onClick={(event) => event.stopPropagation()}
           >
             <EyeIcon size={16} />
           </Link>
@@ -126,6 +141,7 @@ export function CatalogProductCard({ product }: CatalogProductCardProps) {
             onClick={handleAddToCart}
             disabled={cartPending}
             aria-label="Add to cart"
+            data-action-stop
           >
             <CartIcon size={16} />
           </button>
@@ -135,6 +151,7 @@ export function CatalogProductCard({ product }: CatalogProductCardProps) {
             disabled={favPending}
             aria-pressed={saved}
             aria-label={saved ? "Remove from favorites" : "Save to favorites"}
+            data-action-stop
           >
             <HeartIcon size={16} />
           </button>
@@ -165,6 +182,7 @@ export function CatalogProductCard({ product }: CatalogProductCardProps) {
               href={`/product/${product.slug}`}
               aria-label={`View ${product.name}`}
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-primary hover:text-primary"
+              onClick={(event) => event.stopPropagation()}
             >
               <EyeIcon size={16} />
             </Link>
@@ -173,6 +191,7 @@ export function CatalogProductCard({ product }: CatalogProductCardProps) {
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-primary hover:text-primary disabled:opacity-60"
               onClick={handleAddToCart}
               disabled={cartPending}
+              data-action-stop
             >
               <CartIcon size={16} />
             </button>
@@ -183,6 +202,7 @@ export function CatalogProductCard({ product }: CatalogProductCardProps) {
               }`}
               onClick={handleToggleFavorite}
               disabled={favPending}
+              data-action-stop
             >
               <HeartIcon size={16} />
             </button>

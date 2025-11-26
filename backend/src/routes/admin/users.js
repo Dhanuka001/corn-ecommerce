@@ -1,32 +1,34 @@
 const { Router } = require("express");
 const respond = require("../../lib/respond");
 const { requireAuth, requireRole } = require("../../middleware/auth");
-const {
-  loadSettingsWithZones,
-  updateSettings,
-} = require("../../services/admin.service");
+const { listUsers, updateUser } = require("../../services/admin.service");
 
 const router = Router();
 const adminsOnly = [requireAuth, requireRole("ADMIN")];
 
 router.use(...adminsOnly);
 
-router.get("/", async (_req, res, next) => {
+router.get("/", async (req, res, next) => {
   try {
-    const payload = await loadSettingsWithZones();
+    const payload = await listUsers({
+      q: req.query.q,
+      page: req.query.page,
+      limit: req.query.limit,
+    });
     return respond.success(res, payload);
   } catch (error) {
     return next(error);
   }
 });
 
-router.post("/", async (req, res, next) => {
+router.patch("/:id", async (req, res, next) => {
   try {
-    const payload = await updateSettings({
+    const user = await updateUser({
+      userId: req.params.id?.trim(),
       payload: req.body || {},
       actor: req.user,
     });
-    return respond.success(res, payload);
+    return respond.success(res, { user });
   } catch (error) {
     return next(error);
   }

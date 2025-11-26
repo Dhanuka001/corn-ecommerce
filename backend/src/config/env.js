@@ -45,6 +45,7 @@ const env = {
   nodeEnv: process.env.NODE_ENV || "development",
   port: Number(process.env.PORT || 8080),
   jwtSecret: process.env.JWT_SECRET || "corn-dev-secret-change-me",
+  requestBodyLimit: process.env.REQUEST_BODY_LIMIT || "5mb",
   googleClientId: googleClientIds[0] || "",
   googleClientIds,
   googleClientSecret: (process.env.GOOGLE_CLIENT_SECRET || "").trim(),

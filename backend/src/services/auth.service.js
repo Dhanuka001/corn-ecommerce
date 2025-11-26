@@ -13,6 +13,7 @@ const userSelect = {
   avatarUrl: true,
   phone: true,
   role: true,
+  suspended: true,
   createdAt: true,
   updatedAt: true,
   addresses: {
@@ -70,6 +71,10 @@ const loginUser = async ({ email, password }) => {
 
   if (!userRecord?.passwordHash) {
     throw createHttpError(401, "Invalid credentials.");
+  }
+
+  if (userRecord.suspended) {
+    throw createHttpError(403, "Account is suspended.");
   }
 
   const passwordValid = await argon2.verify(
@@ -163,6 +168,10 @@ const loginWithGoogle = async ({ credential }) => {
 
   if (!user) {
     throw createHttpError(500, "Unable to complete Google sign-in.");
+  }
+
+  if (user.suspended) {
+    throw createHttpError(403, "Account is suspended.");
   }
 
   const token = createSessionToken(user);

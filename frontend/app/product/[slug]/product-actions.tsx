@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { useCart } from "@/context/cart-context";
@@ -31,20 +30,38 @@ export function ProductActions({
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(
     variants[0]?.id ?? null,
   );
+  const [qty, setQty] = useState(1);
 
   const currentPrice = useMemo(() => {
-    if (!selectedVariantId) {
-      return priceLKR;
-    }
+    if (!selectedVariantId) return priceLKR;
     const match = variants.find((variant) => variant.id === selectedVariantId);
     return match?.priceLKR ?? priceLKR;
   }, [priceLKR, selectedVariantId, variants]);
+
+  const addBusinessDays = (daysToAdd: number) => {
+    const result = new Date();
+    let added = 0;
+    while (added < daysToAdd) {
+      result.setDate(result.getDate() + 1);
+      const day = result.getDay();
+      if (day !== 0 && day !== 6) added += 1;
+    }
+    return result;
+  };
+
+  const deliveryWindow = useMemo(() => {
+    const options: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
+    const start = addBusinessDays(4);
+    const end = addBusinessDays(7);
+    const formatter = new Intl.DateTimeFormat("en", options);
+    return `${formatter.format(start)} to ${formatter.format(end)}`;
+  }, []);
 
   const handleAddToCart = async () => {
     await addItem({
       productId,
       variantId: selectedVariantId ?? undefined,
-      qty: 1,
+      qty,
     });
   };
 
@@ -52,25 +69,40 @@ export function ProductActions({
 
   return (
     <div className="space-y-4 rounded-3xl bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Selected price
-          </p>
-          <p className="text-2xl font-semibold text-slate-900">
-            {currencyFormatter.format(currentPrice)}
-          </p>
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+       
         <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">
-          Ready to ship
+          In stock
         </span>
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-sm font-semibold text-slate-800">Quantity</p>
+        <div className="inline-flex items-center gap-3 rounded-full border border-slate-200 px-3 py-1.5">
+          <button
+            className="h-7 w-7 rounded-full border border-slate-200 text-base font-semibold text-slate-700 transition hover:border-primary/40 hover:text-primary disabled:opacity-60"
+            onClick={() => setQty((prev) => Math.max(1, prev - 1))}
+            disabled={qty <= 1}
+            aria-label="Decrease quantity"
+          >
+            –
+          </button>
+          <span className="w-6 text-center text-sm font-semibold text-slate-900">
+            {qty}
+          </span>
+          <button
+            className="h-7 w-7 rounded-full border border-slate-200 text-base font-semibold text-slate-700 transition hover:border-primary/40 hover:text-primary"
+            onClick={() => setQty((prev) => prev + 1)}
+            aria-label="Increase quantity"
+          >
+            +
+          </button>
+        </div>
       </div>
 
       {variants.length > 0 ? (
         <div className="space-y-2">
-          <p className="text-sm font-semibold text-slate-800">
-            Choose a variant
-          </p>
+          <p className="text-sm font-semibold text-slate-800">Choose a variant</p>
           <div className="flex flex-wrap gap-2">
             {variants.map((variant) => (
               <button
@@ -108,13 +140,36 @@ export function ProductActions({
         >
           {saved ? "Saved" : "Save"}
         </button>
-        <Link
-          href="/shop"
-          className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:border-slate-300"
-        >
-          Back to shop
-        </Link>
       </div>
+
+      <div className="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-800">
+        <span className="text-xl">🚚</span>
+        <span>Estimated delivery {deliveryWindow}</span>
+      </div>
+      <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800">
+        <p className="font-semibold text-slate-900">Payment methods</p>
+        <p className="mt-1 text-xs text-slate-600">
+          PayHere (Visa, Mastercard, Amex) · eZCash · Genie
+        </p>
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
+          {[
+            { label: "Visa", src: "/payments/visa.png" },
+            { label: "Mastercard", src: "/payments/logo.png" },
+            { label: "Amex", src: "/payments/amex.png" },
+            { label: "PayHere", src: "/payments/payhere.png" },
+            { label: "eZCash", src: "/payments/ezcash.png" },
+            { label: "Genie", src: "/payments/genie.png" },
+          ].map((method) => (
+            <img
+              key={method.label}
+              src={method.src}
+              alt={`${method.label} logo`}
+              className="h-8 w-auto object-contain"
+            />
+          ))}
+        </div>
+      </div>
+
       <p className="text-xs text-slate-500">
         SKU reference: <span className="font-semibold">{slug}</span>
       </p>

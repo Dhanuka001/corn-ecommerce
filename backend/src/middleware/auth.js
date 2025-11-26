@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const respond = require("../lib/respond");
 const env = require("../config/env");
+const prisma = require("../lib/prisma");
 
 const sessionCookieOptions = {
   httpOnly: true,
@@ -38,7 +39,7 @@ const getSessionUser = (req) => {
   return payload || null;
 };
 
-const requireAuth = (req, res, next) => {
+const requireAuth = async (req, res, next) => {
   const { payload, invalid } = decodeSessionFromRequest(req);
   if (!payload) {
     if (invalid) {
@@ -46,8 +47,26 @@ const requireAuth = (req, res, next) => {
     }
     return respond.error(res, 401, "Unauthorized");
   }
-  req.user = payload;
-  return next();
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: { id: true, role: true, suspended: true },
+    });
+
+    if (!user || user.suspended) {
+      clearSessionCookie(res);
+      return respond.error(res, 403, "Account is unavailable.");
+    }
+
+    req.user = {
+      userId: user.id,
+      role: user.role,
+    };
+    return next();
+  } catch (error) {
+    return next(error);
+  }
 };
 
 const requireRole =

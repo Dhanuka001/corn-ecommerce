@@ -63,19 +63,22 @@ export function AddressFormModal({
   const [form, setForm] = useState<AddressPayload>(emptyForm);
 
   useEffect(() => {
-    if (initialValues) {
-      setForm({
-        fullName: initialValues.fullName ?? "",
-        phone: initialValues.phone ?? "",
-        addressLine1: initialValues.addressLine1 ?? "",
-        addressLine2: initialValues.addressLine2 ?? "",
-        city: initialValues.city ?? "",
-        district: initialValues.district ?? "",
-        postalCode: initialValues.postalCode ?? "",
-      });
-    } else {
-      setForm(emptyForm);
-    }
+    if (!isOpen) return;
+    // Prefill the form when the modal opens.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setForm(
+      initialValues
+        ? {
+            fullName: initialValues.fullName ?? "",
+            phone: initialValues.phone ?? "",
+            addressLine1: initialValues.addressLine1 ?? "",
+            addressLine2: initialValues.addressLine2 ?? "",
+            city: initialValues.city ?? "",
+            district: initialValues.district ?? "",
+            postalCode: initialValues.postalCode ?? "",
+          }
+        : emptyForm,
+    );
   }, [initialValues, isOpen]);
 
   if (!isOpen) return null;

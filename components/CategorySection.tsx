@@ -34,35 +34,26 @@ export function CategorySection({
   categories = defaultCategories,
 }: CategorySectionProps) {
   return (
-    <section className="space-y-6">
-      <div className="flex items-center justify-between">
+    <section className="space-y-6 rounded-3xl bg-beige-light/80 px-4 py-6 md:px-6">
+      <div className="flex items-center justify-between px-2">
         <h2 className="text-xl font-semibold tracking-tight text-text">{title}</h2>
         <Link
           href="/#all"
-          className="text-sm font-medium text-text/70 underline decoration-text/30 underline-offset-4 transition hover:text-text hover:decoration-text/60"
+          className="text-sm font-semibold uppercase tracking-[0.16em] text-text underline decoration-text/40 underline-offset-4 transition hover:text-text"
         >
           Explore all
         </Link>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
         {categories.map((category) => (
           <Link
             key={category.name}
             href={category.href}
-            className="group relative flex h-full flex-col justify-between rounded-2xl border border-beige-dark/40 bg-beige-light px-6 py-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-text/5"
+            className="group flex h-full items-center justify-center border-2 border-text bg-white px-4 py-6 text-base font-semibold tracking-tight text-text transition hover:-translate-y-1 hover:bg-text hover:text-beige-light"
           >
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-semibold tracking-tight text-text">
-                {category.name}
-              </span>
-              <p className="text-sm leading-relaxed text-text/75">{category.copy}</p>
-            </div>
-            <span className="mt-4 inline-flex items-center text-sm font-medium text-text/80 transition group-hover:text-text">
-              Browse
-              <span className="ml-2 transition-transform duration-150 group-hover:translate-x-1">
-                →
-              </span>
+            <span className="text-center text-lg font-semibold leading-tight">
+              {category.name}
             </span>
           </Link>
         ))}

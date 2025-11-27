@@ -23,7 +23,7 @@
     "name": "Editorial Midi Dress",
     "price": 8800,
     "category": "Women",
-    "images": ["/images/hero-female-premium.jpg"],
+    "images": ["https://i.pinimg.com/736x/68/72/2f/68722f76cb5580bbc8d3be18d66d802a.jpg"],
     "description": "Minimal lines and soft drape in a premium neutral palette."
   },
   {
@@ -32,7 +32,25 @@
     "name": "Textured Knit Set",
     "price": 6400,
     "category": "Women",
-    "images": ["/images/hero-female.jpg"],
+    "images": ["https://i.pinimg.com/736x/7d/33/ba/7d33bac244e1a431eb5b54538f3a4008.jpg"],
     "description": "Layerable knit duo with gentle texture and easy movement."
+  },
+  {
+    "id": 5,
+    "slug": "soft-tailored-blazer",
+    "name": "Soft Tailored Blazer",
+    "price": 9200,
+    "category": "Women",
+    "images": ["https://i.pinimg.com/1200x/49/2d/c2/492dc2b4edd02569ac09c78f13b764a2.jpg"],
+    "description": "Relaxed structure with clean lines and a gentle drape."
+  },
+  {
+    "id": 6,
+    "slug": "minimal-knit-sweater",
+    "name": "Minimal Knit Sweater",
+    "price": 5600,
+    "category": "Women",
+    "images": ["https://i.pinimg.com/736x/22/49/7d/22497dbd2f4bcb68cbd1d115324f1521.jpg"],
+    "description": "Cozy knit in a soft neutral tone with easy, modern fit."
   }
 ]

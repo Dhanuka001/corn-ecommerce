@@ -14,14 +14,16 @@ const priceFormatter = new Intl.NumberFormat("en-US", {
 const stars = Array.from({ length: 5 });
 
 export function ProductCard({ product }: ProductCardProps) {
-  const cover = product.images[0] ?? "/images/cardigan1.jpg";
+  const cover =
+    product.images[0] ??
+    "https://i.pinimg.com/736x/56/f9/71/56f971f986719bacb99be935ab3a44dd.jpg";
 
   return (
     <Link
       href={`/products/${product.slug}`}
       className="group flex h-full flex-col overflow-hidden border border-beige-dark/20 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-xl hover:shadow-text/5"
     >
-      <div className="relative h-[520px] w-full overflow-hidden bg-beige-light">
+      <div className="relative h-[420px] w-full overflow-hidden bg-beige-light">
         <div
           className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-[0.2em] text-text/50"
           style={{ writingMode: "vertical-rl" }}
@@ -34,6 +36,7 @@ export function ProductCard({ product }: ProductCardProps) {
           fill
           sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 768px) 33vw, 90vw"
           className="object-cover transition duration-500 ease-out group-hover:scale-105"
+          unoptimized
           priority
         />
         <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-[0.2em] text-text/50">

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 type HeroSectionProps = {
@@ -25,72 +24,72 @@ export function HeroSection({
   imageAlt = "Premium editorial female look",
 }: HeroSectionProps) {
   return (
-    <section className="relative w-full overflow-hidden bg-white min-h-screen">
-      {/* Split backgrounds */}
-      <div className="absolute inset-0 grid md:grid-cols-2">
-        <div className="relative bg-[#e8e2da]">
-          <div
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-[0.2em] text-text/70"
-            style={{ writingMode: "vertical-rl" }}
-          >
-            BeigeAura — time to get dressed
-          </div>
-        </div>
-        <div className="relative">
-          <Image
-            src={imageSrc}
-            alt={imageAlt}
-            fill
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-l from-black/35 via-black/15 to-transparent" />
-          <div
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-[0.2em] text-white/80"
-            style={{ writingMode: "vertical-rl" }}
-          >
-            Since 2024
-          </div>
-        </div>
-      </div>
+    <section className="relative w-full overflow-hidden bg-white pt-24">
+      <div className="absolute left-[-140px] top-[-80px] h-80 w-80 rounded-full bg-text/5 blur-3xl" />
+      <div className="absolute right-[-160px] bottom-[-160px] h-[26rem] w-[26rem] rounded-full bg-text/5 blur-3xl" />
 
-      {/* Center overlay content */}
-      <div className="relative flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-16 text-center text-white sm:px-10">
-        <span className="text-xs uppercase tracking-[0.3em] text-white/80">
-          {eyebrow}
-        </span>
-        <h1 className="text-4xl font-black leading-none tracking-tight text-text sm:text-5xl md:text-6xl lg:text-7xl">
-          {title}
-        </h1>
-        <div className="flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-text/85">
-          <span className="h-px w-10 bg-text/70" />
-          {subtitle}
-          <span className="h-px w-10 bg-text/70" />
+      <div className="relative mx-auto grid min-h-[70vh] max-w-6xl items-stretch gap-0 px-6 pb-12 md:grid-cols-2 md:px-8 lg:px-0">
+        <div className="flex flex-col justify-center gap-6 py-10 md:py-16 md:pr-10">
+          <div className="inline-flex items-center gap-3 rounded-full bg-text px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.26em] text-beige-light">
+            <span>{eyebrow}</span>
+            <span className="rounded-full bg-beige-light/30 px-2 py-1 text-[10px] text-white">
+              Updated daily
+            </span>
+          </div>
+
+          <h1 className="text-4xl font-black leading-tight tracking-tight text-text sm:text-5xl md:text-6xl">
+            {title}
+          </h1>
+          <p className="max-w-xl text-base leading-relaxed text-text/80 sm:text-lg">{subtitle}</p>
+
+          <div className="flex flex-wrap items-center gap-4">
+            <Link
+              href={ctaHref}
+              className="inline-flex items-center justify-center bg-text px-7 py-3 text-sm font-semibold text-beige-light transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-text/10"
+            >
+              {ctaLabel}
+            </Link>
+            <Link
+              href={secondaryHref}
+              className="inline-flex items-center justify-center border border-text/15 px-7 py-3 text-sm font-semibold text-text/80 transition hover:-translate-y-0.5 hover:border-text/40 hover:text-text"
+            >
+              {secondaryLabel}
+            </Link>
+          </div>
+
+          <div className="flex flex-wrap gap-6 text-sm text-text/70">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-text" />
+              <span>Free delivery over $75</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-text" />
+              <span>Free returns for 30 days</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-text" />
+              <span>Student 10% off</span>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-wrap items-center justify-center gap-5 pt-4">
-          <Link
-            href={ctaHref}
-            className="inline-flex items-center justify-center bg-text px-7 py-3 text-sm font-semibold text-beige-light transition duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-text/10"
+
+        <div className="relative min-h-[320px] overflow-hidden md:min-h-[520px]">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `linear-gradient(0deg, rgba(0,0,0,0.2), rgba(0,0,0,0.05)), url(${imageSrc})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center center",
+              backgroundRepeat: "no-repeat",
+            }}
+            role="img"
+            aria-label={imageAlt}
           >
-            {ctaLabel}
-          </Link>
-          <Link
-            href={secondaryHref}
-            className="inline-flex items-center justify-center border border-[#e8e2da] bg-transparent px-7 py-3 text-sm font-semibold text-text transition duration-200 hover:-translate-y-0.5 hover:bg-[#e8e2da]/30"
-          >
-            {secondaryLabel}
-          </Link>
-        </div>
-        <div className="mt-6 flex flex-col items-center gap-2 text-white/70">
-          <div className="h-10 w-px bg-white/60" />
-          <a
-            href="#featured"
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/70 bg-white/15 animate-bounce transition hover:bg-white/25"
-            aria-label="Scroll to featured"
-          >
-            <span className="text-lg">⌄</span>
-          </a>
+            <div className="absolute bottom-5 left-5 flex flex-col gap-2 bg-white/85 px-4 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-text shadow-lg">
+              <span>Up to 30% off</span>
+              <span className="text-text/60">Dresses, co-ords & tailoring</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>

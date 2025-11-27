@@ -1,95 +1,84 @@
-import Image from "next/image";
+import Link from "next/link";
 import { CategorySection } from "@/components/CategorySection";
 import { Footer } from "@/components/Footer";
 import { HeroSection } from "@/components/HeroSection";
 import { Navbar } from "@/components/Navbar";
-import { NewArrivalSection } from "@/components/NewArrivalSection";
 import { ProductGrid } from "@/components/ProductGrid";
 import { Testimonials } from "@/components/Testimonials";
 import { getProducts } from "@/lib/getProducts";
 
 export default async function Home() {
   const products = await getProducts();
-  const featured = products.slice(0, 6);
-
+  const featured = products.slice(0, 9);
   return (
-    <div className="min-h-screen bg-beige-light text-text">
+    <div className="min-h-screen bg-white text-text">
       <Navbar />
 
       <HeroSection
-        eyebrow="The Soft Warm Minimal Aesthetic"
-        title="Neutral silhouettes."
-        subtitle="Structured ease in warm neutrals—tailored layers that move."
-        ctaLabel="Shop collection"
-        ctaHref="#featured"
-        secondaryLabel="View lookbook"
-        secondaryHref="#journal"
-        imageSrc="/images/hero-female-pin.jpg"
-        imageAlt="Premium female editorial look in warm beige tones"
+        eyebrow="Women's new in"
+        title="Everything new. Zero effort."
+        subtitle="Daily drops, trend edits, and back-in-stock pieces before they go."
+        ctaLabel="Shop women"
+        ctaHref="#new-in"
+        secondaryLabel="Shop sale"
+        secondaryHref="#sale"
+        imageSrc="https://i.pinimg.com/736x/49/0b/f6/490bf6fab1f98cc97a75914f878f4634.jpg"
+        imageAlt="Model in neutral streetwear"
       />
 
       <main className="mx-auto flex max-w-6xl flex-col gap-12 px-6 py-12">
-
         <div className="animate-fade-in-up">
-          <NewArrivalSection />
-        </div>
-
-        <div className="animate-fade-in-up">
-          <CategorySection title="Shop by feeling" />
-        </div>
-
-        <div id="featured" className="animate-fade-in-up">
-          <ProductGrid
-            title="Featured essentials"
-            description="Cozy knits, airy layers, and grounding staples in warm beige tones."
-            products={featured}
+          <CategorySection
+            title="Shop by category"
+            categories={[
+              { name: "Dresses", copy: "", href: "#dresses" },
+              { name: "Coats & Jackets", copy: "", href: "#co-ords" },
+              { name: "Knitwear", copy: "", href: "#knitwear" },
+              { name: "Jeans", copy: "", href: "#denim" },
+              { name: "Shoes", copy: "", href: "#shoes" },
+              { name: "View all", copy: "", href: "#featured" },
+            ]}
           />
         </div>
 
         <section
-          id="lifestyle"
-          className="animate-fade-in-up overflow-hidden rounded-3xl border border-beige-dark/40 bg-white/80 shadow-[0_30px_80px_-60px_rgba(26,26,26,0.4)]"
+          id="sale"
+          className="animate-fade-in-up overflow-hidden bg-text px-6 py-8 text-beige-light shadow-[0_20px_60px_-40px_rgba(26,26,26,0.6)]"
         >
-          <div className="grid items-center gap-0 md:grid-cols-2">
-            <div className="space-y-4 px-8 py-12 md:px-10">
-              <p className="text-xs uppercase tracking-[0.2em] text-text/60">
-                Home Atmosphere
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="space-y-2">
+              <p className="text-xs uppercase tracking-[0.2em] text-beige/80">Limited offer</p>
+              <h3 className="text-2xl font-semibold tracking-tight">
+                Up to 30% off dresses, co-ords & tailoring
+              </h3>
+              <p className="text-sm text-beige/90">
+                Use code: NEUTRALS at checkout. Ends midnight.
               </p>
-              <h2 className="text-2xl font-semibold tracking-tight text-text">
-                Slow living, soft light.
-              </h2>
-              <p className="text-sm leading-relaxed text-text/75">
-                Layer textiles, ceramics, and candlelight to create a calm retreat. Pair
-                tactile throws with structured silhouettes for a space that feels
-                intentional and lived-in.
-              </p>
-              <div className="flex gap-3">
-                <a
-                  href="#home"
-                  className="rounded-full bg-text px-4 py-2 text-sm font-semibold text-beige-light transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-text/10"
-                >
-                  Explore home
-                </a>
-                <a
-                  href="#journal"
-                  className="rounded-full border border-text/20 px-4 py-2 text-sm font-semibold text-text transition hover:-translate-y-0.5 hover:border-text/40"
-                >
-                  Read journal
-                </a>
-              </div>
             </div>
-            <div className="relative h-full w-full bg-beige">
-              <Image
-                src="/images/lifestyle-real.jpg"
-                alt="Lifestyle collage"
-                width={1200}
-                height={800}
-                className="h-full w-full object-cover"
-                priority
-              />
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="#featured"
+                className="rounded-full bg-beige-light px-5 py-3 text-sm font-semibold text-text transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-beige/30"
+              >
+                Shop sale
+              </Link>
+              <Link
+                href="#dresses"
+                className="rounded-full border border-beige/60 px-5 py-3 text-sm font-semibold text-beige-light transition hover:-translate-y-0.5 hover:border-beige-light"
+              >
+                Shop dresses
+              </Link>
             </div>
           </div>
         </section>
+
+        <div id="new-in" className="animate-fade-in-up">
+          <ProductGrid
+            title="New in: women's edit"
+            description="Fresh drops, restocks, and trending pieces just landed."
+            products={featured}
+          />
+        </div>
 
         <div className="animate-fade-in-up">
           <Testimonials />

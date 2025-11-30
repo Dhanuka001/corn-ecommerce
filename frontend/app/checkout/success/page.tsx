@@ -1,16 +1,22 @@
-"use client";
-
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
 import { Footer } from "@/components/footer";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { Navbar } from "@/components/navbar";
 
-export default function CheckoutSuccessPage() {
-  const searchParams = useSearchParams();
-  const orderId = searchParams.get("order_id") || searchParams.get("orderId");
-  const paymentId = searchParams.get("payment_id") || searchParams.get("paymentId");
+type CheckoutSuccessPageProps = {
+  searchParams: Record<string, string | string[] | undefined>;
+};
+
+export default function CheckoutSuccessPage({ searchParams }: CheckoutSuccessPageProps) {
+  const orderId =
+    (typeof searchParams.order_id === "string" && searchParams.order_id) ||
+    (typeof searchParams.orderId === "string" && searchParams.orderId) ||
+    null;
+  const paymentId =
+    (typeof searchParams.payment_id === "string" && searchParams.payment_id) ||
+    (typeof searchParams.paymentId === "string" && searchParams.paymentId) ||
+    null;
 
   return (
     <div className="min-h-screen bg-white text-neutral-900">

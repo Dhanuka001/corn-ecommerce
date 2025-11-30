@@ -1,29 +1,29 @@
 const posts = [
   {
-    title: "Battery safety at Corn: what is next?",
+    title: "Battery safety at PhoneBazzar: what is next?",
     excerpt:
-      "Peek inside the Corn energy lab to see how we stress test every Volt power cell before launch.",
+      "Peek inside the PhoneBazzar energy lab to see how we stress test every Volt power cell before launch.",
     image:
       "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
   },
   {
     title: "What charger does your new device need?",
     excerpt:
-      "USB-C tips, wired vs. wireless charging comparisons, and the Corn accessories we pair with iPhone 16.",
+      "USB-C tips, wired vs. wireless charging comparisons, and the PhoneBazzar accessories we pair with iPhone 16.",
     image:
       "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
   },
   {
     title: "Facts 101: are all USB-C cables the same?",
     excerpt:
-      "We break down PD wattage, e-marked cables, and why Corn braids every cable for travel durability.",
+      "We break down PD wattage, e-marked cables, and why PhoneBazzar braids every cable for travel durability.",
     image:
       "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800&q=80",
   },
   {
     title: "Wireless charging: what you need to know",
     excerpt:
-      "From Qi2 certification to MagSafe alignment, here is the latest from Corn Labs.",
+      "From Qi2 certification to MagSafe alignment, here is the latest from PhoneBazzar Labs.",
     image:
       "https://images.unsplash.com/photo-1555617983-ccfcf4d5dcd7?auto=format&fit=crop&w=800&q=80",
   },

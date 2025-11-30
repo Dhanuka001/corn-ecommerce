@@ -160,11 +160,11 @@ export function Navbar() {
               <Link
                 href="/"
                 className="flex items-center"
-                aria-label="Corn Electronics home"
+                aria-label="PhoneBazzar.lk home"
               >
                 <Image
-                  src="/logo.png"
-                  alt="Corn Electronics"
+                  src="/pb.png"
+                  alt="PhoneBazzar.lk"
                   width={48}
                   height={48}
                   className="h-12 w-auto"
@@ -173,17 +173,11 @@ export function Navbar() {
               </Link>
             </div>
 
-            <div className="hidden flex-1 items-center gap-3 lg:flex">
-              <button className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-5 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-transparent hover:bg-slate-100">
-                <MenuIcon className="text-primary" size={18} />
-                All Categories
-                <ChevronDownIcon className="text-slate-400" />
-              </button>
-
+            <div className="hidden flex-1 justify-center lg:flex">
               <form
                 action="/shop"
                 method="get"
-                className="relative flex flex-1 items-center max-w-[300px]"
+                className="relative flex w-full max-w-[420px] items-center"
               >
                 <input
                   type="text"

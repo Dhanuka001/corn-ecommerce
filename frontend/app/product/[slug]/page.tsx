@@ -33,7 +33,7 @@ const reviews = [
     name: "Ishara",
     rating: 5,
     title: "Worth the upgrade",
-    body: "Noise canceling is excellent for this price and the Corn warranty sealed the deal.",
+    body: "Noise canceling is excellent for this price and the PhoneBazzar warranty sealed the deal.",
     date: "2 months ago",
   },
 ];
@@ -41,7 +41,7 @@ const reviews = [
 const faqItems = [
   {
     q: "What is the warranty?",
-    a: "All Corn products include a 3-year local warranty with service handled through our Sri Lanka partners.",
+    a: "All PhoneBazzar.lk products include a 3-year local warranty with service handled through our Sri Lanka partners.",
   },
   {
     q: "How fast do you deliver?",
@@ -60,7 +60,7 @@ const currencyFormatter = new Intl.NumberFormat("en-LK", {
 });
 
 const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://corn.example";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://phonebazzar.lk";
 
 async function loadProduct(slug: string): Promise<ProductDetail | null> {
   return fetchProductBySlug(slug);
@@ -74,21 +74,21 @@ export async function generateMetadata({
 
   if (!product) {
     return {
-      title: "Product not found • Corn Ecommerce",
+      title: "Product not found • PhoneBazzar.lk",
       description:
-        "Browse the newest drops and exclusives from Corn Ecommerce.",
+        "Browse the newest drops and exclusives from PhoneBazzar.lk.",
     };
   }
 
-  const title = `${product.name} • Corn Ecommerce`;
+  const title = `${product.name} • PhoneBazzar.lk`;
 
   return {
     title,
-    description: product.description ?? "Corn Electronics product.",
+    description: product.description ?? "PhoneBazzar.lk product.",
     openGraph: {
       type: "website",
       url: `${siteUrl}/product/${product.slug}`,
-      siteName: "Corn Ecommerce",
+      siteName: "PhoneBazzar.lk",
       title,
       description: product.description ?? undefined,
       images: product.images.map((image) => ({
@@ -140,12 +140,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div className="grid gap-3 sm:grid-cols-2">
               <InfoCard
                 title="Fast dispatch"
-                description="Ships within 24 hours from the Corn hub."
+                description="Ships within 24 hours from the PhoneBazzar hub."
                 icon="truck"
               />
               <InfoCard
                 title="Warranty & care"
-                description="3-year Corn warranty with local service."
+                description="3-year PhoneBazzar warranty with local service."
                 icon="shield"
               />
               <InfoCard
@@ -183,8 +183,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div className="rounded-3xl bg-white/80 p-4 text-sm text-slate-700">
               <p className="font-semibold text-slate-900">Categories</p>
               <p>
-                {product.categories.map((cat) => cat.name).join(" · ") ||
-                  "Corn catalog"}
+                  {product.categories.map((cat) => cat.name).join(" · ") ||
+                    "PhoneBazzar catalog"}
               </p>
             </div>
 
@@ -199,8 +199,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         <section className="mt-6 rounded-3xl border border-slate-100 bg-white p-5 shadow-sm">
           <h2 className="text-xl font-semibold text-slate-900">Description</h2>
-          <p className="mt-2 text-sm leading-relaxed text-slate-700">
-            {product.description || "Premium Corn hardware for daily use with local warranty and fast delivery."}
+            <p className="mt-2 text-sm leading-relaxed text-slate-700">
+            {product.description || "Premium PhoneBazzar hardware for daily use with local warranty and fast delivery."}
           </p>
         </section>
 
@@ -228,7 +228,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <section className="mt-10 grid gap-8 lg:grid-cols-[1.2fr,0.8fr]">
           <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-semibold text-slate-900">Customer reviews</h2>
-            <p className="text-sm text-slate-600">What buyers think about this Corn drop.</p>
+            <p className="text-sm text-slate-600">What buyers think about this PhoneBazzar drop.</p>
             <div className="mt-4 flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
               <StarRow rating={4.7} />
               <p className="text-sm font-semibold text-slate-900">4.7/5 overall</p>

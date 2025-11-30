@@ -428,9 +428,6 @@ export default function AccountPageClient({ initialTab }: AccountPageClientProps
                   Track recent purchases and payment status.
                 </p>
               </div>
-              <button className="rounded-full border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-800 transition hover:border-neutral-900 hover:bg-neutral-50">
-                Need help?
-              </button>
             </div>
             <div className="mt-6 space-y-4">
               {ordersLoading ? (
@@ -557,7 +554,7 @@ export default function AccountPageClient({ initialTab }: AccountPageClientProps
                 },
                 {
                   label: "Notifications",
-                  description: "Choose how Corn contacts you",
+                  description: "Choose how PhoneBazzar contacts you",
                   action: "Manage",
                 },
               ].map((item) => (
@@ -630,13 +627,13 @@ export default function AccountPageClient({ initialTab }: AccountPageClientProps
                       ? `${user.firstName} ${user.lastName ?? ""}`.trim()
                       : user.email}
                   </p>
-                  <p className="text-sm text-slate-500">Corn Electronics</p>
+                  <p className="text-sm text-slate-500">PhoneBazzar.lk</p>
                 </div>
               </div>
             ) : (
               <div className="rounded-2xl bg-slate-50/60 p-4 text-center">
                 <p className="text-lg font-semibold text-slate-900">
-                  Join Corn Electronics
+                  Join PhoneBazzar.lk
                 </p>
                 <p className="text-sm text-slate-500">
                   Unlock faster checkout, saved addresses, and VIP perks.
@@ -747,7 +744,7 @@ export default function AccountPageClient({ initialTab }: AccountPageClientProps
             <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
               <LogoutIcon size={24} />
             </div>
-            <h3 className="text-xl font-semibold text-slate-900">Sign out of Corn?</h3>
+            <h3 className="text-xl font-semibold text-slate-900">Sign out of PhoneBazzar?</h3>
             <p className="mt-2 text-sm text-slate-500">
               You&apos;ll need to log back in to manage your orders, downloads, and wishlist.
             </p>

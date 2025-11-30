@@ -108,7 +108,7 @@ export function StorePerks() {
   return (
     <section
       className="mt-1 px-4 lg:mt-0 lg:px-0"
-      aria-label="Corn Electronics service highlights"
+    aria-label="PhoneBazzar service highlights"
     >
       <div className="rounded-[28px]  bg-white/90 p-6 shadow-sm shadow-primary/5 backdrop-blur-sm sm:p-8">
         <div className="hidden gap-6 sm:grid sm:grid-cols-2 xl:grid-cols-4">

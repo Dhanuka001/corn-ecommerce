@@ -26,10 +26,7 @@ export function BestSellingCarousel() {
     >
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
-            Trending Now
-          </p>
-          <h2 className="text-2xl font-semibold text-slate-900">
+          <h2 className="text-2xl font-semibold text-slate-900 mt-8">
             Best Selling
           </h2>
         </div>

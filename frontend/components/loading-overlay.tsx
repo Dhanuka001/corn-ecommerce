@@ -28,8 +28,8 @@ export function LoadingOverlay({
 
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-transparent">
           <Image
-            src="/logo.png"
-            alt="Corn Ecommerce logo"
+            src="/pb.png"
+            alt="PhoneBazzar.lk logo"
             width={64}
             height={64}
             priority

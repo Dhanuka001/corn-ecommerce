@@ -29,7 +29,7 @@ const initialMessages: Message[] = [
   {
     id: "4",
     role: "bot",
-    text: "Yes, Corn ships all chargers to CA with tracked delivery.",
+    text: "Yes, PhoneBazzar ships all chargers to CA with tracked delivery.",
   },
 ];
 
@@ -66,7 +66,7 @@ export function ChatWidget() {
               <div className="relative h-8 w-8 overflow-hidden rounded-full border border-neutral-200 bg-white">
                 <Image
                   src="/logo.png"
-                  alt="Corn Electronics logo"
+                  alt="PhoneBazzar.lk logo"
                   fill
                   sizes="32px"
                   className="object-contain"
@@ -75,7 +75,7 @@ export function ChatWidget() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-neutral-900">
-                  Corn Support
+                  PhoneBazzar Support
                 </p>
                 <p className="text-[11px] text-neutral-500">
                   Typically replies in under 2 min

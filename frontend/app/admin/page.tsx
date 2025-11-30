@@ -884,7 +884,7 @@ export default function AdminPage() {
           <header className="sticky top-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-slate-50/80 px-4 py-3 backdrop-blur">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.32em] text-primary">
-                Corn Admin
+                PhoneBazzar Admin
               </p>
               <h1 className="text-3xl font-semibold text-slate-900 lg:text-4xl">
                 Operations cockpit
@@ -1785,7 +1785,7 @@ export default function AdminPage() {
                     setProductForm((prev) => ({ ...prev, name: e.target.value }))
                   }
                   className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-primary"
-                  placeholder="Corn Watch Pro"
+                  placeholder="PhoneBazzar Watch Pro"
                 />
               </div>
               <div className="space-y-2">

@@ -34,14 +34,14 @@ export function Footer() {
           <div className="space-y-6">
             <div>
               <div className="text-sm uppercase tracking-[0.3em] text-primary">
-                Corn Electronics
+                PhoneBazzar.lk
               </div>
               <p className="mt-2 text-3xl font-semibold">Join the club</p>
             </div>
-            <p className="text-sm text-white/60">
-              Subscribe to hear about new drops, limited collaborations, and
-              Corn-only experiences directly in your inbox.
-            </p>
+              <p className="text-sm text-white/60">
+                Subscribe to hear about new drops, limited collaborations, and
+                PhoneBazzar-only experiences directly in your inbox.
+              </p>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <input
                 type="email"
@@ -86,16 +86,16 @@ export function Footer() {
             </div>
             <div>
               <p className="text-base font-semibold text-primary">Contact Us</p>
-              <p className="mt-3 text-sm text-white/70">hello@corn.lk</p>
+              <p className="mt-3 text-sm text-white/70">hello@phonebazzar.lk</p>
               <p className="text-sm text-white/70">+94 77 660 1146</p>
             </div>
           </div>
         </div>
 
         <div className="mt-10 border-t border-white/10 pt-6 text-center text-xs text-white/60">
-          <p>© {new Date().getFullYear()} Corn Electronics. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} PhoneBazzar.lk. All rights reserved.</p>
           <p className="mt-1">
-            Corn HQ · Kasbawa, Sri Lanka
+            PhoneBazzar HQ · Kasbawa, Sri Lanka
           </p>
         </div>
       </div>

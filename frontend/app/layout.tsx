@@ -16,8 +16,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Corn Ecommerce",
-  description: "Modern ecommerce experience",
+  title: "PhoneBazzar.lk",
+  description: "Modern ecommerce experience from PhoneBazzar.lk",
 };
 
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;

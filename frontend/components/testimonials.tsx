@@ -2,28 +2,28 @@ const testimonials = [
   {
     name: "Levi S.",
     initials: "Le",
-    title: "Corn Volt Power Hub",
+    title: "PhoneBazzar Volt Power Hub",
     quote:
-      "Excellent product. Perfect for my MacBook and camera setup. I love the Corn build quality and the finish matches everything on my desk.",
+      "Excellent product. Perfect for my MacBook and camera setup. I love the PhoneBazzar build quality and the finish matches everything on my desk.",
   },
   {
     name: "Kyle R.",
     initials: "Ky",
-    title: "Corn Atlas Smartwatch",
+    title: "PhoneBazzar Atlas Smartwatch",
     quote:
       "So good we grabbed two — one for home workouts and one for hikes. Battery life is unreal and the UI feels premium.",
   },
   {
     name: "Justin",
     initials: "Ju",
-    title: "Corn Air Lite Buds",
+    title: "PhoneBazzar Air Lite Buds",
     quote:
-      "Tuned EQ is on point. ANC kills the city noise and the case clicks shut like luxury. Corn nailed this drop.",
+      "Tuned EQ is on point. ANC kills the city noise and the case clicks shut like luxury. PhoneBazzar nailed this drop.",
   },
   {
     name: "Robert F.",
     initials: "Ro",
-    title: "Corn Prime Dock",
+    title: "PhoneBazzar Prime Dock",
     quote:
       "My honest opinion? This thing is a powerhouse. Makes my hybrid setup simple and still looks clean on the shelf.",
   },
@@ -39,7 +39,7 @@ export function Testimonials() {
               Straight from our fans
             </p>
             <h2 className="mt-2 text-3xl font-semibold text-slate-900">
-              Loved by the Corn community
+              Loved by the PhoneBazzar community
             </h2>
           </div>
         </div>

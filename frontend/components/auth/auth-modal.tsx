@@ -58,7 +58,7 @@ export function AuthModal({
 
   const switchText =
     mode === "login"
-      ? "New to Corn Electronics?"
+      ? "New to PhoneBazzar.lk?"
       : "Already have an account?";
   const switchAction = mode === "login" ? "Register" : "Sign in";
 

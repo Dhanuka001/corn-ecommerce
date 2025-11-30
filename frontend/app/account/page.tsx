@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, type SVGAttributes } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { useAuth } from "@/context/auth-context";
 import { useNotifications } from "@/context/notification-context";
@@ -133,7 +134,7 @@ const LogoutIcon = ({ size = 20, ...props }: IconProps) => (
   </svg>
 );
 
-const navigationItems = [
+  const navigationItems = [
   {
     key: "dashboard",
     label: "Dashboard",
@@ -168,10 +169,12 @@ const navigationItems = [
 
 type SectionKey = (typeof navigationItems)[number]["key"];
 
-export default function AccountPage() {
+  export default function AccountPage() {
+  const searchParams = useSearchParams();
   const { user, openAuth, logout } = useAuth();
   const { notifyError, notifySuccess } = useNotifications();
   const [activeSection, setActiveSection] = useState<SectionKey>("dashboard");
+  const requestedTab = searchParams.get("tab");
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [addressesLoading, setAddressesLoading] = useState(false);
@@ -183,6 +186,14 @@ export default function AccountPage() {
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [favoritesCount, setFavoritesCount] = useState<number>(0);
   const [cancelLoadingId, setCancelLoadingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!requestedTab) return;
+    const match = navigationItems.find((item) => item.key === requestedTab);
+    if (match) {
+      setActiveSection(match.key);
+    }
+  }, [requestedTab]);
 
   const initials = useMemo(() => {
     if (!user) return "";

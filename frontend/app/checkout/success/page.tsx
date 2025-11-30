@@ -36,9 +36,9 @@ export default function CheckoutSuccessPage({ searchParams }: CheckoutSuccessPag
         <div className="mt-6 w-full max-w-lg rounded-2xl border border-neutral-200 bg-white p-6 text-left shadow-sm">
           <p className="text-sm font-semibold text-neutral-900">What happens next?</p>
           <ul className="mt-3 space-y-2 text-sm text-neutral-600">
-            <li>• PayHere notifies our backend via notify_url.</li>
-            <li>• We create your order and mark it as paid.</li>
-            <li>• You&apos;ll see the order under your account once it&apos;s created.</li>
+            <li>• We wait for PayHere to confirm the payment before moving forward.</li>
+            <li>• Your order is marked as paid and added to your account history.</li>
+            <li>• You&apos;ll receive an email as soon as everything is recorded.</li>
           </ul>
 
           {orderId || paymentId ? (
@@ -53,7 +53,7 @@ export default function CheckoutSuccessPage({ searchParams }: CheckoutSuccessPag
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/account/orders"
+            href="/account?tab=orders"
             className="rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5"
           >
             View my orders

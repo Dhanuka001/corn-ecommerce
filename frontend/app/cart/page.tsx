@@ -13,7 +13,8 @@ import { useAuth } from "@/context/auth-context";
 import { getAddresses, type Address } from "@/lib/api/addresses";
 import { CheckoutAddressSelector } from "@/components/checkout/checkout-address-selector";
 import { CheckoutSummary } from "@/components/checkout/checkout-summary";
-import { fetchCheckoutSummary, placeOrder } from "@/lib/api/checkout";
+import { fetchCheckoutSummary } from "@/lib/api/checkout";
+import { createPayherePayment } from "@/lib/api/payhere";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("en-LK", {
@@ -21,7 +22,15 @@ const formatCurrency = (value: number) =>
     currency: "LKR",
   }).format(value);
 
-const MobileCheckoutBar = ({ total }: { total: string }) => (
+const MobileCheckoutBar = ({
+  total,
+  onPay,
+  disabled,
+}: {
+  total: string;
+  onPay: () => void;
+  disabled: boolean;
+}) => (
   <div className="fixed inset-x-0 bottom-[86px] z-40 px-4 pb-[calc(env(safe-area-inset-bottom)+0.4rem)] lg:hidden">
     <div className="mx-auto flex max-w-3xl items-center gap-3 rounded-2xl border border-neutral-200 bg-white/95 px-4 py-3 shadow-[0_14px_40px_rgba(15,23,42,0.14)] backdrop-blur">
       <div className="flex-1">
@@ -31,14 +40,15 @@ const MobileCheckoutBar = ({ total }: { total: string }) => (
         <p className="text-lg font-semibold leading-tight text-neutral-900">
           {total}
         </p>
-        <p className="text-[11px] text-neutral-500">Shipping & tax at checkout</p>
+        <p className="text-[11px] text-neutral-500">Shipping & tax calculated</p>
       </div>
-      <Link
-        href="/checkout"
-        className="inline-flex h-12 min-w-[130px] items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(79,70,229,0.28)] transition hover:-translate-y-0.5"
+      <button
+        className="inline-flex h-12 min-w-[150px] items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(79,70,229,0.28)] transition hover:-translate-y-0.5 disabled:opacity-60"
+        onClick={onPay}
+        disabled={disabled}
       >
-        Checkout
-      </Link>
+        Pay with PayHere
+      </button>
     </div>
   </div>
 );
@@ -46,7 +56,7 @@ const MobileCheckoutBar = ({ total }: { total: string }) => (
 export default function CartPage() {
   const { user } = useAuth();
   const { cart, loading, pending, updateQuantity, removeItem, refresh } = useCart();
-  const { notifyError, notifySuccess } = useNotifications();
+  const { notifyError } = useNotifications();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [addressLoading, setAddressLoading] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -58,7 +68,7 @@ export default function CartPage() {
     shippingRateLabel?: string;
   } | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
-  const [placingOrder, setPlacingOrder] = useState(false);
+  const [paying, setPaying] = useState(false);
 
   const items = cart?.items ?? [];
   const subtotal = cart?.summary?.subTotalLKR ?? 0;
@@ -134,35 +144,58 @@ export default function CartPage() {
   };
 
   const canCheckout = !!selectedAddressId && !!summary;
-
-  const handlePlaceOrder = async () => {
+  
+  const redirectToPayHere = async () => {
     if (!selectedAddressId || !summary) {
       notifyError("Address required", "Select a shipping address first.");
       return;
     }
-    setPlacingOrder(true);
+    if (!cartId) {
+      notifyError("Cart missing", "Refresh and try again.");
+      return;
+    }
+    setPaying(true);
+    const loader = document.createElement("div");
+    loader.id = "payhere-overlay";
+    loader.className = "fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm";
+    loader.innerHTML = `
+      <div class="flex flex-col items-center gap-3 text-white">
+        <div class="h-10 w-10 animate-spin rounded-full border-4 border-white/30 border-t-[#ED1C24]" aria-label="Loading"></div>
+        <div class="text-sm font-semibold">Redirecting to PayHere...</div>
+        <p class="text-xs text-white/80 text-center">Please wait while we secure your payment session.</p>
+      </div>
+    `;
+    document.body.appendChild(loader);
     try {
-      const idempotencyKey =
-        typeof crypto !== "undefined" && crypto.randomUUID
-          ? crypto.randomUUID()
-          : Math.random().toString(36).slice(2);
-      const result = await placeOrder({
+      const payment = await createPayherePayment({
         shippingAddressId: selectedAddressId,
         billingAddressId: selectedAddressId,
-        paymentMethod: "COD",
-        idempotencyKey,
       });
-      await refresh();
-      notifySuccess(
-        "Order placed",
-        `Order ${result.orderNo} confirmed. Total ${formatCurrency(result.totalLKR)}.`,
-      );
+
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = payment.redirectUrl;
+      form.style.display = "none";
+      Object.entries(payment.payload).forEach(([key, value]) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = String(value ?? "");
+        form.appendChild(input);
+      });
+      document.body.appendChild(form);
+      form.submit();
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Unable to place order.";
-      notifyError("Checkout failed", message);
+        error instanceof Error ? error.message : "Unable to start payment.";
+      notifyError("Payment failed", message);
+      void refresh();
     } finally {
-      setPlacingOrder(false);
+      setPaying(false);
+      const overlay = document.getElementById("payhere-overlay");
+      if (overlay?.parentNode) {
+        overlay.parentNode.removeChild(overlay);
+      }
     }
   };
 
@@ -351,22 +384,23 @@ export default function CartPage() {
               totalLKR={summary?.totalLKR ?? subtotal}
               shippingRateLabel={summary?.shippingRateLabel}
               loading={summaryLoading}
-            />
-            <div className="mt-4 space-y-3">
-              <button
-                className="w-full rounded-full border border-primary bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60"
-                disabled={!canCheckout || pending || placingOrder}
-                onClick={handlePlaceOrder}
-              >
-                {placingOrder ? "Placing order..." : "Place order"}
-              </button>
-              <Link
-                href="/shop"
-                className="flex w-full items-center justify-center gap-2 rounded-full border border-neutral-200 bg-white px-5 py-3 text-sm font-semibold text-neutral-800 transition hover:border-neutral-900"
-              >
-                Continue shopping
-              </Link>
-            </div>
+            >
+              <div className="mt-6 space-y-3">
+                <button
+                  className="w-full rounded-full border border-primary bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60"
+                  disabled={!canCheckout || pending || paying}
+                  onClick={redirectToPayHere}
+                >
+                  {paying ? "Redirecting..." : "Proceed to payment"}
+                </button>
+                <Link
+                  href="/shop"
+                  className="flex w-full items-center justify-center gap-2 rounded-full border border-neutral-200 bg-white px-5 py-3 text-sm font-semibold text-neutral-800 transition hover:border-neutral-900"
+                >
+                  Continue shopping
+                </Link>
+              </div>
+            </CheckoutSummary>
           </aside>
         </div>
       </main>
@@ -374,6 +408,8 @@ export default function CartPage() {
       {items.length > 0 ? (
         <MobileCheckoutBar
           total={formatCurrency(summary?.totalLKR ?? subtotal)}
+          onPay={redirectToPayHere}
+          disabled={!canCheckout || pending || paying}
         />
       ) : null}
 

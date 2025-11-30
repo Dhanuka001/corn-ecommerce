@@ -7,6 +7,7 @@ type CheckoutSummaryProps = {
   totalLKR: number;
   shippingRateLabel?: string;
   loading?: boolean;
+  children?: React.ReactNode;
 };
 
 const formatCurrency = (value: number) =>
@@ -22,6 +23,7 @@ export function CheckoutSummary({
   totalLKR,
   shippingRateLabel,
   loading,
+  children,
 }: CheckoutSummaryProps) {
   return (
     <div className="rounded-2xl border border-neutral-200 bg-white shadow-md">
@@ -47,6 +49,7 @@ export function CheckoutSummary({
               : shippingRateLabel || "Select an address to see delivery options."}
           </p>
         </div>
+        {children ? <div className="pt-2">{children}</div> : null}
       </div>
     </div>
   );

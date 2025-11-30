@@ -67,6 +67,113 @@ const loadAddress = async (addressId, userId, label) => {
   return address;
 };
 
+const createOrderFromQuote = async ({
+  quote,
+  userId,
+  paymentMethod,
+  idempotencyKey,
+  markPaid,
+  payhereReference,
+  payherePaymentId,
+  rawPaymentPayload,
+}) => {
+  if (idempotencyKey) {
+    const existing = await prisma.order.findUnique({
+      where: { idempotencyKey },
+      select: { id: true, orderNo: true, totalLKR: true },
+    });
+    if (existing) {
+      return existing;
+    }
+  }
+
+  const { cart, items, shippingAddress, billingAddress, totals } = quote;
+
+  const order = await prisma.$transaction(async (tx) => {
+    for (const item of items) {
+      if (item.variantId) {
+        await tx.variant.update({
+          where: { id: item.variantId },
+          data: { stock: { decrement: item.qty } },
+        });
+      } else {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { decrement: item.qty } },
+        });
+      }
+    }
+
+    const timelineEntries = [
+      {
+        type: "ORDER_PLACED",
+        note: `Order created with ${paymentMethod}`,
+      },
+    ];
+
+    if (markPaid) {
+      timelineEntries.push({
+        type: "PAYMENT_CAPTURED",
+        note: "Payment confirmed via PayHere.",
+      });
+    }
+
+    const createdOrder = await tx.order.create({
+      data: {
+        orderNo: formatOrderNo(),
+        idempotencyKey: idempotencyKey || null,
+        userId,
+        status: markPaid ? "PAID" : "PENDING",
+        paymentMethod,
+        paymentStatus: markPaid ? "PAID" : "UNPAID",
+        shippingAddrId: shippingAddress.id,
+        billingAddrId: billingAddress.id,
+        subTotalLKR: totals.subTotalLKR,
+        shippingLKR: totals.shippingLKR,
+        discountLKR: totals.discountLKR,
+        totalLKR: totals.totalLKR,
+        payhereRef: payhereReference || null,
+        items: {
+          create: items.map((item) => ({
+            productId: item.productId,
+            variantId: item.variantId,
+            name: item.name,
+            sku: item.sku,
+            qty: item.qty,
+            unitLKR: item.price,
+            lineTotalLKR: item.lineTotalLKR,
+          })),
+        },
+        timeline: {
+          create: timelineEntries,
+        },
+      },
+      select: {
+        id: true,
+        orderNo: true,
+        totalLKR: true,
+      },
+    });
+
+    await tx.payment.create({
+      data: {
+        orderId: createdOrder.id,
+        method: paymentMethod,
+        status: markPaid ? "PAID" : "UNPAID",
+        amountLKR: totals.totalLKR,
+        providerRef: payherePaymentId || payhereReference || null,
+        rawPayload: rawPaymentPayload || null,
+      },
+    });
+
+    await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
+
+    return createdOrder;
+  });
+
+  return order;
+};
+
 const resolveShippingRate = async (district, subtotal) => {
   const zone = await prisma.shippingZone.findFirst({
     where: { districts: { has: district } },
@@ -114,28 +221,12 @@ const repriceCartItems = (cart) => {
   return { items, subTotalLKR };
 };
 
-const placeOrder = async ({
+const buildOrderQuote = async ({
+  cartId,
   userId,
   shippingAddressId,
   billingAddressId,
-  paymentMethod,
-  idempotencyKey,
-  cartId,
 }) => {
-  if (!VALID_PAYMENT_METHODS.includes(paymentMethod)) {
-    throw createHttpError(400, "Invalid payment method.");
-  }
-
-  if (idempotencyKey) {
-    const existing = await prisma.order.findUnique({
-      where: { idempotencyKey },
-      select: { id: true, orderNo: true, totalLKR: true },
-    });
-    if (existing) {
-      return existing;
-    }
-  }
-
   const cart = await loadCart(cartId, userId);
   const { items, subTotalLKR } = repriceCartItems(cart);
 
@@ -159,82 +250,104 @@ const placeOrder = async ({
   const shippingLKR = shippingRate.priceLKR;
   const totalLKR = subTotalLKR + shippingLKR - discountLKR;
 
-  const orderData = await prisma.$transaction(async (tx) => {
-    // decrement stock
-    for (const item of items) {
-      if (item.variantId) {
-        await tx.variant.update({
-          where: { id: item.variantId },
-          data: { stock: { decrement: item.qty } },
-        });
-      } else {
-        await tx.product.update({
-          where: { id: item.productId },
-          data: { stock: { decrement: item.qty } },
-        });
-      }
-    }
+  return {
+    cart,
+    items,
+    shippingAddress,
+    billingAddress,
+    shippingRate,
+    totals: {
+      subTotalLKR,
+      shippingLKR,
+      discountLKR,
+      totalLKR,
+    },
+  };
+};
 
-    const order = await tx.order.create({
-      data: {
-        orderNo: formatOrderNo(),
-        idempotencyKey: idempotencyKey || null,
-        userId,
-        status: "PENDING",
-        paymentMethod,
-        paymentStatus: "UNPAID",
-        shippingAddrId: shippingAddress.id,
-        billingAddrId: billingAddress.id,
-        subTotalLKR,
-        shippingLKR,
-        discountLKR,
-        totalLKR,
-        items: {
-          create: items.map((item) => ({
-            productId: item.productId,
-            variantId: item.variantId,
-            name: item.name,
-            sku: item.sku,
-            qty: item.qty,
-            unitLKR: item.price,
-            lineTotalLKR: item.lineTotalLKR,
-          })),
-        },
-        timeline: {
-          create: [
-            {
-              type: "ORDER_PLACED",
-              note: `Order created with ${paymentMethod}`,
-            },
-          ],
-        },
-      },
-      select: {
-        id: true,
-        orderNo: true,
-        totalLKR: true,
-      },
-    });
+const placeOrder = async ({
+  userId,
+  shippingAddressId,
+  billingAddressId,
+  paymentMethod,
+  idempotencyKey,
+  cartId,
+}) => {
+  if (!VALID_PAYMENT_METHODS.includes(paymentMethod)) {
+    throw createHttpError(400, "Invalid payment method.");
+  }
 
-    await tx.payment.create({
-      data: {
-        orderId: order.id,
-        method: paymentMethod,
-        status: "UNPAID",
-        amountLKR: totalLKR,
-      },
-    });
+  if (paymentMethod === "PAYHERE") {
+    throw createHttpError(
+      400,
+      "Use the PayHere checkout flow to initiate online payments.",
+    );
+  }
 
-    await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
-
-    return order;
+  const quote = await buildOrderQuote({
+    cartId,
+    userId,
+    shippingAddressId,
+    billingAddressId,
   });
 
-  return orderData;
+  return createOrderFromQuote({
+    quote,
+    userId,
+    paymentMethod,
+    idempotencyKey,
+    markPaid: false,
+  });
+};
+
+const createOrderAfterPayherePayment = async ({
+  payhereOrderId,
+  payherePaymentId,
+  userId,
+  cartId,
+  shippingAddressId,
+  billingAddressId,
+  rawPayload,
+}) => {
+  const payhereReference = payherePaymentId || payhereOrderId;
+
+  const existing = await prisma.order.findFirst({
+    where: {
+      OR: [
+        { idempotencyKey: payhereOrderId },
+        { payhereRef: payhereReference },
+      ],
+    },
+    select: { id: true, orderNo: true, totalLKR: true },
+  });
+
+  if (existing) {
+    return existing;
+  }
+
+  const quote = await buildOrderQuote({
+    cartId,
+    userId,
+    shippingAddressId,
+    billingAddressId,
+  });
+
+  return createOrderFromQuote({
+    quote,
+    userId,
+    paymentMethod: "PAYHERE",
+    idempotencyKey: payhereOrderId,
+    markPaid: true,
+    payhereReference,
+    payherePaymentId,
+    rawPaymentPayload: rawPayload,
+  });
 };
 
 module.exports = {
+  buildOrderQuote,
   placeOrder,
+  createOrderAfterPayherePayment,
   listOrdersForUser: async (userId) =>
     prisma.order.findMany({
       where: { userId },

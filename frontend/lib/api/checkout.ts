@@ -24,7 +24,7 @@ export async function fetchCheckoutSummary(payload: {
 export async function placeOrder(payload: {
   shippingAddressId: string;
   billingAddressId?: string;
-  paymentMethod: "COD" | "PAYHERE";
+  paymentMethod: "COD";
   idempotencyKey?: string;
 }) {
   return apiRequest<{ id: string; orderNo: string; totalLKR: number }>(

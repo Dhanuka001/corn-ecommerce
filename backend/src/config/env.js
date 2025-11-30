@@ -34,6 +34,12 @@ const defaultOrigins = [
 ];
 
 const parsedWebOrigins = parseOrigins(process.env.WEB_APP_ORIGIN);
+const resolvedWebOrigins = parsedWebOrigins.length
+  ? parsedWebOrigins
+  : defaultOrigins;
+const defaultFrontend = resolvedWebOrigins[0] || "http://localhost:3000";
+const backendBaseUrl = (process.env.BACKEND_URL || "http://localhost:8080").replace(/\/$/, "");
+const frontendBaseUrl = (process.env.FRONTEND_URL || defaultFrontend).replace(/\/$/, "");
 const googleClientIds = parseList(
   process.env.GOOGLE_CLIENT_IDS ||
     process.env.GOOGLE_CLIENT_ID ||
@@ -51,7 +57,22 @@ const env = {
   googleClientSecret: (process.env.GOOGLE_CLIENT_SECRET || "").trim(),
   sessionCookieName: process.env.SESSION_COOKIE || "corn_session",
   sessionMaxAgeMs: Number(process.env.SESSION_MAX_AGE_MS || 7 * MS_IN_DAY),
-  webOrigins: parsedWebOrigins.length ? parsedWebOrigins : defaultOrigins,
+  webOrigins: resolvedWebOrigins,
+  frontendBaseUrl,
+  backendBaseUrl,
+  payhereMerchantId: (process.env.PAYHERE_MERCHANT_ID || "").trim(),
+  payhereMerchantSecret: (process.env.PAYHERE_MERCHANT_SECRET || "").trim(),
+  payhereSandbox:
+    process.env.PAYHERE_SANDBOX === undefined
+      ? true
+      : String(process.env.PAYHERE_SANDBOX).toLowerCase() !== "false",
+  payhereReturnUrl:
+    (process.env.PAYHERE_RETURN_URL || `${frontendBaseUrl}/checkout/success`).trim(),
+  payhereCancelUrl:
+    (process.env.PAYHERE_CANCEL_URL || `${frontendBaseUrl}/checkout/cancel`).trim(),
+  payhereNotifyUrl:
+    (process.env.PAYHERE_NOTIFY_URL || `${backendBaseUrl}/payments/payhere/notify`).trim(),
+  payhereCurrency: (process.env.PAYHERE_CURRENCY || "LKR").trim(),
 };
 
 env.isProduction = env.nodeEnv === "production";

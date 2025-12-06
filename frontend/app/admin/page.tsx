@@ -39,15 +39,19 @@ import {
   updateAdminUser,
   fetchAuditLogs,
 } from "@/lib/admin-api";
+import { fetchAdminReviews, deleteAdminReview } from "@/lib/api/reviews";
+import { ReviewCard } from "@/components/review-card";
 import type {
   AdminCategory,
   AdminOrder,
   AdminOverview,
   AdminProduct,
+  AdminReview,
   AdminUser,
   AuditLogEntry,
   SettingsPayload,
   ShippingZone,
+  ShippingZoneInput,
 } from "@/types/admin";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
@@ -195,6 +199,12 @@ export default function AdminPage() {
     "revenue",
   );
   const [growthWindow, setGrowthWindow] = useState<"7d" | "30d" | "6m" | "1y">("7d");
+  const [reviews, setReviews] = useState<AdminReview[]>([]);
+  const [reviewMeta, setReviewMeta] = useState({ total: 0, pages: 1 });
+  const [reviewPage, setReviewPage] = useState(1);
+  const [reviewFilter, setReviewFilter] = useState<string | null>(null);
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewDeletingId, setReviewDeletingId] = useState<string | null>(null);
 
   const ensureBaselineCategories = useCallback(
     async (existing: AdminCategory[]) => {
@@ -397,11 +407,13 @@ export default function AdminPage() {
     { id: "orders", label: "Orders" },
     { id: "users", label: "User management" },
     { id: "catalog", label: "Catalog" },
+    { id: "reviews", label: "Product reviews" },
     { id: "inventory", label: "Inventory" },
     { id: "signals", label: "Signals" },
     { id: "settings", label: "Settings" },
     { id: "audit", label: "Audit" },
   ];
+  const REVIEW_PAGE_LIMIT = 12;
 
   const setLoadingFlag = (key: string, value: boolean) =>
     setLoadingMap((prev) => ({ ...prev, [key]: value }));
@@ -478,6 +490,54 @@ export default function AdminPage() {
       setLoadingFlag("refresh", false);
     }
   }, [isAdmin, notifyError, ensureBaselineCategories]);
+
+  const loadReviews = useCallback(
+    async (page = 1) => {
+      setReviewLoading(true);
+      try {
+      const data = await fetchAdminReviews({
+        page,
+        limit: REVIEW_PAGE_LIMIT,
+        productId: reviewFilter ?? undefined,
+      });
+      setReviews(data.data);
+      setReviewPage(data.meta.page);
+      setReviewMeta({ total: data.meta.total, pages: data.meta.pages });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unable to load reviews.";
+        notifyError("Reviews unavailable", message);
+      } finally {
+        setReviewLoading(false);
+      }
+    },
+    [reviewFilter, notifyError],
+  );
+
+  useEffect(() => {
+    if (activeSection === "reviews") {
+      void loadReviews(1);
+    }
+  }, [activeSection, loadReviews]);
+
+  const handleDeleteReview = async (reviewId: string) => {
+    const pageAtDelete = reviewPage;
+    setReviewDeletingId(reviewId);
+    try {
+      await deleteAdminReview(reviewId);
+      notifySuccess("Review deleted", "The review was removed.");
+      await loadReviews(pageAtDelete);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to delete review.";
+      notifyError("Delete failed", message);
+    } finally {
+      setReviewDeletingId(null);
+    }
+  };
+
+  const handleReviewFilterChange = (value: string) => {
+    setReviewFilter(value || null);
+    setReviewPage(1);
+  };
 
   useEffect(() => {
     void refreshAdminData();
@@ -1004,6 +1064,105 @@ export default function AdminPage() {
                 </div>
               </section>
             </>
+          )}
+
+          {activeSection === "reviews" && (
+            <section className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+                    Reviews
+                  </p>
+                  <h3 className="text-xl font-semibold text-slate-900">
+                    Product feedback
+                  </h3>
+                  <p className="text-sm text-slate-500">
+                    {reviewMeta.total} review{reviewMeta.total === 1 ? "" : "s"}
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <select
+                    value={reviewFilter ?? ""}
+                    onChange={(e) => handleReviewFilterChange(e.target.value)}
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 outline-none transition focus:border-primary"
+                  >
+                    <option value="">All products</option>
+                    {products.map((product) => (
+                      <option key={product.id} value={product.id}>
+                        {product.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => void loadReviews(1)}
+                    className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-primary/30 hover:text-primary"
+                  >
+                    Refresh
+                  </button>
+                </div>
+              </div>
+              <div className="mt-4 space-y-4">
+                {reviewLoading ? (
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+                    Loading reviews…
+                  </div>
+                ) : reviews.length ? (
+                  <div className="space-y-4">
+                    {reviews.map((review) => (
+                      <div
+                        key={review.id}
+                        className="space-y-3 rounded-3xl border border-slate-100 bg-slate-50/50 p-4"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-slate-900">
+                              {review.product.name}
+                            </p>
+                            <p className="text-xs text-slate-500">{review.user.email}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => void handleDeleteReview(review.id)}
+                            className="rounded-full border border-red-200 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                            disabled={reviewDeletingId === review.id}
+                          >
+                            {reviewDeletingId === review.id ? "Deleting" : "Delete"}
+                          </button>
+                        </div>
+                        <ReviewCard review={review} showProduct />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+                    No reviews yet.
+                  </p>
+                )}
+              </div>
+              <div className="mt-6 flex items-center justify-between text-xs text-slate-500">
+                <span>
+                  Page {reviewPage} / {reviewMeta.pages} · Showing {reviews.length} of {reviewMeta.total}
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void loadReviews(Math.max(reviewPage - 1, 1))}
+                    disabled={reviewPage <= 1}
+                    className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 transition disabled:cursor-not-allowed disabled:opacity-60 hover:border-primary/30"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void loadReviews(Math.min(reviewPage + 1, reviewMeta.pages))}
+                    disabled={reviewPage >= reviewMeta.pages}
+                    className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 transition disabled:cursor-not-allowed disabled:opacity-60 hover:border-primary/30"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </section>
           )}
 
           {activeSection === "catalog" && (

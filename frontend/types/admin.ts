@@ -1,4 +1,5 @@
 import type { ProductImage } from "./catalog";
+import type { ReviewUser } from "./review";
 
 export type AdminCategory = {
   id: string;
@@ -128,6 +129,21 @@ export type AdminUser = {
   role: "CUSTOMER" | "STAFF" | "ADMIN";
   suspended: boolean;
   createdAt: string;
+};
+
+export type AdminReview = {
+  id: string;
+  rating: number;
+  title: string;
+  body: string;
+  images?: string[] | null;
+  createdAt: string;
+  user: ReviewUser;
+  product: {
+    id: string;
+    name: string;
+    slug: string;
+  };
 };
 
 export type AdminOverview = {

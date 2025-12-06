@@ -1,6 +1,9 @@
 const { Router } = require("express");
 const respond = require("../lib/respond");
 const catalogService = require("../services/catalog.service");
+const reviewService = require("../services/review.service");
+const prisma = require("../lib/prisma");
+const { requireAuth } = require("../middleware/auth");
 
 const router = Router();
 
@@ -81,6 +84,91 @@ router.get("/products/:slug", async (req, res) => {
   } catch (error) {
     console.error("Product detail error:", error);
     return respond.error(res, 500, "Unable to load product.");
+  }
+});
+
+router.get("/products/:slug/reviews", async (req, res) => {
+  try {
+    const slug = req.params.slug?.trim();
+    if (!slug) {
+      return respond.error(res, 400, "Product slug is required.");
+    }
+
+    const product = await prisma.product.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+
+    if (!product) {
+      return respond.error(res, 404, "Product not found.");
+    }
+
+    const page = Number(req.query.page) || 1;
+    const limit = Math.min(Math.max(Number(req.query.limit) || 8, 1), 24);
+    const reviewsResult = await reviewService.listProductReviews({
+      productId: product.id,
+      page,
+      limit,
+    });
+
+    return respond.success(res, {
+      reviews: reviewsResult.reviews,
+      total: reviewsResult.total,
+      averageRating: reviewsResult.averageRating,
+    });
+  } catch (error) {
+    console.error("List reviews error:", error);
+    return respond.error(res, 500, "Unable to load reviews.");
+  }
+});
+
+router.post("/products/:slug/reviews", requireAuth, async (req, res) => {
+  try {
+    const slug = req.params.slug?.trim();
+    if (!slug) {
+      throw respond.createHttpError(400, "Product slug is required.");
+    }
+    const product = await prisma.product.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+
+    if (!product) {
+      throw respond.createHttpError(404, "Product not found.");
+    }
+
+    const { rating, title, body, images } = req.body || {};
+
+    const review = await reviewService.createReview({
+      userId: req.user.userId,
+      productId: product.id,
+      rating,
+      title,
+      body,
+      images,
+    });
+
+    return respond.success(res, { review });
+  } catch (error) {
+    if (error.code === "P2002") {
+      return respond.error(res, 409, "You already reviewed this product.");
+    }
+    if (error.status) {
+      return respond.error(res, error.status, error.message);
+    }
+    console.error("Create review error:", error);
+    return respond.error(res, 500, "Unable to submit review.");
+  }
+});
+
+router.get("/reviews/latest", async (req, res) => {
+  try {
+    const limit = Math.min(Math.max(Number(req.query.limit) || 4, 1), 12);
+    const reviews = await reviewService.listLatestReviews({ limit });
+    return respond.success(res, { reviews });
+  } catch (error) {
+    console.error("Latest reviews error:", error);
+    return respond.error(res, 500, "Unable to load reviews.");
   }
 });
 

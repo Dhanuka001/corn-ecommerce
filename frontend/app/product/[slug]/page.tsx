@@ -9,34 +9,11 @@ import type { ProductDetail } from "@/types/catalog";
 
 import { ProductActions } from "./product-actions";
 import { ProductGallery } from "./product-gallery";
+import { ReviewSection } from "@/components/review-section";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
 };
-
-const reviews = [
-  {
-    name: "Dilani",
-    rating: 5,
-    title: "Great everyday carry",
-    body: "Smooth pairing, premium feel, and the battery holds up better than my old pair.",
-    date: "2 weeks ago",
-  },
-  {
-    name: "Kavindu",
-    rating: 4,
-    title: "Solid value",
-    body: "Comfortable fit and clean sound. Would love even more bass but still very happy.",
-    date: "1 month ago",
-  },
-  {
-    name: "Ishara",
-    rating: 5,
-    title: "Worth the upgrade",
-    body: "Noise canceling is excellent for this price and the PhoneBazzar warranty sealed the deal.",
-    date: "2 months ago",
-  },
-];
 
 const faqItems = [
   {
@@ -226,19 +203,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </section>
 
         <section className="mt-10 grid gap-8 lg:grid-cols-[1.2fr,0.8fr]">
-          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-slate-900">Customer reviews</h2>
-            <p className="text-sm text-slate-600">What buyers think about this PhoneBazzar drop.</p>
-            <div className="mt-4 flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
-              <StarRow rating={4.7} />
-              <p className="text-sm font-semibold text-slate-900">4.7/5 overall</p>
-              <span className="text-xs text-slate-500">Based on {reviews.length} reviews</span>
-            </div>
-            <div className="mt-4 space-y-4">
-              {reviews.map((review) => (
-                <ReviewCard key={review.title} review={review} />
-              ))}
-            </div>
+          <div>
+            <ReviewSection
+              slug={product.slug}
+              initialReviews={product.reviews ?? []}
+              totalReviews={product.reviewSummary?.total ?? 0}
+              averageRating={product.reviewSummary?.averageRating ?? 0}
+            />
           </div>
           <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-semibold text-slate-900">Frequently asked</h2>
@@ -350,41 +321,4 @@ const InfoCard = ({
       <p className="text-sm text-slate-600">{description}</p>
     </div>
   </div>
-);
-
-const StarRow = ({ rating }: { rating: number }) => {
-  const rounded = Math.round(rating * 2) / 2;
-  return (
-    <div className="flex items-center gap-1 text-amber-500">
-      {Array.from({ length: 5 }).map((_, idx) => {
-        const fill = rounded - idx;
-        if (fill >= 1) return <span key={idx}>★</span>;
-        if (fill === 0.5) return <span key={idx}>☆</span>;
-        return <span key={idx} className="text-slate-300">★</span>;
-      })}
-    </div>
-  );
-};
-
-const ReviewCard = ({
-  review,
-}: {
-  review: { name: string; rating: number; title: string; body: string; date: string };
-}) => (
-  <article className="rounded-2xl border border-slate-100 bg-slate-50/80 p-4">
-    <div className="flex flex-wrap items-center justify-between gap-2">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-          {review.name.slice(0, 2).toUpperCase()}
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-slate-900">{review.name}</p>
-          <StarRow rating={review.rating} />
-        </div>
-      </div>
-      <span className="text-xs text-slate-500">{review.date}</span>
-    </div>
-    <h3 className="mt-2 text-sm font-semibold text-slate-900">{review.title}</h3>
-    <p className="mt-1 text-sm text-slate-600">{review.body}</p>
-  </article>
 );

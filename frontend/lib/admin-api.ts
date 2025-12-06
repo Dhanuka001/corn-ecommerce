@@ -4,6 +4,7 @@ import type {
   AdminOrder,
   AdminOverview,
   AdminProduct,
+  AdminReview,
   AdminUser,
   AuditLogEntry,
   Paginated,
@@ -139,3 +140,20 @@ export const fetchAuditLogs = (params?: { page?: number; limit?: number }) =>
     `/admin/audit${buildQuery({ page: params?.page, limit: params?.limit })}`,
     { method: "GET" },
   );
+
+export const fetchAdminReviews = (params?: {
+  page?: number;
+  limit?: number;
+  productId?: string;
+}) =>
+  apiRequest<Paginated<AdminReview>>(
+    `/admin/reviews${buildQuery({
+      page: params?.page,
+      limit: params?.limit,
+      productId: params?.productId,
+    })}`,
+    { method: "GET" },
+  );
+
+export const deleteAdminReview = (id: string) =>
+  apiRequest<{ ok: true }>(`/admin/reviews/${id}`, { method: "DELETE" });

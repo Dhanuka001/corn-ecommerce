@@ -31,10 +31,14 @@ export type ProductSummary = {
   categories?: ProductCategory[];
 };
 
+import type { Review, ReviewSummary } from "./review";
+
 export type ProductDetail = ProductSummary & {
   description?: string | null;
   variants: Variant[];
   categories: ProductCategory[];
+  reviews?: Review[];
+  reviewSummary?: ReviewSummary;
 };
 
 export type ProductListMeta = {

@@ -22,6 +22,7 @@ const adminOrdersRouter = require("./routes/admin/orders");
 const adminUsersRouter = require("./routes/admin/users");
 const adminAuditRouter = require("./routes/admin/audit");
 const adminOverviewRouter = require("./routes/admin/overview");
+const adminReviewsRouter = require("./routes/admin/reviews");
 
 const app = express();
 
@@ -65,6 +66,7 @@ app.use("/admin/orders", adminOrdersRouter);
 app.use("/admin/users", adminUsersRouter);
 app.use("/admin/audit", adminAuditRouter);
 app.use("/admin/overview", adminOverviewRouter);
+app.use("/admin/reviews", adminReviewsRouter);
 
 app.use((_req, res) => respond.error(res, 404, "Route not found"));
 

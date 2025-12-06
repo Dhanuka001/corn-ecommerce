@@ -1,4 +1,5 @@
 const prisma = require("../lib/prisma");
+const reviewService = require("./review.service");
 
 // Shared includes ensure FE gets the pieces it needs without multiple round trips.
 const BASE_IMAGE_INCLUDE = {
@@ -248,9 +249,19 @@ const getProductBySlug = async (slug) => {
     return null;
   }
 
+  const reviewsResult = await reviewService.listProductReviews({
+    productId: product.id,
+    limit: 6,
+  });
+
   return {
     ...product,
     categories: product.categories.map(({ category }) => category),
+    reviews: reviewsResult.reviews,
+    reviewSummary: {
+      total: reviewsResult.total,
+      averageRating: reviewsResult.averageRating,
+    },
   };
 };
 

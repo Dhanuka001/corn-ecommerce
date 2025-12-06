@@ -204,7 +204,7 @@ export default function CartPage() {
       <Navbar />
 
       <div className="bg-neutral-900 px-4 py-3 text-center text-sm font-semibold tracking-tight text-white">
-        Free shipping over LKR 25,000. Cart syncs after you sign in.
+        Cart syncs after you sign in. Nationwide delivery in 3 business days.
       </div>
 
       <main className="mx-auto w-full max-w-7xl px-4 pb-16 pt-10 lg:pt-12">

@@ -870,7 +870,7 @@ export default function AdminPage() {
   if (authLoading || loading) {
     return (
       <div className="mx-auto flex min-h-[70vh] w-full max-w-3xl flex-col items-center justify-center gap-4 px-6 text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.32em] text-primary">
+        <p className="text-xs font-semibold text-slate-500">
           Loading
         </p>
         <h1 className="text-2xl font-semibold text-slate-900 sm:text-3xl">
@@ -883,7 +883,7 @@ export default function AdminPage() {
   if (!isAdmin) {
     return (
       <div className="mx-auto flex min-h-[70vh] w-full max-w-3xl flex-col items-center justify-center gap-4 px-6 text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.32em] text-primary">
+        <p className="text-xs font-semibold text-slate-500">
           Admin only
         </p>
         <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
@@ -943,7 +943,7 @@ export default function AdminPage() {
         <div className="flex-1 space-y-8">
           <header className="sticky top-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-slate-50/80 px-4 py-3 backdrop-blur">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.32em] text-primary">
+              <p className="text-xs font-semibold text-slate-500">
                 PhoneBazzar Admin
               </p>
               <h1 className="text-3xl font-semibold text-slate-900 lg:text-4xl">
@@ -1007,7 +1007,7 @@ export default function AdminPage() {
               <section className="mt-6 rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+                    <p className="text-xs font-semibold text-slate-500">
                       Growth
                     </p>
                     <h3 className="text-lg font-semibold text-slate-900">
@@ -1070,7 +1070,7 @@ export default function AdminPage() {
             <section className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+                  <p className="text-xs font-semibold text-slate-500">
                     Reviews
                   </p>
                   <h3 className="text-xl font-semibold text-slate-900">
@@ -1123,7 +1123,7 @@ export default function AdminPage() {
                           <button
                             type="button"
                             onClick={() => void handleDeleteReview(review.id)}
-                            className="rounded-full border border-red-200 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                             disabled={reviewDeletingId === review.id}
                           >
                             {reviewDeletingId === review.id ? "Deleting" : "Delete"}
@@ -1170,7 +1170,7 @@ export default function AdminPage() {
               <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+                    <p className="text-xs font-semibold text-slate-500">
                       Catalog
                     </p>
                     <h2 className="text-xl font-semibold text-slate-900">
@@ -1239,7 +1239,7 @@ export default function AdminPage() {
               <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+                    <p className="text-xs font-semibold text-slate-500">
                       Categories
                     </p>
                     <h3 className="text-lg font-semibold text-slate-900">
@@ -1285,7 +1285,7 @@ export default function AdminPage() {
             <section className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+                  <p className="text-xs font-semibold text-slate-500">
                     Inventory
                   </p>
                   <h3 className="text-xl font-semibold text-slate-900">
@@ -1394,7 +1394,7 @@ export default function AdminPage() {
             <section className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+                  <p className="text-xs font-semibold text-slate-500">
                     Orders
                   </p>
                   <h3 className="text-xl font-semibold text-slate-900">Manage status</h3>
@@ -1471,7 +1471,7 @@ export default function AdminPage() {
             <section className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+                  <p className="text-xs font-semibold text-slate-500">
                     Signals
                   </p>
                   <h3 className="text-xl font-semibold text-slate-900">What needs love</h3>
@@ -1479,7 +1479,7 @@ export default function AdminPage() {
               </div>
               <div className="mt-4 space-y-4">
                 <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                  <p className="text-xs font-semibold text-slate-500">
                     Low stock
                   </p>
                   {overview?.lowStock?.length ? (
@@ -1501,7 +1501,7 @@ export default function AdminPage() {
                   )}
                 </div>
                 <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                  <p className="text-xs font-semibold text-slate-500">
                     Recent orders
                   </p>
                   {overview?.recentOrders?.length ? (
@@ -1531,7 +1531,7 @@ export default function AdminPage() {
               <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+                    <p className="text-xs font-semibold text-slate-500">
                       Payments & shipping
                     </p>
                     <h3 className="text-xl font-semibold text-slate-900">Store settings</h3>
@@ -1718,7 +1718,7 @@ export default function AdminPage() {
               <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+                    <p className="text-xs font-semibold text-slate-500">
                       People & audit
                     </p>
                     <h3 className="text-xl font-semibold text-slate-900">Users</h3>
@@ -1815,7 +1815,7 @@ export default function AdminPage() {
             <section className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+                  <p className="text-xs font-semibold text-slate-500">
                     People
                   </p>
                   <h3 className="text-xl font-semibold text-slate-900">User management</h3>
@@ -1914,7 +1914,7 @@ export default function AdminPage() {
           <div className="w-full max-w-3xl rounded-3xl bg-white p-8 shadow-2xl">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+                <p className="text-xs font-semibold text-slate-500">
                   Catalog
                 </p>
                 <h3 className="text-xl font-semibold text-slate-900">
@@ -2055,7 +2055,7 @@ export default function AdminPage() {
                           className="h-20 w-full object-cover"
                         />
                         <button
-                          className="absolute right-1 top-1 rounded-full bg-white/80 px-2 text-xs font-semibold text-red-600 shadow"
+                          className="absolute right-1 top-1 rounded-full bg-white/80 px-2 text-xs font-semibold text-slate-500 shadow"
                           onClick={() => {
                             setImageUploads((prev) => {
                               const next = prev.filter((item) => item.id !== img.id);
@@ -2131,7 +2131,7 @@ export default function AdminPage() {
       {confirmDialog?.open ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 py-6 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-2xl border border-slate-100 bg-white p-6 shadow-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+            <p className="text-xs font-semibold text-slate-500">
               Confirm
             </p>
             <h3 className="mt-2 text-lg font-semibold text-slate-900">
@@ -2169,7 +2169,7 @@ export default function AdminPage() {
 function StatCard({ label, value, hint }: { label: string; value: string | number; hint: string }) {
   return (
     <article className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+      <p className="text-xs font-semibold text-slate-500">
         {label}
       </p>
       <p className="mt-2 text-2xl font-semibold text-slate-900">{value}</p>

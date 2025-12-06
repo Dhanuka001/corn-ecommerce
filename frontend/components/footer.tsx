@@ -1,102 +1,106 @@
 "use client";
 
-export function Footer() {
-  const linkLists = [
-    {
-      title: "Become Partner",
-      items: ["Corporate Gifting", "Become a Partner"],
-    },
-    {
-      title: "About Us",
-      items: [
-        "About",
-        "Careers",
-        "Blog",
-        "Warranty Policy",
-        "CSR Policy",
-        "Privacy Policy",
-        "Terms & Conditions",
-        "E-Waste Program",
-      ],
-    },
-    {
-      title: "Help Desk",
-      items: ["Support", "Track Your Order", "Warranty Registration"],
-    },
-  ];
+import Link from "next/link";
+import { useState, FormEvent } from "react";
 
-  const social = ["facebook", "x", "linkedin", "youtube", "instagram"];
+const linkSections = [
+  {
+    title: "Company",
+    links: [
+      { label: "About PhoneBazzar", href: "/about" },
+      { label: "Careers", href: "/careers" },
+      { label: "Contact", href: "/contact" },
+      { label: "Shop All", href: "/shop" },
+    ],
+  },
+  {
+    title: "Support",
+    links: [
+      { label: "Support Center", href: "/support" },
+      { label: "Returns & Warranty", href: "/returns" },
+    ],
+  },
+  {
+    title: "Legal & Policies",
+    links: [
+      { label: "Warranty Policy", href: "/warranty" },
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms & Conditions", href: "/terms" },
+    ],
+  },
+];
+
+export function Footer() {
+  const [email, setEmail] = useState("");
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setEmail("");
+  };
 
   return (
-    <footer id="contact" className="mt-16 bg-[#0f0f0f] text-white">
-      <div className="mx-auto w-full max-w-7xl px-4 py-12 lg:py-16">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_minmax(0,1.25fr)]">
-          <div className="space-y-6">
-            <div>
-              <div className="text-sm uppercase tracking-[0.3em] text-primary">
-                PhoneBazzar.lk
-              </div>
-              <p className="mt-2 text-3xl font-semibold">Join the club</p>
-            </div>
-              <p className="text-sm text-white/60">
-                Subscribe to hear about new drops, limited collaborations, and
-                PhoneBazzar-only experiences directly in your inbox.
-              </p>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <input
-                type="email"
-                placeholder="Your email"
-                className="h-12 flex-1 rounded-full border border-white/20 bg-transparent px-4 text-sm text-white placeholder:text-white/50 focus:border-primary focus:outline-none"
-              />
-              <button
-                type="button"
-                className="inline-flex h-12 items-center rounded-full bg-primary px-6 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-red-500"
-              >
-                Join
-              </button>
+    <footer className="mt-16 bg-slate-950 text-white">
+      <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:py-14">
+        <div className="grid gap-10 md:grid-cols-5">
+          <div className="space-y-3 text-sm text-white/80">
+            <p className="text-base font-semibold text-white/80">PhoneBazzar.lk</p>
+            <p className="text-xs text-white/60">
+              Curated devices, transparent service, and friendly Sri Lankan support across every order.
+            </p>
+            <div className="space-y-1 text-xs text-white/70">
+              <p>hello@phonebazzar.lk</p>
+              <p>+94 77 660 1146</p>
             </div>
           </div>
 
-          {linkLists.map((section) => (
-            <div key={section.title}>
-              <p className="text-base font-semibold">{section.title}</p>
-              <ul className="mt-4 space-y-2 text-sm text-white/70">
-                {section.items.map((item) => (
-                  <li key={item} className="transition hover:text-white">
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-
-          <div className="space-y-6">
-            <div>
-              <p className="text-base font-semibold text-primary">Follow Us</p>
-              <div className="mt-3 flex gap-3">
-                {social.map((label) => (
-                  <span
-                    key={label}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-sm uppercase tracking-wide text-white"
+          {linkSections.map((section) => (
+            <div key={section.title} className="space-y-2 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/70">
+                {section.title}
+              </p>
+              <div className="space-y-1">
+                {section.links.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="block text-white/70 transition hover:text-white"
                   >
-                    {label.slice(0, 1)}
-                  </span>
+                    {link.label}
+                  </Link>
                 ))}
               </div>
             </div>
-            <div>
-              <p className="text-base font-semibold text-primary">Contact Us</p>
-              <p className="mt-3 text-sm text-white/70">hello@phonebazzar.lk</p>
-              <p className="text-sm text-white/70">+94 77 660 1146</p>
-            </div>
+          ))}
+
+          <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/70">
+              Join the list
+            </p>
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <input
+                type="email"
+                required
+                placeholder="Email address"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                className="w-full rounded-full border border-white/15 bg-transparent px-3 py-2 text-xs text-white placeholder:text-white/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-white/30"
+              />
+              <button
+                type="submit"
+                className="w-full rounded-full bg-[#ED1C24] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-[#db1a1d]"
+              >
+                Join
+              </button>
+            </form>
+            <p className="text-xs text-white/50">
+              Get updates on new releases and service offers.
+            </p>
           </div>
         </div>
 
         <div className="mt-10 border-t border-white/10 pt-6 text-center text-xs text-white/60">
           <p>© {new Date().getFullYear()} PhoneBazzar.lk. All rights reserved.</p>
-          <p className="mt-1">
-            PhoneBazzar HQ · Kasbawa, Sri Lanka
-          </p>
+          <p className="mt-1">PhoneBazzar HQ · Kasbawa, Sri Lanka</p>
         </div>
       </div>
     </footer>

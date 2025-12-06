@@ -120,7 +120,7 @@ const BagIcon = ({ size = 20, ...props }: IconProps) => (
 const baseNavLinks = [
   { label: "Popular", href: "/#best-selling" },
   { label: "Shop All", href: "/shop" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Contact", href: "/contact" },
   { label: "Blogs", href: "/#blog" },
 ];
 

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 
 type Message = {
   id: string;
@@ -12,47 +12,38 @@ type Message = {
 
 const initialMessages: Message[] = [
   {
-    id: "1",
-    role: "user",
-    text: "Hi, how long does express shipping take?",
-  },
-  {
-    id: "2",
+    id: "welcome",
     role: "bot",
-    text: "Hey! Express usually arrives in 1-2 business days to most cities.",
+    text: "Hi! Select a question to see the answer.",
+  },
+];
+
+const quickReplies = [
+  {
+    question: "How fast is express shipping?",
+    answer: "Express orders arrive within 1-2 business days to most districts.",
   },
   {
-    id: "3",
-    role: "user",
-    text: "Great. Do you ship chargers to California?",
+    question: "Do you ship accessories internationally?",
+    answer: "Yes, chargers and accessories are shipped worldwide via tracked courier.",
   },
   {
-    id: "4",
-    role: "bot",
-    text: "Yes, PhoneBazzar ships all chargers to CA with tracked delivery.",
+    question: "What is your returns policy?",
+    answer: "Unopened products can be returned within 7 days, and warranty repairs are handled locally.",
   },
 ];
 
 export function ChatWidget() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>(initialMessages);
 
-  const handleSendMessage = (event?: FormEvent<HTMLFormElement>) => {
-    if (event) event.preventDefault();
-    const trimmed = input.trim();
-    if (!trimmed) return;
-
-    // Placeholder handler to demonstrate UI flow; replace with real send logic when ready.
-    // eslint-disable-next-line no-console
-    console.log("Send message:", trimmed);
-
+  const handleQuickReply = (option: (typeof quickReplies)[number]) => {
     setMessages((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), role: "user", text: trimmed },
+      { id: crypto.randomUUID(), role: "user", text: option.question },
+      { id: crypto.randomUUID(), role: "bot", text: option.answer },
     ]);
-    setInput("");
   };
 
   if (pathname?.startsWith("/cart")) return null;
@@ -92,44 +83,41 @@ export function ChatWidget() {
             </button>
           </header>
 
-          <div className="flex max-h-96 flex-col gap-3 overflow-y-auto bg-[#F7F7F7] px-4 py-4 sm:max-h-[420px]">
-            {messages.map((message) => (
+        <div className="flex max-h-96 flex-col gap-3 overflow-y-auto bg-[#F7F7F7] px-4 py-4 sm:max-h-[420px]">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+            >
               <div
-                key={message.id}
-                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed transition ${
+                  message.role === "user"
+                    ? "bg-[#ED1C24] text-white shadow-[0_10px_30px_-18px_rgba(0,0,0,0.6)]"
+                    : "bg-white text-[#111827] shadow-sm border border-neutral-100"
+                }`}
               >
-                <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed transition ${
-                    message.role === "user"
-                      ? "bg-[#ED1C24] text-white shadow-[0_10px_30px_-18px_rgba(0,0,0,0.6)]"
-                      : "bg-white text-[#111827] shadow-sm border border-neutral-100"
-                  }`}
-                >
-                  {message.text}
-                </div>
+                {message.text}
               </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-2 border-t border-neutral-100 bg-white px-4 py-4">
+          <p className="text-xs font-semibold text-neutral-500">Try these quick questions</p>
+          <div className="flex flex-wrap gap-2">
+            {quickReplies.map((option) => (
+              <button
+                key={option.question}
+                type="button"
+                onClick={() => handleQuickReply(option)}
+                className="rounded-full border border-neutral-200 px-3 py-1.5 text-xs font-semibold text-neutral-700 transition hover:border-neutral-300 hover:text-neutral-900"
+              >
+                {option.question}
+              </button>
             ))}
           </div>
-
-          <form
-            onSubmit={handleSendMessage}
-            className="flex items-center gap-2 rounded-b-2xl border-t border-neutral-100 bg-white px-4 py-3"
-          >
-            <input
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder="Ask about orders, shipping..."
-              className="h-11 flex-1 rounded-xl border border-neutral-200 bg-[#F7F7F7] px-3 text-sm text-neutral-900 outline-none transition focus:border-[#ED1C24] focus:bg-white focus:ring-2 focus:ring-[#ED1C24]/15"
-            />
-            <button
-              type="submit"
-              className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#ED1C24] px-4 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-[1px] hover:shadow-xl active:translate-y-0 disabled:opacity-75"
-              disabled={!input.trim()}
-            >
-              Send
-            </button>
-          </form>
         </div>
+      </div>
       ) : null}
 
       <div className="pointer-events-auto flex justify-end">

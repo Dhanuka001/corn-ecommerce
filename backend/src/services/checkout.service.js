@@ -55,6 +55,16 @@ const loadAddress = async ({ addressId, userId }) => {
   return address;
 };
 
+const pickShippingRate = (rates, subtotal) => {
+  const eligible = rates
+    .filter((item) => item.minSubtotalLKR <= subtotal)
+    .sort((a, b) => b.minSubtotalLKR - a.minSubtotalLKR);
+  if (!eligible.length) {
+    return null;
+  }
+  return eligible.find((item) => item.priceLKR > 0) ?? eligible[0];
+};
+
 const resolveShippingRate = async (district, subtotal) => {
   const zone = await prisma.shippingZone.findFirst({
     where: {
@@ -71,9 +81,7 @@ const resolveShippingRate = async (district, subtotal) => {
     throw createHttpError(400, "Shipping not available for this district.");
   }
 
-  const rate = zone.rates
-    .filter((item) => item.minSubtotalLKR <= subtotal)
-    .sort((a, b) => b.minSubtotalLKR - a.minSubtotalLKR)[0];
+  const rate = pickShippingRate(zone.rates, subtotal);
 
   if (!rate) {
     throw createHttpError(400, "No shipping rate available for this subtotal.");

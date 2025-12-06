@@ -29,9 +29,9 @@ export function Hero() {
           }}
         />
 
-        <div className="relative flex h-full flex-col lg:flex-row">
+        <div className="relative flex h-full flex-col lg:flex-row lg:items-center lg:justify-center">
           <div className="w-full px-6 py-8 sm:px-10 lg:px-14">
-            <div className="max-w-xl space-y-4">
+            <div className="max-w-xl space-y-4 text-left">
               <p className="text-xs font-semibold uppercase tracking-[0.4em] text-primary">
                 {hero.subtitle}
               </p>

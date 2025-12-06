@@ -500,9 +500,9 @@ export default function AdminPage() {
         limit: REVIEW_PAGE_LIMIT,
         productId: reviewFilter ?? undefined,
       });
-      setReviews(data.data);
-      setReviewPage(data.meta.page);
-      setReviewMeta({ total: data.meta.total, pages: data.meta.pages });
+      setReviews(data.reviews);
+      setReviewPage(data.page);
+      setReviewMeta({ total: data.total, pages: data.pages });
       } catch (error) {
         const message = error instanceof Error ? error.message : "Unable to load reviews.";
         notifyError("Reviews unavailable", message);

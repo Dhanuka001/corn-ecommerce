@@ -255,82 +255,84 @@ export default function CartPage() {
                   const thumbnail = item.product.images?.[0];
                   const variantLabel = item.variant?.name;
                   return (
-                    <article key={item.id} className="p-5 sm:p-6">
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
-                        <div className="relative flex h-32 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-neutral-100 via-neutral-50 to-neutral-200 sm:w-32">
-                          {thumbnail?.url ? (
-                            <Image
-                              src={thumbnail.url}
-                              alt={thumbnail.alt || item.product.name}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-                              No image
-                            </span>
-                          )}
+                    <article
+                      key={item.id}
+                      className="flex items-center gap-4 px-4 py-3 last:mb-0"
+                    >
+                      <div className="relative flex h-28 w-28 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-neutral-100 via-neutral-50 to-neutral-200">
+                        {thumbnail?.url ? (
+                          <Image
+                            src={thumbnail.url}
+                            alt={thumbnail.alt || item.product.name}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
+                            No image
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex flex-1 flex-col gap-3">
+                        <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="space-y-1">
+                            <p className="text-base font-semibold text-neutral-900">
+                              {item.product.name}
+                            </p>
+                            <p className="text-[12px] text-neutral-500">
+                              SKU: {item.product.sku}
+                            </p>
+                            {variantLabel ? (
+                              <p className="text-[12px] text-neutral-600">
+                                Variant: {variantLabel}
+                              </p>
+                            ) : null}
+                          </div>
+                          <p className="text-base font-semibold text-neutral-900">
+                            {formatCurrency(item.unitLKR)}
+                          </p>
                         </div>
 
-                        <div className="flex-1 space-y-2">
-                          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                            <div className="space-y-1">
-                              <p className="text-lg font-semibold text-neutral-900">
-                                {item.product.name}
-                              </p>
-                              <p className="text-sm text-neutral-500">
-                                SKU: {item.product.sku}
-                              </p>
-                              {variantLabel ? (
-                                <p className="text-sm text-neutral-600">
-                                  Variant: {variantLabel}
-                                </p>
-                              ) : null}
-                            </div>
-                            <p className="text-lg font-semibold text-neutral-900">
-                              {formatCurrency(item.unitLKR)}
-                            </p>
-                          </div>
-
-                          <div className="mt-4 grid gap-3 sm:grid-cols-[auto,1fr] sm:items-center">
-                            <div className="flex items-center gap-3">
-                              <label className="text-sm font-semibold text-neutral-800">
-                                Qty
-                              </label>
-                              <div className="flex h-10 items-center gap-2 rounded-lg border border-neutral-200 px-3 text-sm font-medium text-neutral-900 shadow-inner">
-                                <button
-                                  className="text-neutral-500 transition hover:text-neutral-900 disabled:opacity-40"
-                                  disabled={pending || item.qty <= 1}
-                                  onClick={() =>
-                                    handleQtyChange(item.id, item.qty - 1)
-                                  }
-                                >
-                                  –
-                                </button>
-                                <span>{item.qty}</span>
-                                <button
-                                  className="text-neutral-500 transition hover:text-neutral-900 disabled:opacity-40"
-                                  disabled={pending}
-                                  onClick={() =>
-                                    handleQtyChange(item.id, item.qty + 1)
-                                  }
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </div>
-                            <div className="flex flex-wrap items-center gap-4 text-sm">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="flex items-center gap-3 text-sm">
+                            <label className="text-sm font-semibold text-neutral-800">
+                              Qty
+                            </label>
+                            <div className="flex h-9 items-center gap-2 rounded-lg border border-neutral-200 px-3 text-sm font-medium text-neutral-900 shadow-inner">
+                              <button
+                                className="text-neutral-500 transition hover:text-neutral-900 disabled:opacity-40"
+                                disabled={pending || item.qty <= 1}
+                                onClick={() =>
+                                  handleQtyChange(item.id, item.qty - 1)
+                                }
+                              >
+                                –
+                              </button>
+                              <span>{item.qty}</span>
                               <button
                                 className="text-neutral-500 transition hover:text-neutral-900 disabled:opacity-40"
                                 disabled={pending}
-                                onClick={() => handleQtyChange(item.id, 0)}
+                                onClick={() =>
+                                  handleQtyChange(item.id, item.qty + 1)
+                                }
                               >
-                                Remove
+                                +
                               </button>
-                              <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-600">
-                                In stock
-                              </span>
                             </div>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-3 text-xs">
+                            <button
+                              className="text-neutral-500 transition hover:text-neutral-900 disabled:opacity-40"
+                              disabled={pending}
+                              onClick={() => handleQtyChange(item.id, 0)}
+                            >
+                              Remove
+                            </button>
+                            <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-600">
+                              In stock
+                            </span>
                           </div>
                         </div>
                       </div>

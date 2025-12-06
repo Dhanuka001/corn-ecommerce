@@ -1,6 +1,7 @@
 import { API_BASE_URL } from "../api";
 import { apiRequest } from "../api";
 import type { Review } from "@/types/review";
+import type { AdminReview } from "@/types/admin";
 
 export type ProductReviewListResponse = {
   reviews: Review[];
@@ -76,7 +77,7 @@ export async function fetchAdminReviews({
   }
 
   return apiRequest<{
-    reviews: Review[];
+    reviews: AdminReview[];
     total: number;
     page: number;
     limit: number;

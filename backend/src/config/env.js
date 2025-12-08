@@ -25,6 +25,14 @@ const parseList = (value) => {
     .filter(Boolean);
 };
 
+const parseBoolean = (value) => {
+  if (value === undefined || value === null) return undefined;
+  const normalized = String(value).trim().toLowerCase();
+  if (["1", "true", "yes", "y"].includes(normalized)) return true;
+  if (["0", "false", "no", "n"].includes(normalized)) return false;
+  return undefined;
+};
+
 const parseOrigins = parseList;
 
 const defaultOrigins = [
@@ -73,6 +81,13 @@ const env = {
   payhereNotifyUrl:
     (process.env.PAYHERE_NOTIFY_URL || `${backendBaseUrl}/payments/payhere/notify`).trim(),
   payhereCurrency: (process.env.PAYHERE_CURRENCY || "LKR").trim(),
+  mailHost: (process.env.MAIL_HOST || "").trim(),
+  mailPort: Number(process.env.MAIL_PORT || 587),
+  mailSecure: parseBoolean(process.env.MAIL_SECURE) ?? false,
+  mailUser: (process.env.MAIL_USER || "").trim(),
+  mailPass: (process.env.MAIL_PASS || "").trim(),
+  mailFromName: (process.env.MAIL_FROM_NAME || "Corn Electronics").trim(),
+  mailFromAddress: (process.env.MAIL_FROM_ADDRESS || "support@cornelectronics.com").trim(),
 };
 
 env.isProduction = env.nodeEnv === "production";

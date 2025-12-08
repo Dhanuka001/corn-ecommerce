@@ -4,6 +4,7 @@ const prisma = require("../lib/prisma");
 const env = require("../config/env");
 const { createHttpError } = require("../lib/respond");
 const { verifyGoogleIdToken } = require("../lib/google");
+const { queueTransactionalMail } = require("./mail.service");
 
 const userSelect = {
   id: true,
@@ -38,6 +39,23 @@ const createSessionToken = (user) =>
     expiresIn: Math.floor(env.sessionMaxAgeMs / 1000),
   });
 
+const sendWelcomeEmail = (user) => {
+  if (!user?.email) {
+    return;
+  }
+  void queueTransactionalMail({
+    to: user.email,
+    template: "welcome",
+    data: {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    },
+  }).catch((error) => {
+    console.error("Failed to queue welcome email", error);
+  });
+};
+
 const registerUser = async ({ email, password, firstName, lastName }) => {
   const normalizedEmail = normalizeEmail(email);
   const existingUser = await prisma.user.findUnique({
@@ -60,6 +78,7 @@ const registerUser = async ({ email, password, firstName, lastName }) => {
   });
 
   const token = createSessionToken(user);
+  sendWelcomeEmail(user);
   return { user, token };
 };
 

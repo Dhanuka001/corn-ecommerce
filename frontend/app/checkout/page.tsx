@@ -41,6 +41,8 @@ export default function CheckoutPage() {
   } | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [showAddressPrompt, setShowAddressPrompt] = useState(false);
+  const [addressPromptSeen, setAddressPromptSeen] = useState(false);
 
   const items = cart?.items ?? [];
   const subtotal = useMemo(
@@ -70,6 +72,18 @@ export default function CheckoutPage() {
     if (!user) return;
     void loadAddresses();
   }, [user]);
+
+  useEffect(() => {
+    if (!addressLoading && !addresses.length && !addressPromptSeen) {
+      setShowAddressPrompt(true);
+    }
+  }, [addressLoading, addresses.length, addressPromptSeen]);
+
+  useEffect(() => {
+    if (addresses.length) {
+      setAddressPromptSeen(false);
+    }
+  }, [addresses.length]);
 
   const updateSummary = async (addressId: string) => {
     if (!cart?.id || !addressId || items.length === 0) return;
@@ -103,7 +117,8 @@ export default function CheckoutPage() {
 
   const handlePayWithPayHere = async () => {
     if (!selectedAddressId) {
-      notifyError("Address required", "Select a shipping address first.");
+      setShowAddressPrompt(true);
+      setAddressPromptSeen(true);
       return;
     }
     if (!items.length) {
@@ -143,7 +158,19 @@ export default function CheckoutPage() {
     }
   };
 
+  const closeAddressPrompt = () => {
+    setShowAddressPrompt(false);
+    setAddressPromptSeen(true);
+  };
+
   const totalQuantity = items.reduce((total, item) => total + item.qty, 0);
+  const hasAddresses = addresses.length > 0;
+  const addressActionLabel = hasAddresses
+    ? "Manage addresses"
+    : "Add shipping address";
+  const addressActionHint = hasAddresses
+    ? "Update or remove saved addresses anytime."
+    : "Add your shipping address to unlock delivery and shipping details.";
 
   return (
     <div className="min-h-screen bg-white text-neutral-900">
@@ -177,7 +204,7 @@ export default function CheckoutPage() {
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.6fr)_minmax(360px,0.95fr)]">
           <section className="space-y-6">
             <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">
                     Shipping address
@@ -185,12 +212,14 @@ export default function CheckoutPage() {
                   <p className="text-lg font-semibold text-neutral-900">
                     Where should we deliver?
                   </p>
+                  <p className="mt-1 text-xs text-neutral-500">{addressActionHint}</p>
                 </div>
                 <Link
                   href="/account/addresses"
                   className="text-sm font-semibold text-primary transition hover:text-red-500"
+                  onClick={() => setShowAddressPrompt(false)}
                 >
-                  Manage addresses
+                  {addressActionLabel}
                 </Link>
               </div>
 
@@ -294,12 +323,7 @@ export default function CheckoutPage() {
               </p>
               <button
                 className="mt-4 w-full rounded-full border border-primary bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60"
-                disabled={
-                  submitting ||
-                  cartLoading ||
-                  !selectedAddressId ||
-                  items.length === 0
-                }
+                disabled={submitting || cartLoading || items.length === 0}
                 onClick={handlePayWithPayHere}
               >
                 {submitting ? "Redirecting to PayHere…" : "Pay with PayHere"}
@@ -314,6 +338,45 @@ export default function CheckoutPage() {
 
       <Footer />
       <MobileBottomNav />
+      {showAddressPrompt && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-4 py-6">
+          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-lg font-semibold text-neutral-900">
+                  Add a shipping address
+                </p>
+                <p className="mt-1 text-sm text-neutral-600">
+                  We need your address to calculate delivery and start the order.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeAddressPrompt}
+                className="text-sm font-semibold text-neutral-500 transition hover:text-neutral-900"
+              >
+                Close
+              </button>
+            </div>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link
+                href="/account/addresses"
+                className="inline-flex flex-1 items-center justify-center rounded-full border border-primary bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg"
+                onClick={closeAddressPrompt}
+              >
+                Add shipping address
+              </Link>
+              <button
+                type="button"
+                onClick={closeAddressPrompt}
+                className="flex-1 rounded-full border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-700 transition hover:border-neutral-300 hover:text-neutral-900"
+              >
+                Maybe later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

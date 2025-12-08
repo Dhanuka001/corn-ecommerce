@@ -54,9 +54,9 @@ export function ChatWidget() {
         <div className="pointer-events-auto mb-3 w-full rounded-2xl border border-neutral-200 bg-white shadow-[0_16px_50px_-24px_rgba(0,0,0,0.45)] sm:w-[380px]">
           <header className="flex items-center justify-between gap-3 rounded-t-2xl border-b border-neutral-100 bg-white px-4 py-3">
             <div className="flex items-center gap-3">
-              <div className="relative h-8 w-8 overflow-hidden rounded-full border border-neutral-200 bg-white">
+              <div className="relative h-8 w-8 overflow-hidden bg-white">
                 <Image
-                  src="/logo.png"
+                  src="/pb.png"
                   alt="PhoneBazzar.lk logo"
                   fill
                   sizes="32px"

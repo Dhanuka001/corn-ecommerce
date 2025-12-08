@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 
 import { BestSellingCarousel } from "@/components/best-selling-carousel";
-import { BlogHighlights } from "@/components/blog-highlights";
 import { CategoryBrowser } from "@/components/category-browser";
 import { Footer } from "@/components/footer";
 import { Hero } from "@/components/hero";
@@ -49,7 +48,6 @@ export default function Home() {
             <NewArrivals />
             <BestSellingCarousel />
             <Testimonials />
-            <BlogHighlights />
           </div>
         </main>
 

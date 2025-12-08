@@ -1,8 +1,6 @@
 "use client";
 
 import type { Address } from "@/lib/api/addresses";
-import Link from "next/link";
-
 type CheckoutAddressSelectorProps = {
   addresses: Address[];
   selectedAddressId: string | null;
@@ -17,13 +15,10 @@ export function CheckoutAddressSelector({
   if (!addresses.length) {
     return (
       <div className="rounded-2xl border border-dashed border-neutral-200 bg-white p-6 text-sm text-neutral-700 shadow-sm">
-        <p>No saved addresses yet.</p>
-        <Link
-          href="/account/addresses"
-          className="mt-3 inline-flex rounded-full border border-primary bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg"
-        >
-          Manage addresses
-        </Link>
+        <p className="font-semibold text-neutral-900">No saved addresses yet.</p>
+        <p className="mt-1 text-xs text-neutral-500">
+          Add an address from the button above so we can calculate shipping and keep your order ready.
+        </p>
       </div>
     );
   }

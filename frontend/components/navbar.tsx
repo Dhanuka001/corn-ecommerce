@@ -121,7 +121,7 @@ const baseNavLinks = [
   { label: "Popular", href: "/#best-selling" },
   { label: "Shop All", href: "/shop" },
   { label: "Contact", href: "/contact" },
-  { label: "Blogs", href: "/#blog" },
+  { label: "Blogs", href: "/blog" },
 ];
 
 export function Navbar() {

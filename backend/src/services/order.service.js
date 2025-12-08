@@ -1,5 +1,7 @@
 const prisma = require("../lib/prisma");
+const env = require("../config/env");
 const { createHttpError } = require("../lib/respond");
+const { queueTransactionalMail } = require("./mail.service");
 
 const VALID_PAYMENT_METHODS = ["COD", "PAYHERE"];
 const ORDER_INCLUDE = {
@@ -299,13 +301,15 @@ const placeOrder = async ({
     billingAddressId,
   });
 
-  return createOrderFromQuote({
+  const order = await createOrderFromQuote({
     quote,
     userId,
     paymentMethod,
     idempotencyKey,
     markPaid: false,
   });
+  void notifyOrderEmail({ orderId: order.id, userId });
+  return order;
 };
 
 const createOrderAfterPayherePayment = async ({
@@ -340,7 +344,7 @@ const createOrderAfterPayherePayment = async ({
     billingAddressId,
   });
 
-  return createOrderFromQuote({
+  const order = await createOrderFromQuote({
     quote,
     userId,
     paymentMethod: "PAYHERE",
@@ -350,6 +354,97 @@ const createOrderAfterPayherePayment = async ({
     payherePaymentId,
     rawPaymentPayload: rawPayload,
   });
+  void notifyOrderEmail({ orderId: order.id, userId });
+  return order;
+};
+
+async function gatherOrderEmailData({ orderId, userId }) {
+  if (!orderId || !userId) return;
+
+  const [order, user] = await Promise.all([
+    prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                images: {
+                  orderBy: { position: "asc" },
+                  take: 1,
+                },
+              },
+            },
+            variant: true,
+          },
+        },
+        shippingAddr: true,
+      },
+    }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true },
+    }),
+  ]);
+
+  if (!order || !user?.email) {
+    return null;
+  }
+
+  const items = order.items.map((item) => ({
+    name: item.name,
+    sku: item.sku,
+    qty: item.qty,
+    variantName: item.variant?.name,
+    unitPrice: item.unitLKR,
+    lineTotal: item.lineTotalLKR,
+    imageUrl:
+      item.product?.images?.[0]?.url || `${env.frontendBaseUrl}/pb.png`,
+  }));
+
+  const shippingAddress = order.shippingAddr || {};
+
+  return {
+    to: user.email,
+    data: {
+      orderNo: order.orderNo,
+      orderDate: order.createdAt,
+      paymentMethod: order.paymentMethod,
+      shippingAddress: {
+        fullName: shippingAddress.fullName,
+        phone: shippingAddress.phone,
+        addressLine1: shippingAddress.addressLine1,
+        addressLine2: shippingAddress.addressLine2,
+        city: shippingAddress.city,
+        district: shippingAddress.district,
+        postalCode: shippingAddress.postalCode,
+        country: shippingAddress.country,
+      },
+      items,
+      totals: {
+        subTotalLKR: order.subTotalLKR,
+        shippingLKR: order.shippingLKR,
+        discountLKR: order.discountLKR,
+        totalLKR: order.totalLKR,
+      },
+    },
+  };
+};
+
+async function notifyOrderEmail({ orderId, userId }) {
+  try {
+    const emailPayload = await gatherOrderEmailData({ orderId, userId });
+    if (!emailPayload) {
+      return;
+    }
+    await queueTransactionalMail({
+      to: emailPayload.to,
+      template: "orderConfirmation",
+      data: emailPayload.data,
+    });
+  } catch (error) {
+    console.error("Failed to send order confirmation email", error);
+  }
 };
 
 module.exports = {

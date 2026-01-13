@@ -1,4 +1,4 @@
-name: corn-ecommerce
+version: "3.8"
 
 services:
   frontend:
@@ -9,6 +9,7 @@ services:
       - ../frontend/.env.production
     restart: unless-stopped
     networks: [web]
+    container_name: corn-frontend
 
   backend:
     build:
@@ -21,6 +22,7 @@ services:
       db:
         condition: service_healthy
     networks: [web]
+    container_name: corn-backend
 
   db:
     image: postgres:16-alpine
@@ -37,9 +39,9 @@ services:
       interval: 5s
       timeout: 3s
       retries: 15
-    
     ports:
       - "127.0.0.1:5432:5432"
+    container_name: corn-db
 
   caddy:
     image: caddy:2-alpine
@@ -55,6 +57,7 @@ services:
       - frontend
       - backend
     networks: [web]
+    container_name: corn-caddy
 
 networks:
   web:

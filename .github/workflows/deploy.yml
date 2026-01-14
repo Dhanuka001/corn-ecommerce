@@ -51,7 +51,12 @@ jobs:
           fi
 
           echo "[2/7] Cleaning app directory"
-          rm -rf "$VPS_APP_DIR"
+          if command -v sudo >/dev/null 2>&1; then
+            sudo chown -R "$VPS_USER":"$VPS_USER" "$VPS_APP_DIR" || true
+            sudo rm -rf "$VPS_APP_DIR"
+          else
+            rm -rf "$VPS_APP_DIR"
+          fi
 
           echo "[3/7] Cloning fresh repository"
           git clone -b "$GIT_BRANCH" https://github.com/Dhanuka001/corn-ecommerce "$VPS_APP_DIR"

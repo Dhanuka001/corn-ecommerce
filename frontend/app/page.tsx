@@ -17,24 +17,15 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const handleLoad = () => setIsLoading(false);
-
-    if (document.readyState === "complete") {
-      const timeoutId = window.setTimeout(handleLoad, 150);
-      return () => window.clearTimeout(timeoutId);
-    }
-
-    window.addEventListener("load", handleLoad);
-    return () => {
-      window.removeEventListener("load", handleLoad);
-    };
+    const timeoutId = window.setTimeout(() => setIsLoading(false), 80);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   return (
     <>
       <LoadingOverlay visible={isLoading} />
       <div
-        className={`min-h-screen bg-zinc-50 transition-opacity duration-300 ${
+        className={`min-h-screen bg-zinc-50 transition-opacity duration-150 ${
           isLoading ? "opacity-0" : "opacity-100"
         }`}
       >

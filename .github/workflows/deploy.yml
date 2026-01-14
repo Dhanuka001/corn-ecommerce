@@ -52,7 +52,7 @@ jobs:
 
           echo "[2/7] Cleaning app directory"
           if command -v sudo >/dev/null 2>&1; then
-            sudo chown -R "$VPS_USER":"$VPS_USER" "$VPS_APP_DIR" || true
+            sudo chown -R "$(id -un)":"$(id -gn)" "$VPS_APP_DIR" || true
             sudo rm -rf "$VPS_APP_DIR"
           else
             rm -rf "$VPS_APP_DIR"

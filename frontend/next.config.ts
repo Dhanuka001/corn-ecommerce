@@ -3,8 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   images: {
-    // Avoid image optimization proxy failures in prod; serve remote images directly.
-    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",

@@ -1,13 +1,20 @@
 cornelectronics.com, www.cornelectronics.com {
     encode gzip
 
+    @static {
+        path /_next/static/* /_next/image*
+        path_regexp static_assets \.(?:png|jpg|jpeg|gif|webp|avif|svg|ico|css|js|woff2?)$
+    }
+
+    header @static Cache-Control "public, max-age=2592000, immutable"
+
     handle_path /api* {
-        reverse_proxy corn-ecommerce-backend-1:8080
+        reverse_proxy backend:8080
     }
 
     header /* Cache-Control "no-store"
 
     handle {
-        reverse_proxy corn-ecommerce-frontend-1:3000
+        reverse_proxy frontend:3000
     }
 }

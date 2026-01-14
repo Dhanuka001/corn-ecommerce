@@ -8,6 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-main
+      cancel-in-progress: true
 
     steps:
       - name: Checkout repo
@@ -22,7 +25,7 @@ jobs:
           [ -z "$PORT" ] && PORT=22
           ssh-keyscan -p "$PORT" -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Deploy over SSH (safe clone + build + restart)
+      - name: Deploy over SSH (clean rebuild + restart)
         env:
           VPS_HOST:     ${{ secrets.VPS_HOST }}
           VPS_USER:     ${{ secrets.VPS_USER }}
@@ -39,39 +42,32 @@ jobs:
 
           : "${VPS_APP_DIR:=/opt/app}"
           : "${GIT_BRANCH:=main}"
+          PROJECT_NAME="corn-ecommerce"
+          COMPOSE_FILE="$VPS_APP_DIR/infra/docker-compose.prod.yml"
 
-          echo "[1/6] Checking repo state"
-          if [ ! -d "$VPS_APP_DIR/.git" ]; then
-            echo "⚠️  No git repository found. Cloning fresh..."
-            rm -rf "$VPS_APP_DIR"
-            git clone -b "$GIT_BRANCH" https://github.com/Dhanuka001/corn-ecommerce "$VPS_APP_DIR"
-            cd "$VPS_APP_DIR"
-          else
-            echo "✔ Repo exists — pulling latest"
-            cd "$VPS_APP_DIR"
-            git fetch origin "$GIT_BRANCH"
-            git reset --hard "origin/$GIT_BRANCH"
+          echo "[1/7] Stopping existing stack (if any)"
+          if [ -f "$COMPOSE_FILE" ]; then
+            docker compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" down --remove-orphans || true
           fi
 
-          echo "[2/6] Going to infra folder"
-          cd "$VPS_APP_DIR/infra"
+          echo "[2/7] Cleaning app directory"
+          rm -rf "$VPS_APP_DIR"
 
-          echo "[3/6] Stopping old containers"
-          docker compose -f docker-compose.prod.yml down --remove-orphans || true
-          docker network rm corn-ecommerce_web || true
+          echo "[3/7] Cloning fresh repository"
+          git clone -b "$GIT_BRANCH" https://github.com/Dhanuka001/corn-ecommerce "$VPS_APP_DIR"
 
-          echo "[4/6] Building new containers"
-          docker compose -f docker-compose.prod.yml build
+          echo "[4/7] Building new containers (no cache)"
+          docker compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" build --no-cache
 
-          echo "[5/6] Starting stack"
-          docker compose -f docker-compose.prod.yml up -d --force-recreate --remove-orphans
+          echo "[5/7] Starting stack"
+          docker compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" up -d --force-recreate --remove-orphans
 
-          echo "[6/6] Running Prisma migrations"
-          if docker compose -f docker-compose.prod.yml ps backend >/dev/null 2>&1; then
-            docker compose -f docker-compose.prod.yml exec -T backend sh -lc \
+          echo "[6/7] Running Prisma migrations"
+          if docker compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" ps backend >/dev/null 2>&1; then
+            docker compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" exec -T backend sh -lc \
               'npx prisma generate && npx prisma migrate deploy || true'
           fi
 
-          echo "Deployment completed successfully!"
-          docker compose -f docker-compose.prod.yml ps
+          echo "[7/7] Deployment completed successfully!"
+          docker compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" ps
           EOF

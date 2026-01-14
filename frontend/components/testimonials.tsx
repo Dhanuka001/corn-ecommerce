@@ -1,33 +1,12 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
 import { fetchLatestReviews } from "@/lib/api/reviews";
 import { ReviewCard } from "@/components/review-card";
 import type { Review } from "@/types/review";
 
-export function Testimonials() {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let active = true;
-    void (async () => {
-      try {
-        const latest = await fetchLatestReviews(4);
-        if (active) {
-          setReviews(latest);
-        }
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
+export async function Testimonials() {
+  const reviews: Review[] = await fetchLatestReviews(4, {
+    cache: "force-cache",
+    revalidate: 300,
+  });
 
   return (
     <section className="px-4 py-14 sm:py-16" aria-label="Customer testimonials">
@@ -44,14 +23,7 @@ export function Testimonials() {
         </div>
 
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {loading ? (
-            Array.from({ length: 4 }).map((_, idx) => (
-              <div
-                key={`loading-${idx}`}
-                className="h-48 rounded-[28px] border border-slate-200 bg-white/60 p-6 shadow-sm animate-pulse"
-              />
-            ))
-          ) : reviews.length ? (
+          {reviews.length ? (
             reviews.map((review) => (
               <ReviewCard key={review.id} review={review} showProduct />
             ))

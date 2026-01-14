@@ -40,7 +40,7 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://phonebazzar.lk";
 
 async function loadProduct(slug: string): Promise<ProductDetail | null> {
-  return fetchProductBySlug(slug);
+  return fetchProductBySlug(slug, { revalidate: 60 });
 }
 
 export async function generateMetadata({

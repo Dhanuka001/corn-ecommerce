@@ -1,22 +1,15 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { CatalogProductCard } from "./catalog-product-card";
 import { fetchProducts } from "@/lib/catalog-api";
 import type { ProductSummary } from "@/types/catalog";
 
-export function BestSellingCarousel() {
-  const [items, setItems] = useState<ProductSummary[]>([]);
-
-  useEffect(() => {
-    const load = async () => {
-      const { data } = await fetchProducts({ sort: "newest", limit: 12 });
-      setItems(data.slice(0, 4));
-    };
-    void load();
-  }, []);
+export async function BestSellingCarousel() {
+  const { data } = await fetchProducts(
+    { sort: "newest", limit: 12 },
+    { revalidate: 120 },
+  );
+  const items: ProductSummary[] = data.slice(0, 4);
 
   return (
     <section

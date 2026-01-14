@@ -47,6 +47,7 @@ export function ProductGallery({ name, images }: ProductGalleryProps) {
           width={1100}
           height={1100}
           className="h-[460px] w-full object-contain lg:h-[560px]"
+          sizes="(min-width: 1024px) 50vw, 100vw"
           priority
         />
       </div>

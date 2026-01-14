@@ -18,6 +18,24 @@ type FetchProductsParams = {
   maxPrice?: number;
 };
 
+type FetchOptions = {
+  cache?: RequestCache;
+  revalidate?: number;
+};
+
+const buildFetchOptions = (options?: FetchOptions): RequestInit & { next?: { revalidate: number } } => {
+  const fetchOptions: RequestInit & { next?: { revalidate: number } } = {
+    method: "GET",
+    cache: options?.cache ?? "force-cache",
+  };
+
+  if (typeof options?.revalidate === "number") {
+    fetchOptions.next = { revalidate: options.revalidate };
+  }
+
+  return fetchOptions;
+};
+
 const buildQuery = (params: Record<string, string | number | boolean | string[] | undefined>) => {
   const search = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
@@ -43,12 +61,12 @@ const emptyListResponse = (limit = 12): ProductListResponse => ({
 
 export async function fetchProductBySlug(
   slug: string,
+  options?: FetchOptions,
 ): Promise<ProductDetail | null> {
-  const response = await fetch(`${API_BASE_URL}/products/${slug}`, {
-    method: "GET",
-    // Products are public, no credentials needed.
-    cache: "no-store",
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/products/${slug}`,
+    buildFetchOptions({ ...options }),
+  );
 
   if (!response.ok) {
     return null;
@@ -60,6 +78,7 @@ export async function fetchProductBySlug(
 
 export async function fetchProducts(
   params: FetchProductsParams = {},
+  options?: FetchOptions,
 ): Promise<ProductListResponse> {
   const defaultLimit = params.limit ?? 24;
   const response = await fetch(`${API_BASE_URL}/products${buildQuery({
@@ -72,10 +91,7 @@ export async function fetchProducts(
     inStock: params.inStock,
     minPrice: params.minPrice,
     maxPrice: params.maxPrice,
-  })}`, {
-    method: "GET",
-    cache: "no-store",
-  });
+  })}`, buildFetchOptions(options));
 
   if (!response.ok) {
     return emptyListResponse(defaultLimit);
@@ -98,11 +114,13 @@ export async function fetchProducts(
   };
 }
 
-export async function fetchCatalogCategories(): Promise<CatalogCategory[]> {
-  const response = await fetch(`${API_BASE_URL}/categories`, {
-    method: "GET",
-    cache: "no-store",
-  });
+export async function fetchCatalogCategories(
+  options?: FetchOptions,
+): Promise<CatalogCategory[]> {
+  const response = await fetch(
+    `${API_BASE_URL}/categories`,
+    buildFetchOptions(options),
+  );
 
   if (!response.ok) {
     return [];

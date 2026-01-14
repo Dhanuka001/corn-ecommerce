@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 import { CatalogProductCard } from "@/components/catalog-product-card";
 import { Footer } from "@/components/footer";
@@ -67,8 +67,8 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   };
 
   const [{ data: products, meta }, categories] = await Promise.all([
-    fetchProducts(filters),
-    fetchCatalogCategories(),
+    fetchProducts(filters, { revalidate: 60 }),
+    fetchCatalogCategories({ revalidate: 300 }),
   ]);
 
   const priceRange: NonNullable<ProductListMeta["priceRange"]> = {

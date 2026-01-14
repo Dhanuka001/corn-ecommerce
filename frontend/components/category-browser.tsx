@@ -125,7 +125,7 @@ export function CategoryBrowser() {
                     width={112}
                     height={112}
                     className="h-24 w-24 object-contain"
-                    priority
+                    sizes="112px"
                   />
                 </div>
                 <p className="text-sm font-semibold text-slate-700">

@@ -9,6 +9,23 @@ export type ProductReviewListResponse = {
   averageRating: number;
 };
 
+type FetchOptions = {
+  cache?: RequestCache;
+  revalidate?: number;
+};
+
+const buildFetchOptions = (options?: FetchOptions): RequestInit & { next?: { revalidate: number } } => {
+  const fetchOptions: RequestInit & { next?: { revalidate: number } } = {
+    cache: options?.cache ?? "no-store",
+  };
+
+  if (typeof options?.revalidate === "number") {
+    fetchOptions.next = { revalidate: options.revalidate };
+  }
+
+  return fetchOptions;
+};
+
 export async function fetchProductReviews(
   slug: string,
   options: { page?: number; limit?: number } = {},
@@ -23,7 +40,7 @@ export async function fetchProductReviews(
 
   const response = await fetch(
     `${API_BASE_URL}/products/${slug}/reviews${params.toString() ? `?${params}` : ""}`,
-    { cache: "no-store" },
+    buildFetchOptions({ cache: "no-store" }),
   );
 
   if (!response.ok) {
@@ -49,10 +66,14 @@ export async function submitProductReview(
   });
 }
 
-export async function fetchLatestReviews(limit = 4): Promise<Review[]> {
-  const response = await fetch(`${API_BASE_URL}/reviews/latest?limit=${limit}`, {
-    cache: "no-store",
-  });
+export async function fetchLatestReviews(
+  limit = 4,
+  options?: FetchOptions,
+): Promise<Review[]> {
+  const response = await fetch(
+    `${API_BASE_URL}/reviews/latest?limit=${limit}`,
+    buildFetchOptions(options),
+  );
   if (!response.ok) {
     return [];
   }

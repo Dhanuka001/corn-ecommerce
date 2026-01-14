@@ -51,7 +51,7 @@ jobs:
           fi
 
           echo "[2/7] Cleaning app directory"
-          if command -v sudo >/dev/null 2>&1; then
+          if command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
             sudo chown -R "$(id -un)":"$(id -gn)" "$VPS_APP_DIR" || true
             sudo rm -rf "$VPS_APP_DIR"
           else

@@ -5,7 +5,7 @@ export function Hero() {
     title: "Power your day with PhoneBazzar gadgets",
     subtitle: "Built for everyday life",
     features: ["Phones & tablets", "Speakers & wearables", "Chargers & accessories"],
-    backgroundImage: "/corn-hero-image.png",
+    backgroundImage: "/corn-hero-image.webp",
   };
 
   return (

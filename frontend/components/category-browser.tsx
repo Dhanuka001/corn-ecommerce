@@ -5,14 +5,14 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 const categories = [
-  { label: "Chargers", image: "/categories/charger.png" },
-  { label: "Cables", image: "/categories/cable.png" },
-  { label: "Bluetooth Speakers", image: "/categories/bluetooth-speaker.png" },
-  { label: "Karaoke Speakers", image: "/categories/karoke-speaker.png" },
-  { label: "Smart Watches", image: "/categories/smart%20watch.png" },
-  { label: "Mobile & Tablets", image: "/categories/mobile-tablet.png" },
-  { label: "Powerbanks", image: "/categories/powerbank.png" },
-  { label: "Home Appliances", image: "/categories/home-appliences.png" },
+  { label: "Chargers", image: "/categories/charger.webp" },
+  { label: "Cables", image: "/categories/cable.webp" },
+  { label: "Bluetooth Speakers", image: "/categories/bluetooth-speaker.webp" },
+  { label: "Karaoke Speakers", image: "/categories/karoke-speaker.webp" },
+  { label: "Smart Watches", image: "/categories/smart-watch.webp" },
+  { label: "Mobile & Tablets", image: "/categories/mobile-tablet.webp" },
+  { label: "Powerbanks", image: "/categories/powerbank.webp" },
+  { label: "Home Appliances", image: "/categories/home-appliences.webp" },
 ];
 
 const slugify = (value: string) =>
